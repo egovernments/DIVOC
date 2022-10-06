@@ -33,7 +33,7 @@
   "verifyEmail": false,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
-  "resetPasswordAllowed": false,
+  "resetPasswordAllowed": true,
   "editUsernameAllowed": true,
   "bruteForceProtected": false,
   "permanentLockout": false,
@@ -2910,19 +2910,19 @@
         },
         {
           "authenticator": "reset-credential-email",
-          "authenticatorFlow": false,
+          "authenticatorFlow": true,
           "requirement": "REQUIRED",
           "priority": 20,
-          "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "userSetupAllowed": true,
+          "autheticatorFlow": true
         },
         {
           "authenticator": "reset-password",
-          "authenticatorFlow": false,
+          "authenticatorFlow": true,
           "requirement": "REQUIRED",
           "priority": 30,
-          "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "userSetupAllowed": true,
+          "autheticatorFlow": true
         },
         {
           "authenticatorFlow": true,
