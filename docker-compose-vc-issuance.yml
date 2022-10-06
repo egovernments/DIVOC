@@ -15,7 +15,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   vc-registry:
-    image: dockerhub/sunbird-rc-core:v0.0.8
+    image: dockerhub/sunbird-rc-core:v0.0.9-3
     volumes:
       - ./vc-registry:/home/sunbirdrc/config/public/_schemas
     environment:
@@ -56,7 +56,7 @@ services:
       keycloak:
         condition: service_started
   sunbird-certificate-signer:
-    image: dockerhub/sunbird-rc-certificate-signer:v0.0.8
+    image: dockerhub/sunbird-rc-certificate-signer:v0.0.9-3
     environment:
       PORT: 8079
       CERTIFICATE_NAMESPACE: "https://sunbird.org/credentials/vaccination/v1"
@@ -75,8 +75,10 @@ services:
         -----END RSA PRIVATE KEY-----
     ports:
       - "6079:8079"
+    volumes:
+      - ./imports:/etc/signer  
   sunbird-certificate-api:
-    image: dockerhub/sunbird-rc-certificate-api:v0.0.8
+    image: dockerhub/sunbird-rc-certificate-api:v0.0.9-3
     volumes:
       - ./scripts:/scripts
     entrypoint: ["sh", "/scripts/docker-entrypoint.sh"]
