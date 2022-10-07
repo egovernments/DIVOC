@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Redirect, Route} from 'react-router-dom'
+import {Navigate, Route} from 'react-router-dom'
 
 import {useKeycloak} from '@react-keycloak/web'
 
@@ -12,13 +12,10 @@ export function PrivateRoute({component: Component, role, clientId, ...rest}) {
             render={(props) =>
                 keycloak.authenticated ? (
                     role === undefined || keycloak.hasResourceRole(role, clientId) ?
-                        <Component {...props} /> : <Redirect to="/"/>
+                        <Component {...props} /> : <Navigate to="/" replace />
                 ) : (
-                    <Redirect
-                        to={{
-                            pathname: '/login',
-                            state: {from: props.location},
-                        }}
+                    <Navigate
+                        to="/login" state={{from: props.location}} replace
                     />
                 )
             }

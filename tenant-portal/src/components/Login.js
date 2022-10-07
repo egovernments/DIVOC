@@ -1,12 +1,12 @@
 import * as React from 'react'
 import {useEffect} from 'react'
-import {useHistory} from 'react-router-dom'
+import {useNavigate} from 'react-router-dom'
 
 import {useKeycloak} from '@react-keycloak/web'
 
 const Login = () => {
     const {keycloak} = useKeycloak();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!keycloak.authenticated) {
@@ -18,9 +18,9 @@ const Login = () => {
     useEffect(() => {
         if (keycloak.authenticated) {
             let redirectUrl = "/";
-            history.push(redirectUrl)
+            navigate(redirectUrl)
         }
-    }, [keycloak, history]);
+    }, [keycloak, navigate]);
 
     return (
         <div>
