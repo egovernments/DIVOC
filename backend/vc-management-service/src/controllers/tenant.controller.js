@@ -56,6 +56,36 @@ async function createAndAssignNewRole(userName, token) {
     }
 }
 
+async function generateToken(req, res) {
+    const userId = req.params.userId.toLowerCase();
+    try {
+        const isValidUserId = utils.isValidUserId(userId);
+        if (isValidUserId) {
+            let token;
+            await keycloakService.getAdminToken().then(async (res) => {
+                targetAdminToken = res;
+                await keycloakService.generateUserToken(targetAdminToken, userId).then(async (res) => {
+                    token = res;
+                }).catch(err => {
+                    throw err
+                });
+            }).catch(err => {
+                throw err
+            });
+            res.status(200).json({
+                token
+            });
+            return;
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(err?.response?.status || 500).json({
+            message: err?.response?.data
+        });
+    }
+}
+
 module.exports = {
-    createTenant
+    createTenant,
+    generateToken
 }

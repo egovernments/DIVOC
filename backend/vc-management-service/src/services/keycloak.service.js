@@ -91,18 +91,36 @@ const getRoleInfo = async (roleName, token) => {
     });
 }
 
-const getAdminToken = () => {
+const getAdminToken = async () => {
     const params = new URLSearchParams();
     params.append('grant_type', 'client_credentials');
     params.append('client_id', constants.SUNBIRD_SSO_CLIENT);
     params.append('client_secret', constants.SUNBIRD_SSO_ADMIN_CLIENT_SECRET);
 
+    const newtoken = await getToken(params);
+    return newtoken.access_token;
+}
+
+const generateUserToken = async (token, userId) => {
+    const params = new URLSearchParams();
+    params.append('grant_type', 'urn:ietf:params:oauth:grant-type:token-exchange');
+    params.append('client_id', 'registry-frontend');
+    params.append('subject_token', token);
+    params.append('requested_token_type', 'urn:ietf:params:oauth:token-type:refresh_token');
+    params.append('audience', constants.SUNBIRD_REGISTRY_FRONTEND_CLIENT);
+    params.append('requested_subject', userId);
+
+    const newtoken = await getToken(params);
+    return newtoken;
+}
+
+const getToken = (params) => {
     return axios.post(`${config.KEYCLOAK_URL}/auth/realms/${config.KEYCLOAK_REALM}/protocol/openid-connect/token`, params, {headers: { 'Content-Type': 'application/x-www-form-urlencoded' }})
-        .then(async res => res.data.access_token)
-        .catch(err => {
-            console.error("Error : ", err);
-            throw err;
-        })
+    .then(async res => res.data)
+    .catch(err => {
+        console.error("Error : ", err);
+        throw err;
+    })
 }
 
 module.exports = {
@@ -111,5 +129,6 @@ module.exports = {
     assignNewRole,
     getUserInfo,
     getRoleInfo,
-    getAdminToken
+    getAdminToken,
+    generateUserToken
 };

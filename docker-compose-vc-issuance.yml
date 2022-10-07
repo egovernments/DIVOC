@@ -205,6 +205,7 @@ services:
       SUNBIRD_SSO_ADMIN_CLIENT_SECRET: '0358fa30-6014-4192-9551-7c61b15b774c'
       IS_CLOUD_STORAGE: 'false'
       STORAGE_REGION: 'us-east-1'
+      SUNBIRD_REGISTRY_FRONTEND_CLIENT: 'registry-frontend'
     depends_on:
       vc-registry:
         condition: service_started
