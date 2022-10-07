@@ -56,7 +56,7 @@ services:
       keycloak:
         condition: service_started
   sunbird-certificate-signer:
-    image: dockerhub/sunbird-rc-certificate-signer:v0.0.9-3
+    image: dockerhub/sunbird-rc-certificate-signer:v0.0.9
     environment:
       PORT: 8079
       CERTIFICATE_NAMESPACE: "https://sunbird.org/credentials/vaccination/v1"
@@ -78,7 +78,7 @@ services:
     volumes:
       - ./imports:/etc/signer  
   sunbird-certificate-api:
-    image: dockerhub/sunbird-rc-certificate-api:v0.0.9-3
+    image: dockerhub/sunbird-rc-certificate-api:v0.0.9
     volumes:
       - ./scripts:/scripts
     entrypoint: ["sh", "/scripts/docker-entrypoint.sh"]
