@@ -61,22 +61,18 @@ async function generateToken(req, res) {
     try {
         const isValidUserId = utils.isValidUserId(userId);
         if (isValidUserId) {
-            let token;
-            await keycloakService.getAdminToken().then(async (res) => {
-                targetAdminToken = res;
-                await keycloakService.generateUserToken(targetAdminToken, userId).then(async (res) => {
-                    token = res;
-                }).catch(err => {
-                    throw err
+            await keycloakService.generateUserToken(userId).then(async (result) => {
+                res.status(200).json({
+                    access_token: result
                 });
             }).catch(err => {
                 throw err
             });
-            res.status(200).json({
-                token
-            });
             return;
         }
+        res.status(400).json({
+            message: "Invalid userId. It must start with an alphabet or a number and can only contain .-_@"
+        })
     } catch (err) {
         console.error(err);
         res.status(err?.response?.status || 500).json({

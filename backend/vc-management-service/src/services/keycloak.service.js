@@ -101,17 +101,22 @@ const getAdminToken = async () => {
     return newtoken.access_token;
 }
 
-const generateUserToken = async (token, userId) => {
-    const params = new URLSearchParams();
-    params.append('grant_type', 'urn:ietf:params:oauth:grant-type:token-exchange');
-    params.append('client_id', 'registry-frontend');
-    params.append('subject_token', token);
-    params.append('requested_token_type', 'urn:ietf:params:oauth:token-type:refresh_token');
-    params.append('audience', constants.SUNBIRD_REGISTRY_FRONTEND_CLIENT);
-    params.append('requested_subject', userId);
+const generateUserToken = async (userId) => {
 
-    const newtoken = await getToken(params);
-    return newtoken;
+    const adminToken = await getAdminToken();
+
+    if (adminToken) {
+        const params = new URLSearchParams();
+        params.append('grant_type', constants.KEYCLOCK_GRANT_TYPE_TOKEN_EXCHANGE);
+        params.append('client_id', constants.SUNBIRD_REGISTRY_FRONTEND_CLIENT);
+        params.append('subject_token', adminToken);
+        params.append('requested_token_type', constants.KEYCLOCK_TOKEN_TYPE_REFRESH_TOKEN);
+        params.append('audience', constants.SUNBIRD_REGISTRY_FRONTEND_CLIENT);
+        params.append('requested_subject', userId);
+
+        const newtoken = await getToken(params);
+        return newtoken;
+    }
 }
 
 const getToken = (params) => {
