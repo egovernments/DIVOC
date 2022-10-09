@@ -2910,19 +2910,19 @@
         },
         {
           "authenticator": "reset-credential-email",
-          "authenticatorFlow": true,
+          "authenticatorFlow": false,
           "requirement": "REQUIRED",
           "priority": 20,
-          "userSetupAllowed": true,
-          "autheticatorFlow": true
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
         },
         {
           "authenticator": "reset-password",
-          "authenticatorFlow": true,
+          "authenticatorFlow": false,
           "requirement": "REQUIRED",
           "priority": 30,
-          "userSetupAllowed": true,
-          "autheticatorFlow": true
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
         },
         {
           "authenticatorFlow": true,

@@ -1,53 +1,48 @@
+
 <#import "template.ftl" as layout>
-<@layout.registrationLayout displayInfo=true; section>
-    <#if section = "title">
-        ${msg("doForgotPassword")}
-    <#elseif section = "header">
-        ${msg("doForgotPassword")}
+<@layout.registrationLayout displayMessage=!messagesPerField.existsError('email') displayInfo=realm.resetPasswordAllowed; section>
+    <#if section = "header">
+        ${msg("loginAccountTitle")}
     <#elseif section = "form">
-        <form id="kc-reset-password-form" class="form reset-password ${properties.kcFormClass!}" action="${url.loginAction}" method="post">
-            <div class="reset-password-field ${properties.kcFormGroupClass!}">
+        <h3>Forgot Password?</h3>
+        <div id="kc-form" class="ndear-login-card-wrapper w-100">
+            <div id="kc-form-wrapper">
+                    <form id="kc-form-login" onsubmit="login.disabled = true; return true;" action="${url.loginAction}"  onclick="window.location.reload()" method="post">
+                        <div class="${properties.kcFormGroupClass!}">
+                            <label for="email"
+                                   class="${properties.kcLabelClass!}">${msg("registeredEmail")}</label>
 
-                <div class="${properties.kcLabelClass!}">
-                    <i tabindex="-1" role="button">person</i>
-                    <input required id="username" class="mdc-text-field__input ${properties.kcInputClass!}" name="username" type="text" autofocus>
-                    <div class="${properties.kcLabelWrapperClass!}">
-                        <label for="username" class="mdc-floating-label ${properties.kcLabelClass!}">${msg("username")?no_esc}</label>
-                    </div>
-                    <div class="mdc-notched-outline">
-                        <svg>
-                            <path class="mdc-notched-outline__path"/>
-                        </svg>
-                    </div>
-                    <div class="mdc-notched-outline__idle"></div>
-                </div>
+                                <div class="input-wrapper">
+                                    <div class="input-field mobile">
+                                        <input tabindex="1" id="email" class="${properties.kcInputClass!}"
+                                               name="email" value="${(login.email!'')}" type="text" autofocus
+                                               autocomplete="off"
+                                               aria-invalid="<#if messagesPerField.existsError('email')>true</#if>"
+                                        />
+                                    </div>
 
+                                </div>
+
+                                <#if messagesPerField.existsError('email')>
+                                    <span id="input-error" class="${properties.kcInputErrorMessageClass!}"
+                                          aria-live="polite">
+                                          ${kcSanitize(messagesPerField.getFirstError('email'))?no_esc}
+                                    </span>
+                                </#if>
+                        </div>
+
+                        <div id="kc-form-buttons" class="${properties.kcFormGroupClass!}">
+                            <input type="hidden" id="id-hidden-input" name="credentialId"
+                                   <#if auth.selectedCredential?has_content>value="${auth.selectedCredential}"</#if>/>
+                            <input tabindex="2"
+                                   class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
+                                   name="submit" id="kc-submit" type="submit" value="${msg("doSubmit")}"/>
+                        </div>
+                    </form>
             </div>
 
-            <div class="${properties.kcFormGroupClass!}">
-                <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
-                    <div class="${properties.kcFormOptionsWrapperClass!}">
-                        <span>
-                            <#--  <a class="btn btn-default btn-flat btn-block" href="${url.loginUrl}"><i class="fa fa-caret-left"></i>&nbsp;&nbsp;${msg("backToLogin")}</a>  -->
-                            <button class="mdc-button" onclick="window.location.href = ${url.loginUrl}" formnovalidate>
-                                <i class="material-icons mdc-button__icon" aria-hidden="true">arrow_back</i>
-                                ${msg("backToLogin")?no_esc}
-                            </button>
-                        </span>
-                    </div>
-                </div>
+        </div>
 
-                <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
-                    <#--  <input class="btn btn-primary btn-flat btn-block ${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}" type="submit" value="${msg("doSubmit")}"/>  -->
-                    <button class="mdc-button mdc-button--raised ${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}" type="submit">
-                        ${msg("doSubmit")?no_esc}
-                    </button>
-                </div>
-            </div>
-            <div class="clearfix"></div>
-        </form>
-    <#elseif section = "info" >
-        <hr />
-        ${msg("emailInstruction")?no_esc}
     </#if>
+
 </@layout.registrationLayout>
