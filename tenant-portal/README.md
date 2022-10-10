@@ -1,0 +1,1 @@
+This project was created for tenants to create and publish schemas
