@@ -105,11 +105,44 @@ const getAdminToken = () => {
         })
 }
 
+const sendTenantInvite = async (userId,token) => {
+    const req = ["UPDATE_PROFILE"];
+    const reqConfig = {
+        headers: {
+            Authorization: token
+        }
+    }
+    console.log("sendTenantInvite");
+    return axios.put(`${config.KEYCLOAK_URL}/auth/admin/realms/${config.KEYCLOAK_REALM}/users/${userId}/execute-actions-email`,req,reqConfig)
+        .then(res => res.data)
+        .catch(err => {
+            console.error("Error : ", err);
+            throw err;
+        })
+}
+
+const sendVerifyEmail = async (userId,token) => {
+    const reqConfig = {
+        headers: {
+            Authorization: token
+        }
+    }
+    console.log("sendVerifyEmail");
+    return axios.put(`${config.KEYCLOAK_URL}/auth/admin/realms/${config.KEYCLOAK_REALM}/users/${userId}/send-verify-email`,reqConfig)
+        .then(res => res.data)
+        .catch(err => {
+            console.error("Error : ", err);
+            throw err;
+        })
+}
+
 module.exports = {
     KeycloakFactory,
     createNewRole,
     assignNewRole,
     getUserInfo,
     getRoleInfo,
-    getAdminToken
+    getAdminToken,
+    sendTenantInvite,
+    sendVerifyEmail
 };
