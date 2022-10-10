@@ -1,6 +1,5 @@
 import React from "react";
 import axios from 'axios';
-import { useEffect } from "react";
 import { useKeycloak } from "@react-keycloak/web";
 
 function CreateSchema() {
@@ -12,10 +11,6 @@ function CreateSchema() {
             "Content-Type": "application/json",
         },
     };
-
-    useEffect(() => {
-        createSchema();
-    },[])
 
     const createSchema = async () => {
         axios

@@ -1,9 +1,11 @@
 import './App.css';
-import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import {PrivateRoute} from "./utils/PrivateRoute";
+import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import {useKeycloak} from "@react-keycloak/web";
 import Login from './components/Login';
+import Home from "./components/Home/Home";
+import {PrivateRoute} from "./utils/PrivateRoute";
 import CreateSchema from "./components/CreateSchema/CreateSchema";
+import config from "./config.json"
 
 function App() {
   const {initialized, keycloak} = useKeycloak();
@@ -13,12 +15,13 @@ function App() {
 
   return (
       <div>
-        <Router>
-          <Routes>
-            <Route path="/login" element={<Login />}/>
-            <PrivateRoute path="/" element={<CreateSchema />} role={"tenant"} clientId={"certificate-login"}/>
-          </Routes>
-        </Router>
+          <Router>
+              <Switch>
+                  <Route exact path={config.urlPath + "/"} component={Home}/>
+                  <Route exact path={config.urlPath + "/login"} component={Login}/>
+                  <PrivateRoute path={config.urlPath + "/create-schema"} element={<CreateSchema />} role={"tenant"} clientId={"certificate-login"}/>
+              </Switch>
+          </Router>
       </div>
   );
 }
