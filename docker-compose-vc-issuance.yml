@@ -121,6 +121,7 @@ services:
       IS_COUNTRY_CODE_PREFIXED: $IS_COUNTRY_CODE_PREFIXED
       KEYCLOAK_IMPORT: /opt/jboss/keycloak/imports/src-realm-export.json
       PROXY_ADDRESS_FORWARDING: "true"
+      JAVA_OPTS: -Dkeycloak.profile.feature.token_exchange=enabled
     #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
     healthcheck:
       test:
@@ -207,6 +208,9 @@ services:
       SUNBIRD_SSO_ADMIN_CLIENT_SECRET: '0358fa30-6014-4192-9551-7c61b15b774c'
       IS_CLOUD_STORAGE: 'false'
       STORAGE_REGION: 'us-east-1'
+      SUNBIRD_REGISTRY_FRONTEND_CLIENT: 'registry-frontend'
+      KEYCLOCK_TOKEN_TYPE_REFRESH_TOKEN: 'urn:ietf:params:oauth:token-type:refresh_token'
+      KEYCLOCK_GRANT_TYPE_TOKEN_EXCHANGE: 'urn:ietf:params:oauth:grant-type:token-exchange'
     depends_on:
       vc-registry:
         condition: service_started

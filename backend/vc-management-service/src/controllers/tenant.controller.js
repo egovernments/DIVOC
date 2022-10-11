@@ -56,6 +56,32 @@ async function createAndAssignNewRole(userName, token) {
     }
 }
 
+async function generateToken(req, res) {
+    const userId = req.params.userId.toLowerCase();
+    try {
+        const isValidUserId = utils.isValidUserId(userId);
+        if (isValidUserId) {
+            await keycloakService.generateUserToken(userId).then(async (result) => {
+                res.status(200).json({
+                    access_token: result
+                });
+            }).catch(err => {
+                throw err
+            });
+            return;
+        }
+        res.status(400).json({
+            message: "Invalid userId. It must start with an alphabet or a number and can only contain .-_@"
+        })
+    } catch (err) {
+        console.error(err);
+        res.status(err?.response?.status || 500).json({
+            message: err?.response?.data
+        });
+    }
+}
+
 module.exports = {
-    createTenant
+    createTenant,
+    generateToken
 }
