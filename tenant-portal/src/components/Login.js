@@ -1,13 +1,13 @@
 import * as React from 'react'
 import {useEffect} from 'react'
-import {useHistory} from 'react-router-dom'
+import {useNavigate} from 'react-router-dom'
 
 import {useKeycloak} from '@react-keycloak/web'
 import config from "../config.json"
 
 const Login = () => {
     const {keycloak} = useKeycloak();
-    const navigate = useHistory();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!keycloak.authenticated) {

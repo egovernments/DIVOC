@@ -1,6 +1,6 @@
 {
   "realm": "sunbird-rc",
-  "auth-server-url": "/auth/",
+  "auth-server-url": "http://3.7.57.244/auth/",
   "ssl-required": "external",
   "resource": "certificate-login",
   "public-client": true,
