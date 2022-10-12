@@ -91,49 +91,41 @@ const getRoleInfo = async (roleName, token) => {
     });
 }
 
-const getAdminToken = () => {
+const getAdminToken = async () => {
     const params = new URLSearchParams();
     params.append('grant_type', 'client_credentials');
     params.append('client_id', constants.SUNBIRD_SSO_CLIENT);
     params.append('client_secret', constants.SUNBIRD_SSO_ADMIN_CLIENT_SECRET);
 
+    const newtoken = await getToken(params);
+    return newtoken.access_token;
+}
+
+const generateUserToken = async (userId) => {
+
+    const adminToken = await getAdminToken();
+
+    if (adminToken) {
+        const params = new URLSearchParams();
+        params.append('grant_type', constants.KEYCLOCK_GRANT_TYPE_TOKEN_EXCHANGE);
+        params.append('client_id', constants.SUNBIRD_REGISTRY_FRONTEND_CLIENT);
+        params.append('subject_token', adminToken);
+        params.append('requested_token_type', constants.KEYCLOCK_TOKEN_TYPE_REFRESH_TOKEN);
+        params.append('audience', constants.SUNBIRD_REGISTRY_FRONTEND_CLIENT);
+        params.append('requested_subject', userId);
+
+        const newtoken = await getToken(params);
+        return newtoken;
+    }
+}
+
+const getToken = (params) => {
     return axios.post(`${config.KEYCLOAK_URL}/auth/realms/${config.KEYCLOAK_REALM}/protocol/openid-connect/token`, params, {headers: { 'Content-Type': 'application/x-www-form-urlencoded' }})
-        .then(async res => res.data.access_token)
-        .catch(err => {
-            console.error("Error : ", err);
-            throw err;
-        })
-}
-
-const sendTenantInvite = async (userId,token) => {
-    const req = ["UPDATE_PROFILE"];
-    const reqConfig = {
-        headers: {
-            Authorization: token
-        }
-    }
-    console.log("sendTenantInvite");
-    return axios.put(`${config.KEYCLOAK_URL}/auth/admin/realms/${config.KEYCLOAK_REALM}/users/${userId}/execute-actions-email`,req,reqConfig)
-        .then(res => res.data)
-        .catch(err => {
-            console.error("Error : ", err);
-            throw err;
-        })
-}
-
-const sendVerifyEmail = async (userId,token) => {
-    const reqConfig = {
-        headers: {
-            Authorization: token
-        }
-    }
-    console.log("sendVerifyEmail");
-    return axios.put(`${config.KEYCLOAK_URL}/auth/admin/realms/${config.KEYCLOAK_REALM}/users/${userId}/send-verify-email`,reqConfig)
-        .then(res => res.data)
-        .catch(err => {
-            console.error("Error : ", err);
-            throw err;
-        })
+    .then(async res => res.data)
+    .catch(err => {
+        console.error("Error : ", err);
+        throw err;
+    })
 }
 
 module.exports = {
@@ -143,6 +135,5 @@ module.exports = {
     getUserInfo,
     getRoleInfo,
     getAdminToken,
-    sendTenantInvite,
-    sendVerifyEmail
+    generateUserToken
 };

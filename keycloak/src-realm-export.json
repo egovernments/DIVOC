@@ -30,7 +30,7 @@
   "registrationAllowed": false,
   "registrationEmailAsUsername": false,
   "rememberMe": false,
-  "verifyEmail": false,
+  "verifyEmail": true,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
   "resetPasswordAllowed": true,
@@ -706,14 +706,14 @@
       "clientId": "account",
       "name": "${client_account}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/divoc/account/",
+      "baseUrl": "/realms/sunbird-rc/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
-        "/realms/divoc/account/*"
+        "/realms/sunbird-rc/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -771,14 +771,14 @@
       "clientId": "account-console",
       "name": "${client_account-console}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/divoc/account/",
+      "baseUrl": "/realms/sunbird-rc/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
-        "/realms/divoc/account/*"
+        "/realms/sunbird-rc/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -823,8 +823,8 @@
     {
       "id": "cd59dfa9-6289-40f9-b5c1-d76b1565501e",
       "clientId": "admin-api",
-      "rootUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/account/",
-      "adminUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/account/",
+      "rootUrl": "https://divoc.xiv.in/keycloak/auth/realms/sunbird-rc/account/",
+      "adminUrl": "https://divoc.xiv.in/keycloak/auth/realms/sunbird-rc/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
@@ -833,7 +833,7 @@
       "redirectUris": [
         "https://localhost:4202/*",
         "https://divoc.xiv.in",
-        "https://divoc.xiv.in/keycloak/auth/realms/divoc/account/*",
+        "https://divoc.xiv.in/keycloak/auth/realms/sunbird-rc/account/*",
         "https://localhost:4200/*",
         "http://ndear.xiv.in/*",
         "https://oauth.pstmn.io/v1/callback"
@@ -1429,14 +1429,14 @@
       "clientId": "security-admin-console",
       "name": "${client_security-admin-console}",
       "rootUrl": "${authAdminUrl}",
-      "baseUrl": "/admin/divoc/console/",
+      "baseUrl": "/admin/sunbird-rc/console/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
-        "/admin/divoc/console/*"
+        "/admin/sunbird-rc/console/*"
       ],
       "webOrigins": [
         "+"
@@ -2993,8 +2993,8 @@
       "name": "Update Password",
       "providerId": "UPDATE_PASSWORD",
       "enabled": true,
-      "defaultAction": false,
-      "priority": 30,
+      "defaultAction": true,
+      "priority": 50,
       "config": {}
     },
     {
@@ -3011,8 +3011,8 @@
       "name": "Verify Email",
       "providerId": "VERIFY_EMAIL",
       "enabled": true,
-      "defaultAction": false,
-      "priority": 50,
+      "defaultAction": true,
+      "priority": 30,
       "config": {}
     },
     {
@@ -3034,7 +3034,7 @@
       "config": {}
     }
   ],
-  "browserFlow": "mobile login",
+  "browserFlow": "browser",
   "registrationFlow": "registration",
   "directGrantFlow": "direct grant",
   "resetCredentialsFlow": "reset credentials",

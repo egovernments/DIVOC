@@ -13,12 +13,7 @@ async function createTenant(req, res) {
             await sunbirdRegistryService.createTenant(req.body).then(async (res) => {
                 tenantAddResponse = res;
                 await createAndAssignNewRole(userId, token)
-                const users = await keycloakService.getUserInfo(userId, token);
-                const Id = users[0]?.id;
-                console.log("Id: ",Id);
-                await keycloakService.sendVerifyEmail(Id,token);
-                await keycloakService.sendTenantInvite(Id,token);
-                
+                                
             }).catch(err => {
                 throw err
             });
@@ -62,6 +57,32 @@ async function createAndAssignNewRole(userName, token) {
     }
 }
 
+async function generateToken(req, res) {
+    const userId = req.params.userId.toLowerCase();
+    try {
+        const isValidUserId = utils.isValidUserId(userId);
+        if (isValidUserId) {
+            await keycloakService.generateUserToken(userId).then(async (result) => {
+                res.status(200).json({
+                    access_token: result
+                });
+            }).catch(err => {
+                throw err
+            });
+            return;
+        }
+        res.status(400).json({
+            message: "Invalid userId. It must start with an alphabet or a number and can only contain .-_@"
+        })
+    } catch (err) {
+        console.error(err);
+        res.status(err?.response?.status || 500).json({
+            message: err?.response?.data
+        });
+    }
+}
+
 module.exports = {
-    createTenant
+    createTenant,
+    generateToken
 }
