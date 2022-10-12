@@ -13,6 +13,7 @@ async function createTenant(req, res) {
             await sunbirdRegistryService.createTenant(req.body).then(async (res) => {
                 tenantAddResponse = res;
                 await createAndAssignNewRole(userId, token)
+                                
             }).catch(err => {
                 throw err
             });
