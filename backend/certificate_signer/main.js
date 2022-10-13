@@ -207,7 +207,7 @@ function transformW3(cert, certificateID) {
   const recipientName = R.pathOr('', ['recipient', 'name'], cert);
   const recipientDob = dobOfRecipient(cert.recipient);
   const vaccine = R.pathOr('', ['vaccination', 'name'], cert);
-  const icd11Code = vaccine ? VACCINE_ICD11_MAPPINGS.filter(a => vaccine.toLowerCase().includes(a.vaccineName)).map(a => a.icd11Code)[0]: '';
+  const icd11Code = vaccine ? VACCINE_ICD11_MAPPINGS.filter(a => vaccine.toLowerCase().replace(/\s/g, "").includes(a.vaccineName)).map(a => a.icd11Code)[0]: '';
   const prophylaxis = icd11Code ? ICD11_MAPPINGS[icd11Code]["icd11Term"]: '';
   const batch = R.pathOr('', ['vaccination', 'batch'], cert);
   const vaccinationDate = R.pathOr('', ['vaccination', 'date'], cert);
