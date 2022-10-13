@@ -270,12 +270,12 @@ const convertCertificateToDCCPayload = async(certificateRaw, nameDetails) => {
     throw new Error("EU Vaccine Details are missing from Configuration");
   }
   const {credentialSubject, evidence} = certificate;
-  const manufacturerCode = Object.keys(VACCINE_MANUF).filter(a => evidence[0].manufacturer?.toLowerCase().includes(a)).length > 0 ?
-    Object.entries(VACCINE_MANUF).filter(([k, v]) => evidence[0].manufacturer?.toLowerCase().includes(k))[0][1] : "";
-  const prophylaxisCode = Object.keys(EU_VACCINE_PROPH).filter(a => evidence[0].vaccine.toLowerCase().includes(a)).length > 0 ?
-    Object.entries(EU_VACCINE_PROPH).filter(([k, v]) => evidence[0].vaccine.toLowerCase().includes(k))[0][1] : "";
-  const vaccineCode = Object.keys(EU_VACCINE_CODE).filter(a => evidence[0].vaccine.toLowerCase().includes(a)).length > 0 ?
-    Object.entries(EU_VACCINE_CODE).filter(([k, v]) => evidence[0].vaccine.toLowerCase().includes(k))[0][1] : "";
+  const manufacturerCode = Object.keys(VACCINE_MANUF).filter(a => evidence[0].manufacturer?.toLowerCase().replace(/\s/g, "").includes(a.toLowerCase().replace(/\s/g, ""))).length > 0 ?
+    Object.entries(VACCINE_MANUF).filter(([k, v]) => evidence[0].manufacturer?.toLowerCase().replace(/\s/g, "").includes(k.toLowerCase().replace(/\s/g, "")))[0][1] : "";
+  const prophylaxisCode = Object.keys(EU_VACCINE_PROPH).filter(a => evidence[0].vaccine.toLowerCase().replace(/\s/g, "").includes(a.toLowerCase().replace(/\s/g, ""))).length > 0 ?
+    Object.entries(EU_VACCINE_PROPH).filter(([k, v]) => evidence[0].vaccine.toLowerCase().replace(/\s/g, "").includes(k.toLowerCase().replace(/\s/g, "")))[0][1] : "";
+  const vaccineCode = Object.keys(EU_VACCINE_CODE).filter(a => evidence[0].vaccine.toLowerCase().replace(/\s/g, "").includes(a.toLowerCase().replace(/\s/g, ""))).length > 0 ?
+    Object.entries(EU_VACCINE_CODE).filter(([k, v]) => evidence[0].vaccine.toLowerCase().replace(/\s/g, "").includes(k.toLowerCase().replace(/\s/g, "")))[0][1] : "";
   const addressCountry = getAlpha2CodeForCountry(evidence[0].facility.address.addressCountry)
   const certificateId = "URN:UVCI:01:" + addressCountry + ":" + evidence[0].certificateId;
   
