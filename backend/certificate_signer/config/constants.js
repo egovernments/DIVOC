@@ -137,6 +137,10 @@ const VACCINE_ICD11_MAPPINGS = [
   {
     "vaccineName": "sinovac",
     "icd11Code": "XM1NL1"
+  },
+  {
+    "vaccineName": "gemcovac",
+    "icd11Code": "XM0GQ8"
   }
 ]
 
