@@ -6,6 +6,7 @@ import Home from "./components/Home/Home";
 import { PrivateRoute } from "./utils/PrivateRoute";
 import CreateSchema from "./components/CreateSchema/CreateSchema";
 import config from "./config.json";
+import Header from "./components/Header/Header"
 
 function App() {
   const { initialized, keycloak } = useKeycloak();
@@ -16,6 +17,7 @@ function App() {
   return (
     <div>
       <Router>
+      <Header/>
         <Routes>
         
           <Route exact path={config.urlPath + "/"} element={<Home />} />
