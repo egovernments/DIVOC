@@ -84,6 +84,7 @@ var vaccineProphylaxis = map[string]string{
 	"sinopharm":   "COVID-19 vaccine, inactivated virus",
 	"coronavac":   "COVID-19 vaccine, inactivated virus",
 	"sinovac":     "COVID-19 vaccine, inactivated virus",
+	"gemcovac":    "COVID-19 vaccine, mRNA based",
 }
 
 type DoseWiseData struct {
