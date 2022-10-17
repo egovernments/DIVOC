@@ -1,0 +1,26 @@
+.navbar {
+    border-top: 1px solid #C1CFD933;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    width: 100%;
+    z-index: 100;
+}
+
+.nav-link {
+    color: #646D82 !important;
+    font-size: 12px;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+.footer{
+    border-top: 1px solid #C1CFD933;
+    padding: 30px !important;
+}
+
+.footer-img {
+    display: block;
+    margin: auto;
+}
