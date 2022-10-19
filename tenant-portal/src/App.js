@@ -5,8 +5,10 @@ import Login from "./components/Login";
 import Home from "./components/Home/Home";
 import { PrivateRoute } from "./utils/PrivateRoute";
 import CreateSchema from "./components/CreateSchema/CreateSchema";
-import config from "./config.json";
 import Header from "./components/Header/Header"
+import config from "./config.json"
+import Footer from "./components/Footer/Footer";
+
 
 function App() {
   const { initialized, keycloak } = useKeycloak();
@@ -32,6 +34,7 @@ function App() {
            </Route>
         </Routes>
       </Router>
+      <Footer/>
     </div>
   );
 }

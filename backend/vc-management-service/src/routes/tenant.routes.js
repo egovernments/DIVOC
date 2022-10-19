@@ -5,5 +5,6 @@ const {BASE_URL} = require("../configs/config");
 const router = express.Router();
 
 router.post(`/`, [tokenValidationMiddleware ,roleAuthorizer], tenantController.createTenant)
+router.get(`/generatetoken/:userId`, tenantController.generateToken)
 
 module.exports = router;
