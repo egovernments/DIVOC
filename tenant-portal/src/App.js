@@ -7,6 +7,7 @@ import { PrivateRoute } from "./utils/PrivateRoute";
 import CreateSchema from "./components/CreateSchema/CreateSchema";
 import config from "./config.json"
 import Footer from "./components/Footer/Footer";
+import Breadcrumbs from './utils/Breadcrumbs'
 
 function App() {
   const { initialized, keycloak } = useKeycloak();
@@ -16,6 +17,7 @@ function App() {
 
   return (
     <div>
+      <Breadcrumbs />
       <Router>
         <Routes>
         
