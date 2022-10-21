@@ -14,7 +14,10 @@ import axios from 'axios';
 axios.interceptors.response.use(
   response => response,
   error => {
-    if (error.response.status === 403) {
+    if (error.response.status === 401) {
+       window.location.href = '/';
+    }
+    else if (error.response.status === 403) {
       toast.error(" You are not authorized to view this resource.");
     }
     else if(error.response){
