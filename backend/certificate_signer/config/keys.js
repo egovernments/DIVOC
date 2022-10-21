@@ -1,4 +1,4 @@
-const { KeyType } = require('certificate-signer-library/signer');
+const { KeyType } = require('certificate-signer-library-vc/signer');
 const publicKeyPem = process.env.CERTIFICATE_PUBLIC_KEY;
 // eslint-disable-next-line max-len
 const signingKeyType = process.env.SIGNING_KEY_TYPE || KeyType.RSA;
