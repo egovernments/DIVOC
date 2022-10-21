@@ -14,14 +14,11 @@ import axios from 'axios';
 axios.interceptors.response.use(
   response => response,
   error => {
-    if (error.response.status === 401) {
-      toast.error("Incorrect User name/Password");
-    }
-    else if (error.response.status === 403) {
-      toast.error("Error 403");
+    if (error.response.status === 403) {
+      toast.error(" You are not authorized to view this resource.");
     }
     else if(error.response){
-      toast.error("Some error occured.");
+      toast.error(error.response.message);
     }
   });
 
