@@ -101,6 +101,8 @@ configuration_service.init();
         uploadId: message.headers.uploadId ? message.headers.uploadId.toString():'',
         rowId: message.headers.rowId ? message.headers.rowId.toString():'',
       });
+      const uploadId = message.headers.uploadId ? message.headers.uploadId.toString():'';
+      const rowId =  message.headers.rowId ? message.headers.rowId.toString():'';
       ICD11_MAPPINGS = JSON.parse(await configLayerObj.getConfigValue(CONFIG_KEYS.ICD));
       VACCINE_ICD11_MAPPINGS = JSON.parse( await configLayerObj.getConfigValue(CONFIG_KEYS.VACCINE_ICD));
       certificateFieldsKeyPath = JSON.parse(await configLayerObj.getConfigValue(CONFIG_KEYS.CERTIFICATES_OPTIONAL_FIELDS_KEY_PATH));
@@ -122,7 +124,36 @@ configuration_service.init();
           throw Error("Please set ICD11 and VACCINE_ICD11 Mappings in ETCD");
         }
         const key = enablePid ? `${preEnrollmentCode}-${programId}-${currentDose}` : `${preEnrollmentCode}-${currentDose}`;
-        await signer.signCertificate(jsonMessage, message.headers, key);
+        var signerResponse = await signer.signCertificate(jsonMessage, key);
+        switch (signerResponse.status) {
+          case "SUCCESS" :
+                    await producer.send({
+                        topic: config.CERTIFIED_TOPIC,
+                        messages: [{key: null, value: signerResponse.response}]
+                      });
+                    await producer.send({
+                        topic: config.CERTIFICATE_ACK_TOPIC,
+                        messages: [{key: null,value: JSON.stringify({uploadId: uploadId,rowId: rowId,status: 'SUCCESS',errorMsg: ''})}]
+                      });
+                    break;
+          case "DUPLICATE" :
+                    await producer.send({
+                      topic: config.DUPLICATE_CERTIFICATE_TOPIC,
+                      messages: [{
+                        key: null,
+                        value: signerResponse.response
+                      }]
+                    });
+                    break;
+          case "FAILURE" :
+                    await producer.send({
+                      topic: config.CERTIFICATE_ACK_TOPIC,
+                      messages: [{
+                        key: null,
+                        value: JSON.stringify({uploadId: uploadId,rowId: rowId,status: 'FAILED',errorMsg: signerResponse.response})}]
+                      });
+                    break;
+        };
         await producer.send({
           topic: PROC_TOPIC,
           messages: [
@@ -150,6 +181,10 @@ configuration_service.init();
         // if (preEnrollmentCode !== "" && currentDose !== "") {
         //   redis.deleteKey(`${preEnrollmentCode}-${currentDose}`) //if retry fails it clears the key -
         // }
+        await producer.send({
+          topic: config.CERTIFICATE_ACK_TOPIC,
+          messages: [{key: null,value: JSON.stringify({uploadId: uploadId,rowId: rowId,status: 'FAILED',errorMsg: e})}]
+        });
         await producer.send({
           topic: PROC_TOPIC,
           messages: [
