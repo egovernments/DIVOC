@@ -7,21 +7,22 @@ import { PrivateRoute } from "./utils/PrivateRoute";
 import CreateSchema from "./components/CreateSchema/CreateSchema";
 import config from "./config.json"
 import Footer from "./components/Footer/Footer";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import ToastComponent from './components/Toast/Toast';
 import axios from 'axios';
 
 axios.interceptors.response.use(
   response => response,
   error => {
     if (error.response.status === 401) {
-      toast.error("Incorrect User name/Password");
+      <ToastComponent header="Authentication error" toastBody="Incorrect User name/Password" />  
+     
     }
     else if (error.response.status === 403) {
-      toast.error("Error 403");
+      <ToastComponent header="Unauthorized access" toastBody="You are not authorized to view this resource" />
+      
     }
     else if(error.response){
-      toast.error("Some error occured.");
+      <ToastComponent header="Error" toastBody={error.response.data} /> 
     }
   });
 
@@ -49,7 +50,7 @@ function App() {
         </Routes>
       </Router>
       <Footer/>
-      <ToastContainer/>
+      <ToastComponent/>
     </div>
   );
 }
