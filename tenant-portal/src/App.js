@@ -1,5 +1,5 @@
 import "./App.css";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes , Navigate } from "react-router-dom";
 import { useKeycloak } from "@react-keycloak/web";
 import Login from "./components/Login";
 import Home from "./components/Home/Home";
@@ -15,7 +15,7 @@ axios.interceptors.response.use(
   response => response,
   error => {
     if (error.response.status === 401) {
-      <ToastComponent header="Authentication error" toastBody="Incorrect User name/Password" />  
+      <Navigate to= {config.urlPath + "/login"} />  
      
     }
     else if (error.response.status === 403) {
