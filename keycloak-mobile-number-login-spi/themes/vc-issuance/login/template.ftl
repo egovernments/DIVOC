@@ -42,18 +42,14 @@
 
     <body>
     
-    
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="/">
+            <img src="${url.resourcesPath}/img/nav-logo.png" width="100%"alt="">
+        </a>
+    </nav>
 <#--    <#nested "header">-->
-    <div class="container-fluid ndear-wrapper">
+    <div class="ndear-wrapper">
         <div class="form-wrapper">
-            <#if properties.keycloakBackgroundImage = "NA">
-            <div class="container-wrapper title-wrapper" style="background-image: url(${url.resourcesPath}/img/bg.svg)">
-            <#else>
-            <div class="container-wrapper title-wrapper" style="background-image: url(${properties.keycloakBackgroundImage})">
-            </#if>
-                <h3>Login to ${properties.portalTitle!} </h3>
-                <span>${properties.portalSubTitle!}</span>
-            </div>
             <div class="ndear-login-wrapper container-wrapper">
                 <#nested "form">
                 <#if displayMessage && message?has_content && (message.type != 'warning' || !isAppInitiatedAction??)>
@@ -69,13 +65,18 @@
                 </#if>
                 
             </div>
+            <div class="container-wrapper title-wrapper">
+                <img class="" src="${url.resourcesPath}/img/vc-tenant-login-image.png" alt="">
+            </div>
+
         </div>
     </div>
-  <#--  <#if properties.showFooter = "true">
     <footer class="footer">
-       
+       <span class="footer-link">Contact Us</span>
+       <span class="footer-link">Term of use</span>
+       <span class="footer-link">Privacy Policy</span>
     </footer>
-    </#if> -->
+
     </body>
     </html>
 </#macro>
