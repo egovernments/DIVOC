@@ -3,7 +3,7 @@
     <#if section = "header">
         ${msg("loginAccountTitle")}
     <#elseif section = "form">
-        <h3>Login to Administrator Portal</h3>
+        <p class="login-title">Login to Administrator Portal</h3>
         <div id="kc-form" class="ndear-login-card-wrapper w-100">
             <div id="kc-form-wrapper">
                 <#if realm.password>
@@ -66,12 +66,6 @@
                                     </div>
                                 </#if>
                             </div>
-                            <div class="${properties.kcFormOptionsWrapperClass!}">
-                                <#if realm.resetPasswordAllowed>
-                                    <span><a tabindex="5"
-                                             href="${url.loginResetCredentialsUrl}">${msg("doForgotPassword")}</a></span>
-                                </#if>
-                            </div>
 
                         </div>
 
@@ -81,6 +75,14 @@
                             <input tabindex="4"
                                    class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
                                    name="login" id="kc-login" type="submit" value="${msg("doLogIn")}"/>
+                        </div>
+
+
+                        <div class="${properties.kcFormOptionsWrapperClass!}">
+                            <#if realm.resetPasswordAllowed>
+                                <span><a tabindex="5"
+                                         href="${url.loginResetCredentialsUrl}">${msg("doForgotPassword")}</a></span>
+                            </#if>
                         </div>
                     </form>
                 </#if>

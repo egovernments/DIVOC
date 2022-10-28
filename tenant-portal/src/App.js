@@ -27,7 +27,7 @@ function App() {
           <Route path={config.urlPath + "/create-schema"}
              element={
                         <PrivateRoute>
-                          <CreateSchema /> role={"tenant"} clientId={"certificate-login"} 
+                          <CreateSchema /> role={"tenant"} clientId={"registry-frontend"}
                         </PrivateRoute>
                      }
            >
