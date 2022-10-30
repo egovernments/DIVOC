@@ -1,0 +1,37 @@
+{
+    "welcomePage": {
+        "title": "Welcome to DIVOC VC Issuance Platform",
+        "text": "Create verifiable credentials.",
+        "view": "View",
+        "trainingMaterial": "Training Material",
+        "or": "or",
+        "videosLink": "Videos",
+        "genTokenCard": {
+            "title": "Generate Token",
+            "text":"Generate token to connect your system with the DIVOC platform"
+        },
+        "manageSchemaCard": {
+            "title": "Manage Schema",
+            "text":"Create New Schemas, View / Edit existing schemas"
+        }
+    },
+
+    "genTokenPage": {
+        "title": "Connect your system with the DIVOC Platform",
+        "text": "You need to connect to your system with the DIVOC platform to start issuing verifiable credentials.",
+        "buttonClickInfo": "Click on the button below to generate the token to connect your system with DIVOC",
+        "buttonText": "Generate Token"
+    },
+
+    "viewTokenPage": {
+        "title": "Connect your system with the DIVOC Platform",
+        "text": "Please find the token generated below. You can copy it to the clipboard or download  the same",
+        "copyButton": "Copy",
+        "downloadButton": "Download",
+        "alertCard": {
+            "title": "Alert!",
+            "text": "Make sure to store this safely. Once you leave this page, you will not be able to access this token again",
+            "imptext":"This token is valid for 1 year."
+        }   
+    }
+}

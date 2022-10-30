@@ -8,7 +8,6 @@ import CreateSchema from "./components/CreateSchema/CreateSchema";
 import config from "./config.json"
 import Footer from "./components/Footer/Footer";
 import Welcome from "./components/Welcome/Welcome";
-import Header from "./components/Header/Header";
 
 function App() {
   const { initialized, keycloak } = useKeycloak();
@@ -18,7 +17,6 @@ function App() {
 
   return (
     <div>
-      <Header />
       <Router>
         <Routes>
         
