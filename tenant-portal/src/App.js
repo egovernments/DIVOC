@@ -11,11 +11,12 @@ import Footer from "./components/Footer/Footer";
 import ToastComponent from './components/Toast/Toast';
 import axios from 'axios';
 
+const {keycloak} = useKeycloak();
 axios.interceptors.response.use(
   response => response,
   error => {
     if (error.response.status === 401) {
-      <Navigate to= {config.urlPath + "/login"} />  
+      keycloak.logout() 
      
     }
     else if (error.response.status === 403) {
