@@ -19,7 +19,7 @@ const Login = () => {
     useEffect(() => {
         if (keycloak.authenticated) {
             let redirectUrl = config.urlPath;
-            navigate.push(redirectUrl)
+            navigate(redirectUrl)
         }
     }, [keycloak, navigate]);
 
