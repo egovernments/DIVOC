@@ -2,7 +2,7 @@ import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Card, Container, Col, Button, Row} from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import WelcomeImg from "../../assets/images/welcome_Image.png";
+import WelcomeImg from "../../assets/img/welcome_Image.png";
 import styles from './Welcome.module.css';
 import {useTranslation} from "react-i18next";
 
