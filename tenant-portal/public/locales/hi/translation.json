@@ -1,37 +1,37 @@
 {
-    "welcomePage": {
-        "title": "डिवोक में आपका स्वागत है",
-        "text": "Create verifiable credentials.",
-        "view": "View",
-        "trainingMaterial": "Training Material",
-        "or": "or",
-        "videosLink": "Videos",
+    "homePage": {
+        "title": "DIVOC VC Issuance Platform में आपका स्वागत है",
+        "text": "सत्यापन योग्य क्रेडेंशियल बनाएं।",
+        "view": "राय",
+        "trainingMaterial": "प्रक्षिक्षण सामग्री",
+        "or": "या",
+        "videosLink": "वीडियो",
         "genTokenCard": {
-            "title": "Generate Token",
-            "text":"Generate token to connect your system with the DIVOC platform"
+            "title": "टोकन उत्पन्न करें",
+            "text":"अपने सिस्टम को DIVOC प्लेटफॉर्म से जोड़ने के लिए टोकन जेनरेट करें"
         },
         "manageSchemaCard": {
-            "title": "Manage Schema",
-            "text":"Create New Schemas, View / Edit existing schemas"
+            "title": "स्कीमा प्रबंधित करें",
+            "text":"नई स्कीमा बनाएं, मौजूदा स्कीमा देखें / संपादित करें"
         }
     },
 
     "genTokenPage": {
-        "title": "Connect your system with the DIVOC Platform",
-        "text": "You need to connect to your system with the DIVOC platform to start issuing verifiable credentials.",
-        "buttonClickInfo": "Click on the button below to generate the token to connect your system with DIVOC",
-        "buttonText": "Generate Token"
+        "title": "DIVOC VC Issuance Platform में आपका स्वागत है",
+        "text": "सत्यापन योग्य क्रेडेंशियल जारी करना शुरू करने के लिए आपको अपने सिस्टम से DIVOC प्लेटफॉर्म से जुड़ने की आवश्यकता है।",
+        "buttonClickInfo": "अपने सिस्टम को DIVOC से जोड़ने के लिए टोकन जेनरेट करने के लिए नीचे दिए गए बटन पर क्लिक करें",
+        "buttonText": "टोकन उत्पन्न करें"
     },
 
     "viewTokenPage": {
-        "title": "Connect your system with the DIVOC Platform",
-        "text": "Please find the token generated below. You can copy it to the clipboard or download  the same",
-        "copyButton": "Copy",
-        "downloadButton": "Download",
+        "title": "DIVOC VC Issuance Platform में आपका स्वागत है",
+        "text": "कृपया नीचे जेनरेट किया गया टोकन ढूंढें। आप इसे क्लिपबोर्ड पर कॉपी कर सकते हैं या इसे डाउनलोड कर सकते हैं",
+        "copyButton": "प्रतिलिपि",
+        "downloadButton": "डाउनलोड",
         "alertCard": {
-            "title": "Alert!",
-            "text": "Make sure to store this safely. Once you leave this page, you will not be able to access this token again",
-            "imptext":"This token is valid for 1 year."
+            "title": "चेतावनी!",
+            "text": "इसे सुरक्षित रूप से स्टोर करना सुनिश्चित करें। एक बार जब आप इस पेज को छोड़ देते हैं, तो आप इस टोकन को दोबारा एक्सेस नहीं कर पाएंगे",
+            "imptext":"यह टोकन 1 वर्ष के लिए वैध है."
         }   
     }
 }

@@ -8,7 +8,6 @@ import CreateSchema from "./components/CreateSchema/CreateSchema";
 import Header from "./components/Header/Header"
 import config from "./config.json"
 import Footer from "./components/Footer/Footer";
-import Welcome from "./components/Welcome/Welcome";
 import ToastComponent from './components/Toast/Toast';
 import axios from 'axios';
 
@@ -44,7 +43,6 @@ function App() {
         
           <Route exact path={config.urlPath + "/"} element={<Home />} />
           <Route exact path={config.urlPath + "/login"} element={<Login />} />
-          <Route exact path={config.urlPath + "/vcwelcome"} element={<Welcome />} />
           <Route path={config.urlPath + "/create-schema"}
              element={
                         <PrivateRoute>
