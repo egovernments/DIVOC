@@ -2,12 +2,14 @@ body, html {
   display: flex;
   flex-direction: column;
   flex: 1;
+  justify-content: space-between;
   overflow: hidden;
   min-height: 0;
   font-size: 14px;
   color:rgba(0,0,0,.87);
   margin:0;
   height: 100%;
+  font-family: "Open Sans", sans-serif;
 }
 body {
   margin: 0;
@@ -16,32 +18,26 @@ body {
 .ndear-wrapper {
   display: flex;
   justify-content: center;
-  padding: 54px;
   background-color: #F6F8FC;
-  height: 100vh;
 }
 .ndear-wrapper .form-wrapper {
   display: flex;
   width: 100%;
+  padding: 0 10% 10%;
   background: white;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
   border-radius: 4px;
 }
 .ndear-wrapper .form-wrapper .container-wrapper{
-  width: 60%;
-  padding-top: 4rem;
   align-items: center;
 }
 .title-wrapper {
-  background-repeat: no-repeat;
   display: flex;
   flex-direction: column;
-  background-size: cover;
-  background-position: center;
-
+  width: 40%;
+  justify-content: center;
 }
 .ndear-login-wrapper {
-  width: 40%;
+  width: 60%;
   padding-left: 10rem !important;
   padding-right: 10rem !important;
 }
@@ -133,8 +129,10 @@ body {
 .ndear-login-card-wrapper .submit{
   color: #ffffff;
   border-style: none;
-  background: #0098AB;
-  border-radius: 8px;
+  background: linear-gradient(45deg, #73BAF4, #5367CA);
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 4px;
   width: 100%;
   padding: 1rem;
   margin-top: 2rem;
@@ -221,6 +219,11 @@ body {
   margin-left: 30px;
 }
 
+.login-title {
+  font-size: 28px;
+  font-weight: 700;
+}
+
 @media (max-width: 992px) {
   .ndear-login-wrapper {
     width: 100%;
@@ -249,6 +252,11 @@ body {
 .bold-text {
   font-weight: bold;
 }
+.input-field-label {
+  font-size: 16px;
+  font-weight: 400;
+  color: #484646;;
+}
 .password-strength-message {
 font-weight: lighter;
 color: gray;
@@ -266,9 +274,11 @@ font-size: 10px;
 }
 
 .forgot-password-wrapper {
-  text-align: right;
+  text-align: center;
 }
 
 .forgot-password-wrapper a {
-  color: #0098AB;
+  color: #6493E0;
+  font-size: 16px;
+  font-weight: 600;
 }

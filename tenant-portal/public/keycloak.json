@@ -2,7 +2,7 @@
   "realm": "sunbird-rc",
   "auth-server-url": "/auth/",
   "ssl-required": "external",
-  "resource": "certificate-login",
+  "resource": "registry-frontend",
   "public-client": true,
   "confidential-port": 0
 }

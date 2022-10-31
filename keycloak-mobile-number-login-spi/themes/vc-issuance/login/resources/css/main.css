@@ -56,7 +56,7 @@
     display: flex;
     border-radius: 4px;
     width: 100%;
-    border: 1px solid #EFEFEF;
+    border: 1px solid lightgrey;
     margin-top: 0.5rem;
 }
 .input-field input {
@@ -132,11 +132,10 @@
 }
 
 footer {
-    background: black;
     padding: 13px 30px;
     color: #8D9091;
     display: flex;
-    justify-content: space-between;
+    justify-content: end;
     align-items: center;
 }
 

@@ -225,6 +225,12 @@ services:
         condition: service_started
       vc-certification-service:
         condition: service_started
+
+  tenant-portal:
+    image: divoc/tenant-portal
+    ports:
+      - "3000:80"
+
   vc-certify-consumer:
     image: divoc/vc-certify-consumer:3.0.0-alpha
     environment:

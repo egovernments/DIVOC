@@ -1,4 +1,3 @@
-const {Kafka} = require('kafkajs');
 const signer = require('./signer');
 const redis = require('./redis');
 const R = require('ramda');
@@ -11,6 +10,9 @@ const INPROGRESS_KEY_EXPIRY_SECS = 5 * 60;
 const CERTIFICATE_INPROGRESS = "P";
 const REGISTRY_SUCCESS_STATUS = "SUCCESSFUL";
 const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
+const SUCCESS_STATUS = "SUCCESS";
+const FAILED_STATUS = "FAILURE";
+const DUPLICATE_STATUS = "DUPLICATE";
 const DUPLICATE_MSG = "duplicate key value violates unique constraint";
 let maxRetrycount = 0;
 
@@ -51,15 +53,7 @@ async function init_signer(conf, signingPayloadTransformer, documentLoader) {
   await redis.initRedis(conf);
   maxRetrycount = config.CERTIFICATE_RETRY_COUNT;
 
-  const kafka = new Kafka({
-    clientId: 'divoc-cert',
-    brokers: conf.KAFKA_BOOTSTRAP_SERVER.split(",")
-  });
-  producer = kafka.producer({allowAutoTopicCreation: true});
-
   initRegistry(conf.REGISTRY_URL, conf.REGISTRY_CERTIFICATE_SCHEMA)
-
-  await producer.connect();
 }
 
 
@@ -69,12 +63,12 @@ async function  signCertificateWithoutPersisting(payload, transformW3, certifica
   return signedCertificate;
 }
 
-async function signCertificate(certificateJson, headers, redisUniqueKey) {
-  let uploadId = headers.uploadId ? headers.uploadId.toString() : '';
-  let rowId = headers.rowId ? headers.rowId.toString() : '';
+async function signCertificate(certificateJson, redisUniqueKey) {
   const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], certificateJson);
   const isSigned = await redis.checkIfKeyExists(redisUniqueKey);
   const isUpdateRequest = R.pathOr(false, ["meta", "previousCertificateId"], certificateJson);
+  var status;
+  var response;
   if (!isSigned || isUpdateRequest) {
     redis.storeKeyWithExpiry(redisUniqueKey, CERTIFICATE_INPROGRESS, INPROGRESS_KEY_EXPIRY_SECS);
     await signAndSave(certificateJson, signingPayloadTransformerFunc, redisUniqueKey)
@@ -85,30 +79,21 @@ async function signCertificate(certificateJson, headers, redisUniqueKey) {
           }
           let errMsg;
           if (res.status === 200) {
-            sendCertifyAck(res.data.params.status, uploadId, rowId, res.data.params.errmsg);
-            producer.send({
-              topic: config.CERTIFIED_TOPIC,
-              messages: [{key: null, value: JSON.stringify(res.signedCertificate)}]
-            });
+            status = SUCCESS_STATUS;
+            response = JSON.stringify(res.signedCertificate);
           } else {
-            errMsg = "error occurred while signing/saving of certificate - " + res.status;
-            sendCertifyAck(REGISTRY_FAILED_STATUS, uploadId, rowId, errMsg)
+            status = FAILED_STATUS;
+            response = "error occurred while signing/saving of certificate - " + res.status;
           }
         })
         .catch(error => {
           console.error(error)
-          sendCertifyAck(REGISTRY_FAILED_STATUS, uploadId, rowId, error.message)
           throw error
         });
+        return {status: status, response: response};
   } else {
     console.error("Duplicate pre-enrollment code received for certification :" + preEnrollmentCode)
-    await producer.send({
-      topic: config.DUPLICATE_CERTIFICATE_TOPIC,
-      messages: [{
-        key: null,
-        value: JSON.stringify({message: certificateJson.toString(), error: "Duplicate pre-enrollment code"})
-      }]
-    });
+    return {status: DUPLICATE_STATUS, response: JSON.stringify({message: certificateJson.toString(), error: "Duplicate pre-enrollment code"})}
   }
 }
 
@@ -145,34 +130,6 @@ async function signAndSave(certificate, transformW3, redisUniqueKey, retryCount 
     redis.storeKeyWithExpiry(redisUniqueKey, certificateId)
   }
   return resp;
-}
-
-async function sendCertifyAck(status, uploadId, rowId, errMsg="") {
-  if (config.ENABLE_CERTIFY_ACKNOWLEDGEMENT) {
-    if (status === REGISTRY_SUCCESS_STATUS) {
-      producer.send({
-        topic: config.CERTIFICATE_ACK_TOPIC,
-        messages: [{
-          key: null,
-          value: JSON.stringify({
-            uploadId: uploadId,
-            rowId: rowId,
-            status: 'SUCCESS',
-            errorMsg: ''
-          })}]})
-    } else if (status === REGISTRY_FAILED_STATUS) {
-      producer.send({
-        topic: config.CERTIFICATE_ACK_TOPIC,
-        messages: [{
-          key: null,
-          value: JSON.stringify({
-            uploadId: uploadId,
-            rowId: rowId,
-            status: 'FAILED',
-            errorMsg: errMsg
-          })}]})
-    }
-  }
 }
 
 function getCertificateId(){
