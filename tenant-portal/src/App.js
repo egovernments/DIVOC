@@ -1,5 +1,5 @@
 import "./App.css";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes , Navigate } from "react-router-dom";
 import { useKeycloak } from "@react-keycloak/web";
 import Login from "./components/Login";
 import Home from "./components/Home/Home";
@@ -8,6 +8,25 @@ import CreateSchema from "./components/CreateSchema/CreateSchema";
 import Header from "./components/Header/Header"
 import config from "./config.json"
 import Footer from "./components/Footer/Footer";
+import ToastComponent from './components/Toast/Toast';
+import axios from 'axios';
+
+const {keycloak} = useKeycloak();
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response.status === 401) {
+      keycloak.logout() 
+     
+    }
+    else if (error.response.status === 403) {
+      <ToastComponent header="Unauthorized access" toastBody="You are not authorized to view this resource" />
+      
+    }
+    else if(error.response){
+      <ToastComponent header="Error" toastBody={error.response.data} /> 
+    }
+  });
 
 
 function App() {
@@ -35,6 +54,7 @@ function App() {
         </Routes>
       </Router>
       <Footer/>
+      <ToastComponent/>
     </div>
   );
 }
