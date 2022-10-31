@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import HomeImg from "../../assets/img/homeImage.png";
 import styles from './Home.module.css';
 import {useTranslation} from "react-i18next";
+import config from '../../config.json';
 
 function Home() {
 
