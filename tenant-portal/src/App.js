@@ -7,6 +7,7 @@ import { PrivateRoute } from "./utils/PrivateRoute";
 import CreateSchema from "./components/CreateSchema/CreateSchema";
 import config from "./config.json"
 import Footer from "./components/Footer/Footer";
+import GenerateToken from "./components/GenerateToken/GenerateToken";
 
 function App() {
   const { initialized, keycloak } = useKeycloak();
@@ -21,6 +22,7 @@ function App() {
         
           <Route exact path={config.urlPath + "/"} element={<Home />} />
           <Route exact path={config.urlPath + "/login"} element={<Login />} />
+          <Route exact path={config.urlPath + "/generatetoken"} element={<GenerateToken />} />
           <Route path={config.urlPath + "/create-schema"}
              element={
                         <PrivateRoute>
