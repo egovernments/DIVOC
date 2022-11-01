@@ -2,9 +2,10 @@
 <@layout.registrationLayout displayMessage=!messagesPerField.existsError('username','password') displayInfo=realm.password && realm.registrationAllowed && !registrationDisabled??; section>
     <#if section = "header">
         ${msg("loginAccountTitle")}
-    <#elseif section = "form">
-        <p class="login-title">Login to Administrator Portal</h3>
+<#elseif section = "form">
+        
         <div id="kc-form" class="ndear-login-card-wrapper w-100">
+            <p class="login-title">Login to Administrator Portal</p>
             <div id="kc-form-wrapper">
                 <#if realm.password>
                     <form id="kc-form-login" onsubmit="login.disabled = true; return true;" action="${url.loginAction}"
@@ -77,17 +78,43 @@
                                    name="login" id="kc-login" type="submit" value="${msg("doLogIn")}"/>
                         </div>
 
-
                         <div class="${properties.kcFormOptionsWrapperClass!}">
                             <#if realm.resetPasswordAllowed>
                                 <span><a tabindex="5"
-                                         href="${url.loginResetCredentialsUrl}">${msg("doForgotPassword")}</a></span>
+                                        href="${url.loginResetCredentialsUrl}">${msg("doForgotPassword")}</a></span>
                             </#if>
                         </div>
                     </form>
                 </#if>
             </div>
-
+            <#if  message?has_content && (message.type != 'warning' || !isAppInitiatedAction??)>
+                <div class="alert-box">
+                    <div class="pf-c-alert__icon">
+                        <#if message.type = 'success'>
+                            <div class = "alert-box-success">                          
+                                <span class="${properties.kcFeedbackSuccessIcon!}">${msg("successfulEmailResponse")}</span>
+                                
+                            </div>
+                        </#if>
+                        <#if message.type = 'warning'>
+                            <div class = "alert-box-success">
+                                <span class="${properties.kcFeedbackWarningIcon!}"></span>
+                                <span class="${properties.kcAlertTitleClass!}">${kcSanitize(message.summary)?no_esc}</span></#if>
+                            </div>
+                        <#if message.type = 'error'>
+                            <div class = "alert-box-success">
+                                <span class="${properties.kcFeedbackErrorIcon!}"></span>
+                                <span class="${properties.kcAlertTitleClass!}">${kcSanitize(message.summary)?no_esc}</span></#if>
+                            </div>
+                        <#if message.type = 'info'>
+                            <div class = "alert-box-success">
+                                <span class="${properties.kcFeedbackInfoIcon!}"></span>
+                                <span class="${properties.kcAlertTitleClass!}">${kcSanitize(message.summary)?no_esc}</span></#if>
+                            </div>
+                    </div>
+                    
+                </div>
+            </#if>
             <#if realm.password && social.providers??>
                 <div id="kc-social-providers" class="${properties.kcFormSocialAccountSectionClass!}">
                     <hr/>
@@ -109,8 +136,12 @@
                     </ul>
                 </div>
             </#if>
-
+            
         </div>
+        <div class="container-wrapper title-wrapper">
+                <img class="" src="${url.resourcesPath}/img/vc-tenant-login-image.png" alt="">
+        </div>
+        
     <#elseif section = "info" >
         <#if realm.password && realm.registrationAllowed && !registrationDisabled??>
             <div id="kc-registration-container">
