@@ -86,35 +86,37 @@
                         </div>
                     </form>
                 </#if>
-            </div>
-            <#if  message?has_content && (message.type != 'warning' || !isAppInitiatedAction??)>
-                <div class="alert-box">
+                <#if  message?has_content && (message.type != 'warning' || !isAppInitiatedAction??)>
                     <div class="pf-c-alert__icon">
                         <#if message.type = 'success'>
-                            <div class = "alert-box-success">                          
-                                <span class="${properties.kcFeedbackSuccessIcon!}">${msg("successfulEmailResponse")}</span>
-                                
+                            <div class = "alert-box success-alert">                          
+                                <span class="${properties.kcFeedbackSuccessIcon!} pr-3"></span>
+                                <span>${msg("successfulEmailResponse")}</span>
                             </div>
                         </#if>
                         <#if message.type = 'warning'>
-                            <div class = "alert-box-success">
+                            <div class = "alert-box warning-alert">
                                 <span class="${properties.kcFeedbackWarningIcon!}"></span>
-                                <span class="${properties.kcAlertTitleClass!}">${kcSanitize(message.summary)?no_esc}</span></#if>
+                                <span >${kcSanitize(message.summary)?no_esc}</span>
                             </div>
+                        </#if>
                         <#if message.type = 'error'>
-                            <div class = "alert-box-success">
+                            <div class = "alert-box error-alert">
                                 <span class="${properties.kcFeedbackErrorIcon!}"></span>
-                                <span class="${properties.kcAlertTitleClass!}">${kcSanitize(message.summary)?no_esc}</span></#if>
+                                <span >${kcSanitize(message.summary)?no_esc}</span>
                             </div>
+                        </#if>
                         <#if message.type = 'info'>
-                            <div class = "alert-box-success">
+                            <div class = "alert-box info-alert">
                                 <span class="${properties.kcFeedbackInfoIcon!}"></span>
-                                <span class="${properties.kcAlertTitleClass!}">${kcSanitize(message.summary)?no_esc}</span></#if>
+                                <span>${kcSanitize(message.summary)?no_esc}</span>
                             </div>
+                        </#if>
                     </div>
                     
-                </div>
-            </#if>
+                </#if>
+            </div>
+            
             <#if realm.password && social.providers??>
                 <div id="kc-social-providers" class="${properties.kcFormSocialAccountSectionClass!}">
                     <hr/>

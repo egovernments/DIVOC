@@ -7,20 +7,23 @@
         ${message.summary}
         </#if>
     <#elseif section = "form">
-    <div class="ndear-login-card-wrapper">
+    <div class="ndear-login-card-wrapper col-8">
         <div class="success-response">
             <img src="${url.resourcesPath}/img/check_circle_outline.png">
-            <h3> Password Updated Successfully!</h3>
+            <p> Password Updated Successfully!</p>
         </div>
         <div id="kc-info-message">
             <p class="instruction">Your password has been updated successfully</p>
         </div>
-        <div id="kc-form-buttons" class="${properties.kcFormGroupClass!}">
-            <button  class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"><a href="${url.loginUrl}">Back to Login</a></button>
+        <div id="kc-form-buttons" class="${properties.kcFormGroupClass!} w-50">
+            <form>
+                <button  class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}" formaction="${client.baseUrl}">Back to Login</button>
+            </form>
         </div>
+
     </div>
-    <div class="container-wrapper title-wrapper">
-                <img class="" src="${url.resourcesPath}/img/reset-password-success.png" alt="">
+    <div class="container-wrapper title-wrapper col-4">
+                <img class="w-100" src="${url.resourcesPath}/img/reset-password-success.png" alt="">
     </div>
 </#if>
 </@layout.registrationLayout>
