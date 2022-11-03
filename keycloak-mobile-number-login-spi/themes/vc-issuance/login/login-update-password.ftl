@@ -3,11 +3,10 @@
     <#if section = "header">
         ${msg("updatePasswordTitle")}
     <#elseif section = "form">
-        <div class="${properties.kcLabelWrapperClass!}">
-            <h3 class="d-flex align-items-center"><a onclick="window.history.back()"><img src="${url.resourcesPath}/img/next-btn.svg" alt="" class="pr-3"></a> Update Password</h3>
-        </div>
+        <div class="ndear-login-card-wrapper w-100">
+       <p class="login-title">Reset Password</p>
 
-        <form id="kc-passwd-update-form" class="${properties.kcFormClass!} ndear-login-card-wrapper w-100"
+        <form id="kc-passwd-update-form" class="${properties.kcFormClass!} "
               action="${url.loginAction}" method="post">
             <input type="text" id="username" name="username" value="${username}" autocomplete="username"
                    readonly="readonly" style="display:none;"/>
@@ -90,5 +89,9 @@
                 </div>
             </div>
         </form>
+        </div>
+        <div class="container-wrapper title-wrapper">
+                <img class="" src="${url.resourcesPath}/img/forgot_password.png" alt="">
+        </div>
     </#if>
 </@layout.registrationLayout>
