@@ -1,6 +1,6 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import GenTokenImg from "../../assets/images/generate_viewToken.png";
+import GenTokenImg from "../../assets/img/generate_viewToken.png";
 import GenericButton from '../GenericButton/GenericButton';
 import styles from './GenerateToken.module.css';
 
