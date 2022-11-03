@@ -10,6 +10,7 @@ import config from "./config.json"
 import Footer from "./components/Footer/Footer";
 import ToastComponent from './components/Toast/Toast';
 import axios from 'axios';
+import './i18n';
 
 function App() {
   const { initialized, keycloak } = useKeycloak();
@@ -37,6 +38,7 @@ function App() {
     <div>
       <Router>
       <Header/>
+      <div style={{paddingBottom: "3rem", paddingTop: "3rem"}}>
         <Routes>
         
           <Route exact path={config.urlPath + "/"} element={<Home />} />
@@ -50,8 +52,9 @@ function App() {
            >
            </Route>
         </Routes>
-      </Router>
+        </div>
       <Footer/>
+      </Router>
       <ToastComponent/>
     </div>
   );
