@@ -55,10 +55,8 @@ function App() {
         </div>
       <Footer/>
       </Router>
-      
       <ToastComponent/>
     </div>
-   
   );
 }
 

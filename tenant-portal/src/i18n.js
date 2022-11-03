@@ -27,6 +27,9 @@ i18n
                 // }
                 return value;
             }
+        },
+        backend: {
+            loadPath: '/tenant-portal/locales/{{lng}}/{{ns}}.json'
         }
     });
 
