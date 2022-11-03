@@ -6,6 +6,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {ReactKeycloakProvider} from '@react-keycloak/web';
 import keycloak from "./utils/keycloak";
+import './i18n'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
