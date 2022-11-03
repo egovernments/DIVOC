@@ -14,28 +14,28 @@ import './i18n';
 
 function App() {
   const { initialized, keycloak } = useKeycloak();
-  axios.interceptors.response.use(
-    response => response,
-    error => {
-      if (error.response.status === 401) {
-        keycloak.logout()
-  
-      }
-      else if (error.response.status === 403) {
-        <ToastComponent header="Unauthorized access" toastBody="You are not authorized to view this resource" />
-  
-      }
-      else if(error.response){
-        <ToastComponent header="Error" toastBody={error.response.data} />
-      }
-    });
- 
-  if (!initialized) {
+    axios.interceptors.response.use(
+        response => response,
+        error => {
+            if (error.response.status === 401) {
+                keycloak.logout()
+
+            }
+            else if (error.response.status === 403) {
+                <ToastComponent header="Unauthorized access" toastBody="You are not authorized to view this resource" />
+
+            }
+            else if(error.response){
+                <ToastComponent header="Error" toastBody={error.response.data} />
+            }
+        });
+
+    if (!initialized) {
     return <div>Loading...</div>;
   }
 
   return (
-       <div>
+    <div>
       <Router>
       <Header/>
       <div style={{paddingBottom: "3rem", paddingTop: "3rem"}}>
@@ -53,7 +53,7 @@ function App() {
            </Route>
         </Routes>
         </div>
-        <Footer/>
+      <Footer/>
       </Router>
       
       <ToastComponent/>
