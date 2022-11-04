@@ -3,11 +3,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import GenTokenImg from "../../assets/img/generate_viewToken.png";
 import CopyIcon from "../../assets/img/copyIcon.png"
 import DownloadIcon from "../../assets/img/downloadIcon.png"
+import AlertIcon from '../../assets/img/alertIcon.png';
 import GenericButton from '../GenericButton/GenericButton';
 import styles from './GenerateToken.module.css';
 import {useKeycloak} from '@react-keycloak/web'
 import {useTranslation} from "react-i18next";
 import { Container, Card, Col, Row, Form } from 'react-bootstrap';
+import InfoCard from '../InfoCard/InfoCard';
 const axios = require('axios');
 
 function GenerateToken() {
@@ -19,7 +21,6 @@ function GenerateToken() {
     copyText.select();
     copyText.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(copyText.value);
-    alert("Copied the token: " + copyText.value);
   }
 
   function downloadToken() {
@@ -45,42 +46,47 @@ function GenerateToken() {
       throw error;
   });
   }
-  const displayToken = async () => {
+  const outputToken = async () => {
       const access_token = await getToken();
       setToken(access_token)
   }
 
   return (
-    <div className='row m-4 p-4'>
+    <div className='row mx-5 px-5 my-5'>
         <div className='col-md-6 p-2'>
-          <div>
-            <div className={styles['title']}>{t('genTokenPage.title')}</div>
+            <div className='title'>{t('genTokenPage.title')}</div>
             {token==='' && <div>
-              <div className={styles['text']}>
-              <p>{t('genTokenPage.text')}</p>
-              <p>{t('genTokenPage.buttonClickInfo')}</p>
+              <div className='text'>
+              <div className='pb-3'>{t('genTokenPage.text')}</div>
+              <div className='pb-3'>{t('genTokenPage.buttonClickInfo')}</div>
               </div>           
-              <div onClick={() => displayToken()}><GenericButton img='' text={t('genTokenPage.buttonText')} type='primary' /></div>
+              <div onClick={() => outputToken()}><GenericButton img='' text={t('genTokenPage.buttonText')} type='primary' /></div>
             </div>}
             {token && <div>
-              <div className={styles['text']}>
-              <p>{t('viewTokenPage.text')}</p>
+              <div className='text'>
+              <p className='mb-0'>{t('viewTokenPage.text1')}</p>
+              <p className='mb-0'>{t('viewTokenPage.text2')}</p>
               </div>
-              <div id='token'>{token}</div>
+              <Form.Control className='my-3' className={styles['token']} size="lg" type="text" readOnly id='token' defaultValue={token} />
               <Container fluid className='my-3'>
-                <Row gutterX='3'>
-                    <Col onClick={() => copyToken()}>
-                      <GenericButton img={CopyIcon} text='Copy' type='primary' />
-                    </Col>
-                    <Col onClick={() => downloadToken()}>
-                      <GenericButton img={DownloadIcon} text='Download' type='primary' />
-                    </Col>
+                <Row>
+                  <div className='col-md-6 ps-0' onClick={() => copyToken()}>
+                  <GenericButton img={CopyIcon} text='Copy' type='primary' />
+                  </div>
+                  <div className='col-md-6 pe-0' onClick={() =>  downloadToken()}>
+                  <GenericButton img={DownloadIcon} text='Download' type='primary' />
+                  </div>
                 </Row>
               </Container>
+              <InfoCard  icon={AlertIcon}
+              title={t('viewTokenPage.alertCard.title')}
+              text={t('viewTokenPage.alertCard.text')} 
+              imptext={t('viewTokenPage.alertCard.imptext')} className='alertCard mt-4' />
             </div>}
-          </div>
         </div>
-        <img src={GenTokenImg} alt="Generate Token Image" className="col-md-6"/>
+        <div className="col-md-6 px-3">
+        <img src={GenTokenImg} alt="GenToken" />
+        </div>
     </div>
   )
 }

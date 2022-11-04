@@ -25,7 +25,8 @@
 
     "viewTokenPage": {
         "title": "Connect your system with the DIVOC Platform",
-        "text": "Please find the token generated below. You can copy it to the clipboard or download  the same",
+        "text1": "Please find the token generated below.",
+        "text2":" You can copy it to the clipboard or download  the same.",
         "copyButton": "Copy",
         "downloadButton": "Download",
         "alertCard": {

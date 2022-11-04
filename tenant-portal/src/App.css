@@ -1,4 +1,20 @@
+.title{
+    font-weight: 700;
+    font-size: 1.75rem;
+    line-height: 2.4rem;
+}
+.text{
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.4rem;
+    color: #484646;
+    padding: 1.5rem 0;
+}
 .btn-primary {
     width: 100%;
     background: linear-gradient(270deg, #5367CA 0%, #73BAF4 100%);
+}
+.alertCard {
+    color: #639CD1;
+    background-color: #F2F9FF;
 }
