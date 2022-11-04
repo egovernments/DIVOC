@@ -3,10 +3,11 @@
     <#if section = "header">
         ${msg("emailForgotTitle")}
     <#elseif section = "form">
-        <h3>Forgot Password?</h3>
+        
         <div id="kc-form" class="ndear-login-card-wrapper w-100">
+        <p class="login-title">Forgot Password?</p>
         <div id="kc-form-wrapper">
-            <form id="kc-reset-password-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
+            <form id="kc-reset-password-form" action="${url.loginAction}" method="post">
                 <div class="${properties.kcFormGroupClass!}">
                     <label for="username" class="${properties.kcLabelClass!}"><#if !realm.loginWithEmailAllowed>${msg("username")}<#elseif !realm.registrationEmailAsUsername>${msg("username")}<#else>${msg("email")}</#if></label>
 
@@ -31,6 +32,10 @@
                 </div>
             </form>
         </div>
+        
+        </div>
+        <div class="container-wrapper title-wrapper">
+                <img class="" src="${url.resourcesPath}/img/forgot_password.png" alt="">
         </div>
     <#elseif section = "info" >
         <#if realm.duplicateEmailsAllowed>
