@@ -42,7 +42,7 @@ function App() {
         
           <Route exact path={config.urlPath + "/"} element={<Home />} />
           <Route exact path={config.urlPath + "/login"} element={<Login />} />
-          <Route exact path={config.urlPath + "/generatetoken"} element={<GenerateToken />} />
+          <Route exact path={config.urlPath + "/generate-token"} element={<GenerateToken />} />
           <Route path={config.urlPath + "/create-schema"}
              element={
                         <PrivateRoute>
