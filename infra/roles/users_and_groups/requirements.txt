@@ -1,3 +1,6 @@
 docker==3.5.1
 molecule==2.19.0
 pytest==3.9.3
+anyconfig>=0.10.0 # not directly required, pinned by Snyk to avoid a vulnerability
+psutil>=5.6.7 # not directly required, pinned by Snyk to avoid a vulnerability
+pyyaml>=5.4 # not directly required, pinned by Snyk to avoid a vulnerability
