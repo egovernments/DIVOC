@@ -10,6 +10,7 @@ import {useKeycloak} from '@react-keycloak/web'
 import {useTranslation} from "react-i18next";
 import { Container, Card, Col, Row, Form } from 'react-bootstrap';
 import InfoCard from '../InfoCard/InfoCard';
+import config from '../../config.json';
 const axios = require('axios');
 
 function GenerateToken() {
@@ -39,7 +40,7 @@ function GenerateToken() {
   }
   const getToken = async () => {
       const userId = await getUserId();
-      return axios.get(`http://localhost/vc-management/v1/tenant/generatetoken/${userId}`).then(res =>
+      return axios.get(`${config.tokenEndPoint}/${userId}`).then(res =>
       res.data.access_token.access_token
   ).catch(error => {
       console.error(error);
