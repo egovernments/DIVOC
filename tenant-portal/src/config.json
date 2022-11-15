@@ -1,3 +1,4 @@
 {
-  "urlPath": "/tenant-portal"
+  "urlPath": "/tenant-portal",
+  "tokenEndPoint": "/vc-management/v1/tenant/generatetoken"
 }

@@ -20,9 +20,15 @@ function Home() {
         <div className="row mx-5 px-5 my-5">
             <div className="col-md-6">
                 <div className="p-2">
-                    <h2>{t('homePage.title')}</h2><br/>
-                    <p>{t('homePage.text')}</p>
-                    <p>{t('homePage.view')} <a href="#" className="mx-2">{t('homePage.trainingMaterial')}</a> {t('homePage.or')} <a href="#" className="mx-2">{t('homePage.videosLink')}</a></p>
+                    <div className="title">{t('homePage.title')}</div>
+                    <div className="text">
+                        <div className="pb-2">{t('homePage.text')}</div>
+                        <div>{t('homePage.view')} 
+                            <a href="#" className="mx-2">{t('homePage.trainingMaterial')}</a>
+                            {t('homePage.or')}
+                            <a href="#" className="mx-2">{t('homePage.videosLink')}</a>
+                        </div>
+                    </div>
                 </div>
                 <Container fluid>
                     <Row gutterX='3'>
@@ -49,7 +55,9 @@ function Home() {
                     </Row>
                 </Container>
             </div>
-            <img src={HomeImg} alt="Home Image" className="col-md-6"/>
+            <div className="col-md-6 px-3">
+            <img src={HomeImg} alt="Home" />
+            </div>
         </div>
     );
 }
