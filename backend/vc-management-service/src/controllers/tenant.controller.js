@@ -24,7 +24,7 @@ async function createTenant(req, res) {
             return;
         }
         res.status(400).json({
-            message: "Invalid userId. It must start with an alphabet or a number and can only contain .-_@"
+            message: "Invalid userId. It must be a valid email address"
         })
     } catch (err) {
         console.error(err);
