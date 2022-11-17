@@ -17,6 +17,7 @@
 .alertCard {
     color: #639CD1;
     background-color: #F2F9FF;
+    border:none;
 }
 .page-content{
     padding: 0 3rem;
