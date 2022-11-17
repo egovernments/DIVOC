@@ -47,7 +47,7 @@
                     </div>
 
                 </div>
-                <div class="container-wrapper image-wrapper">
+                <div class="image-wrapper">
                     <img src="${url.resourcesPath}/img/forgot_password.png" alt="">
                 </div>
             </div>

@@ -32,7 +32,7 @@ body {
 }
 .ndear-login-card-wrapper {
   width: 60%;
-  padding: 0 3rem 0 8rem;
+  padding: 0 8rem 0 3rem;
 }
 .keycloak-form {
   max-width: 600px;
@@ -253,7 +253,7 @@ body {
     padding: 4rem 9rem;
   }
   .ndear-login-card-wrapper {
-    padding: 0 3rem 0 8rem;
+    padding: 0 8rem 0 3rem;
   }
 }
 
@@ -262,7 +262,7 @@ body {
     padding: 4rem 12rem;
   }
   .ndear-login-card-wrapper {
-    padding: 0 3rem 0 12rem;
+    padding: 0 12rem 0 3rem;
   }
 }
 
@@ -303,10 +303,18 @@ font-size: 10px;
   padding-bottom: 1rem;
 }
 .success-response p{
-  color:#4EA466;
+  font-family: 'Open Sans';
+  font-style: normal;
   font-weight: 700;
-  font-size: 28px;
+  font-size: 24px;
+  line-height: 38px;
+  max-width: 100%;
+  color: #4EA466;
   margin: 0;
+}
+
+.success-response img{
+  padding-right: 1rem;
 }
 
 .alert-box{

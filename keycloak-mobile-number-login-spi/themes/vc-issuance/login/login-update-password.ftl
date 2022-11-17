@@ -5,7 +5,7 @@
     <#elseif section = "form">
         <div class="form-wrapper">
             <div class="${properties.kcFormOptionsWrapperClass!}">
-                    <span><a href="${url.loginUrl}"><img src="${url.resourcesPath}/img/vector-arrow.png"
+                    <span><a href="${client.baseUrl}"><img src="${url.resourcesPath}/img/vector-arrow.png"
                                                          alt=""> ${kcSanitize(msg("backToLogin"))?no_esc}</a></span>
             </div>
             <div class="ndear-login-wrapper">
