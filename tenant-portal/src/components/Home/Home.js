@@ -12,13 +12,7 @@ function Home() {
     const {keycloak} = useKeycloak();
     const navigate = useNavigate();
     const { t } = useTranslation();
-
-    useEffect(() => {
-        if (!keycloak.authenticated) {
-            navigate(config.urlPath + "/login");
-        }
-    }, []);
-
+    
     return(
         <div className="d-flex flex-wrap">
             <div className='col-md-6 col-sm-12 page-content'>

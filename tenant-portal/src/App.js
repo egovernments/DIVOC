@@ -41,8 +41,14 @@ function App() {
       <Header/>
       <div style={{marginTop: "6rem"}}>
         <Routes>
-          <Route exact path={config.urlPath + "/"} element={<Home />} />
           <Route exact path={config.urlPath + "/login"} element={<Login />} />
+          <Route path={config.urlPath + "/"}
+             element={
+                        <PrivateRoute>
+                          <Home />
+                        </PrivateRoute>
+                     }
+           ></Route>
           <Route path={config.urlPath + "/create-schema"}
              element={
                         <PrivateRoute>
