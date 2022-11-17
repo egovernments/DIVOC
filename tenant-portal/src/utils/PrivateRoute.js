@@ -5,13 +5,12 @@ import {useKeycloak} from '@react-keycloak/web'
 import { Routes } from 'react-router-dom';
 import config from "../config.json";
 
-export function PrivateRoute({component: Component, role, clientId, ...rest}) {
+export function PrivateRoute({children, role, clientId, ...rest}) {
     const {keycloak} = useKeycloak();
-    
         
         const isLoggedIn = keycloak.authenticated;
 
-        return isLoggedIn ? <Component {...rest} /> : <Navigate to= {config.urlPath + "/login"} />;
+        return isLoggedIn ?  children: <Navigate to= {config.urlPath + "/login"} />;
 
         //  <Route
         //     {...rest}

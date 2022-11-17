@@ -20,12 +20,19 @@
 .card{
     padding: 1rem 0;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
+    border: none;
+    display: flex;
+    height: 100%;
 }
 
 .card:hover{
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
     border: 1px solid transparent;
-    border-image: linear-gradient(270deg, #5367CA, #73BAF4) 1;
+    border-radius: 4%;
+    background: 
+        linear-gradient(to right, white, white), 
+        linear-gradient(270deg, #5367CA, #73BAF4); 
+    background-clip: padding-box, border-box;
+    background-origin: padding-box, border-box;
 }
 
 a {

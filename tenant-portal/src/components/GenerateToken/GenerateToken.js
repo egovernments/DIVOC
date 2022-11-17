@@ -53,13 +53,13 @@ function GenerateToken() {
   }
 
   return (
-    <div className='row mx-5 px-5 my-5'>
-        <div className='col-md-6 p-2'>
+    <div className='d-flex flex-wrap'>
+        <div className='col-md-6 col-sm-12 page-content'>
             <div className='title'>{t('genTokenPage.title')}</div>
             {token==='' && <div>
               <div className='text'>
-              <div className='pb-3'>{t('genTokenPage.text')}</div>
-              <div className='pb-3'>{t('genTokenPage.buttonClickInfo')}</div>
+              <div className='mb-3'>{t('genTokenPage.text')}</div>
+              <div className='mb-3'>{t('genTokenPage.buttonClickInfo')}</div>
               </div>           
               <div onClick={() => outputToken()}><GenericButton img='' text={t('genTokenPage.buttonText')} type='primary' /></div>
             </div>}
@@ -68,25 +68,25 @@ function GenerateToken() {
               <p className='mb-0'>{t('viewTokenPage.text1')}</p>
               <p className='mb-0'>{t('viewTokenPage.text2')}</p>
               </div>
-              <Form.Control className='my-3' className={styles['token']} size="lg" type="text" readOnly id='token' defaultValue={token} />
-              <Container fluid className='my-3'>
-                <Row>
-                  <div className='col-md-6 ps-0' onClick={() => copyToken()}>
+              <Form.Control className={`my-3 ${styles['token']}`} size="lg" type="text" readOnly id='token' defaultValue={token} />
+              <div className='container-fluid my-3 px-0'>
+                <div className='px-0 mx-0 d-flex flex-wrap'>
+                  <div className='col-12 col-lg-6 my-2 pe-0 pe-lg-2' onClick={() => copyToken()}>
                   <GenericButton img={CopyIcon} text='Copy' type='primary' />
                   </div>
-                  <div className='col-md-6 pe-0' onClick={() =>  downloadToken()}>
+                  <div className='col-12 col-lg-6 my-2 ps-0 ps-lg-2' onClick={() =>  downloadToken()}>
                   <GenericButton img={DownloadIcon} text='Download' type='primary' />
                   </div>
-                </Row>
-              </Container>
+                  </div>
+              </div>
               <InfoCard  icon={AlertIcon}
               title={t('viewTokenPage.alertCard.title')}
               text={t('viewTokenPage.alertCard.text')} 
               imptext={t('viewTokenPage.alertCard.imptext')} className='alertCard mt-4' />
             </div>}
         </div>
-        <div className="col-md-6 px-3">
-        <img src={GenTokenImg} alt="GenToken" />
+        <div className="col-md-6 col-sm-12 text-center">
+        <img src={GenTokenImg} alt="GenToken" className='page-image' />
         </div>
     </div>
   )

@@ -1,26 +1,45 @@
 import Navbar from "react-bootstrap/Navbar";
 import NavbarLogo from "../../assets/img/nav-logo.png";
 import "./Header.css";
+import { useKeycloak } from "@react-keycloak/web";
 import Nav from "react-bootstrap/Nav";
 import { useTranslation } from "react-i18next";
-import { NavDropdown } from "react-bootstrap";
+import { Dropdown, NavDropdown } from "react-bootstrap";
 import UserLogo from "../../assets/img/user-logo.png";
+import { useState, useEffect } from "react";
 
 function Header() {
+  const {keycloak} = useKeycloak();
+  const [showProfile, setShowProfile] = useState(false);
   const { i18n } = useTranslation();
   const lngs = {
     en: { nativeName: "English" },
     hi: { nativeName: "Hindi" },
   };
-
-
+  const toggleProfile = (event) => {
+    event.stopPropagation();
+    setShowProfile(!showProfile)
+  }
+  const handleClick = () => {
+    setShowProfile(false);
+  };
+  useEffect(() => {
+    window.addEventListener('click', handleClick);
+    return () => {
+      window.removeEventListener('click', handleClick);
+    };
+  }, []);
+  
+  function logout(){
+    keycloak.logout();
+    return 
+  }
   return (
-    <Navbar fixed="top" bg="white">
-      <Navbar.Brand href={"/"}>
+    <Navbar fixed="top" bg="white" className="px-3 py-2">
+      <Navbar.Brand href={"/tenant-portal"}>
         <img
           src={NavbarLogo}
-          width="100%"
-          className="d-inline-block align-top"
+          width="90%"
           alt="React Bootstrap logo"
         />
       </Navbar.Brand>
@@ -31,6 +50,7 @@ function Header() {
         <NavDropdown
           title={lngs[i18n.language]?.nativeName || "English"}
           id="basic-nav-dropdown"
+          align="end"
         >
           {Object.keys(lngs).map((lng) => (
             <NavDropdown.Item
@@ -41,8 +61,18 @@ function Header() {
             </NavDropdown.Item>
           ))}
         </NavDropdown>
-        <img src={UserLogo} width="7%" height="7%" alt="React Bootstrap logo" />
-       
+        <Dropdown title={<img src={UserLogo} />} >
+          <Dropdown.Menu>
+            <Dropdown.Item>bhanu</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+        <div style={{cursor:"pointer",}}>
+          <img src={UserLogo} className="header-profile " onClick={toggleProfile} />
+          <ul className={(showProfile) ? "profile-dropdown": "d-none" }>
+            <li><span>Change Password</span></li>
+            <li onClick={logout} href="#"><span>Logout</span></li>
+          </ul>
+        </div>
       </Navbar.Collapse>
     </Navbar>
   );

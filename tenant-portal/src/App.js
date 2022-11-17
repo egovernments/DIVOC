@@ -15,23 +15,23 @@ import './i18n';
 
 function App() {
   const { initialized, keycloak } = useKeycloak();
-    axios.interceptors.response.use(
-        response => response,
-        error => {
-            if (error.response.status === 401) {
-                keycloak.logout()
+  axios.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.response.status === 401) {
+            keycloak.logout()
 
-            }
-            else if (error.response.status === 403) {
-                <ToastComponent header="Unauthorized access" toastBody="You are not authorized to view this resource" />
+        }
+        else if (error.response.status === 403) {
+            <ToastComponent header="Unauthorized access" toastBody="You are not authorized to view this resource" />
 
-            }
-            else if(error.response){
-                <ToastComponent header="Error" toastBody={error.response.data} />
-            }
-        });
+        }
+        else if(error.response){
+            <ToastComponent header="Error" toastBody={error.response.data} />
+        }
+    });
 
-    if (!initialized) {
+  if (!initialized) {
     return <div>Loading...</div>;
   }
 
@@ -39,25 +39,31 @@ function App() {
     <div>
       <Router>
       <Header/>
-      <div style={{paddingBottom: "3rem", paddingTop: "3rem"}}>
+      <div style={{marginTop: "6rem"}}>
         <Routes>
-        
           <Route exact path={config.urlPath + "/"} element={<Home />} />
           <Route exact path={config.urlPath + "/login"} element={<Login />} />
-          <Route exact path={config.urlPath + "/generate-token"} element={<GenerateToken />} />
           <Route path={config.urlPath + "/create-schema"}
              element={
                         <PrivateRoute>
-                          <CreateSchema /> role={"tenant"} clientId={"registry-frontend"}
+                          <CreateSchema />
+                        </PrivateRoute>
+                     }
+           >
+           </Route>
+           <Route path={config.urlPath + "/generate-token"}
+             element={
+                        <PrivateRoute>
+                          <GenerateToken /> 
                         </PrivateRoute>
                      }
            >
            </Route>
         </Routes>
         </div>
-      <Footer/>
+        <ToastComponent/>
+      <div><Footer/></div>
       </Router>
-      <ToastComponent/>
     </div>
   );
 }

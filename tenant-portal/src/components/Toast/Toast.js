@@ -6,7 +6,7 @@ function ToastComponent({
     header,
     toastBody
 }) {
-    const [showToast, setShowToast] = useState(true);
+    const [showToast, setShowToast] = useState(false);
     const toggleShow = () => setShowToast(!showToast);
 
     return (

@@ -14,14 +14,14 @@ const Login = () => {
             keycloak.redirectUri = window.location.origin + config.urlPath;
             keycloak.login()
         }
-    }, [keycloak]);
+    }, []);
 
     useEffect(() => {
         if (keycloak.authenticated) {
             let redirectUrl = config.urlPath;
             navigate(redirectUrl)
         }
-    }, [keycloak, navigate]);
+    }, []);
 
     return (
         <div>
