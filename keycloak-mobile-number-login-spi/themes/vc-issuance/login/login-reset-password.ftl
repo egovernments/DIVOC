@@ -5,7 +5,7 @@
     <#elseif section = "form">
         
         <div id="kc-form" class="ndear-login-card-wrapper w-100">
-        <p class="login-title">Forgot Password?</p>
+        <p class="login-title">${msg("doForgotPassword")}</p>
         <div id="kc-form-wrapper">
             <form id="kc-reset-password-form" action="${url.loginAction}" method="post">
                 <div class="${properties.kcFormGroupClass!}">
