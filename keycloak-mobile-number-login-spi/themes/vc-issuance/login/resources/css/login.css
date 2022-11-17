@@ -24,20 +24,19 @@ body {
   justify-content: start;
   padding-top: 3rem;
   width: 40%;
-  align-items: center;
+  align-items: start;
 }
 .ndear-login-wrapper {
   display: flex;
   padding: 4rem 6rem;
 }
 .ndear-login-card-wrapper {
-  display: flex;
-  flex-direction: column;
   width: 60%;
-  padding: 0 3rem;
+  padding: 0 3rem 0 8rem;
 }
-#kc-form-wrapper {
-  max-width: 928px;
+.keycloak-form {
+  max-width: 600px;
+  margin: auto;
 }
 .auth-flow-images {
   max-width: 100%;
@@ -223,6 +222,9 @@ body {
 }
 
 @media (max-width: 992px) {
+  .keycloak-form {
+    max-width: 928px;
+  }
   .ndear-login-wrapper {
     display: flex;
     flex-direction: column;
@@ -238,6 +240,7 @@ body {
   }
   .image-wrapper {
     width: 100%;
+    align-items: center;
   }
   .ndear-login-card-wrapper {
     width: 100%;
@@ -247,7 +250,19 @@ body {
 
 @media (min-width: 1200px) {
   .ndear-login-wrapper {
-    padding: 4rem 8rem;
+    padding: 4rem 9rem;
+  }
+  .ndear-login-card-wrapper {
+    padding: 0 3rem 0 8rem;
+  }
+}
+
+@media (min-width: 1400px) {
+  .ndear-login-wrapper {
+    padding: 4rem 12rem;
+  }
+  .ndear-login-card-wrapper {
+    padding: 0 3rem 0 12rem;
   }
 }
 
