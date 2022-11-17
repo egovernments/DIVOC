@@ -12,6 +12,7 @@ import GenerateToken from "./components/GenerateToken/GenerateToken";
 import ToastComponent from './components/Toast/Toast';
 import axios from 'axios';
 import './i18n';
+import BreadcrumbComponent from "./components/BreadcrumbComponent/BreadcrumbComponent";
 
 function App() {
   const { initialized, keycloak } = useKeycloak();
@@ -40,6 +41,7 @@ function App() {
       <Router>
       <Header/>
       <div style={{marginTop: "6rem"}}>
+      <BreadcrumbComponent />
         <Routes>
           <Route exact path={config.urlPath + "/"} element={<Home />} />
           <Route exact path={config.urlPath + "/login"} element={<Login />} />

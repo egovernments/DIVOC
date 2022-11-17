@@ -35,3 +35,9 @@
 .page-image {
     max-width: 80%;
 }
+.bc {
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    display: flex;
+  }
