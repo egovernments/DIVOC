@@ -3,7 +3,9 @@
     <#if section = "header">
         ${msg("emailVerifyTitle")}
     <#elseif section = "form">
+    <div class="form-wrapper">
         <p class="instruction">${msg("emailVerifyInstruction1")}</p>
+    </div>
     <#elseif section = "info">
         <p class="instruction">
             ${msg("emailVerifyInstruction2")}
