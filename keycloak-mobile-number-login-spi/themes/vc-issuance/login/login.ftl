@@ -3,8 +3,9 @@
     <#if section = "header">
         ${msg("loginAccountTitle")}
 <#elseif section = "form">
-        
-        <div id="kc-form" class="ndear-login-card-wrapper w-100">
+    <div class="form-wrapper">
+        <div class="ndear-login-wrapper">
+        <div id="kc-form" class="ndear-login-card-wrapper">
             <p class="login-title">Login to Administrator Portal</p>
             <div id="kc-form-wrapper">
                 <#if realm.password>
@@ -12,7 +13,7 @@
                           method="post">
                         <div class="${properties.kcFormGroupClass!}">
                             <label for="username"
-                                   class="${properties.kcLabelClass!}"><#if !realm.loginWithEmailAllowed>${msg("username")}<#elseif !realm.registrationEmailAsUsername>${msg("username")}<#else>${msg("email")}</#if></label>
+                                   class="${properties.kcLabelClass!}">${msg("email")}</label>
 
                             <#if usernameEditDisabled??>
                                 <input tabindex="1" id="username" class="${properties.kcInputClass!}" name="username"
@@ -24,18 +25,10 @@
                                         <input tabindex="1" id="username" class="${properties.kcInputClass!}"
                                                name="username" value="${(login.username!'')}" type="text" autofocus
                                                autocomplete="off"
-                                               aria-invalid="<#if messagesPerField.existsError('username','password')>true</#if>"
                                         />
                                     </div>
 
                                 </div>
-
-                                <#if messagesPerField.existsError('username','password')>
-                                    <span id="input-error" class="${properties.kcInputErrorMessageClass!}"
-                                          aria-live="polite">
-                                    ${kcSanitize(messagesPerField.getFirstError('username','password'))?no_esc}
-                            </span>
-                                </#if>
                             </#if>
                         </div>
 
@@ -78,7 +71,7 @@
                                    name="login" id="kc-login" type="submit" value="${msg("doLogIn")}"/>
                         </div>
 
-                        <div class="${properties.kcFormOptionsWrapperClass!}">
+                        <div class="${properties.kcFormOptionsWrapperClass!} text-center">
                             <#if realm.resetPasswordAllowed>
                                 <span><a tabindex="5"
                                         href="${url.loginResetCredentialsUrl}">${msg("doForgotPassword")}</a></span>
@@ -89,9 +82,19 @@
                 <#if  message?has_content && (message.type != 'warning' || !isAppInitiatedAction??)>
                     <div class="pf-c-alert__icon">
                         <#if message.type = 'success'>
-                            <div class = "alert-box success-alert">                          
-                                <span class="${properties.kcFeedbackSuccessIcon!} pr-3"></span>
-                                <span>${msg("successfulEmailResponse")}</span>
+                            <div class = "alert-box success-alert">
+                                <div class="alert-heading"><img src="${url.resourcesPath}/img/vector-check-circle.png" alt=""> Email Sent</div>
+                                <div class="alert-message p-1">
+                                    <div>An email has been sent to "${(login.username!'')}" with instructions for resetting the password. Please check your inbox.</div>
+                                    <div class="fw-bolder fst-italic p-1">Didn’t get a reset link?</div>
+                                    <div class="fw-lighter p-1">
+                                        <ol>
+                                            <li>Check your spam folder</li>
+                                            <li>Check the spelling</li>
+                                            <li>Wait few minutes before trying again.</li>
+                                        </ol>
+                                    </div>
+                                </div>
                             </div>
                         </#if>
                         <#if message.type = 'warning'>
@@ -100,10 +103,10 @@
                                 <span >${kcSanitize(message.summary)?no_esc}</span>
                             </div>
                         </#if>
-                        <#if message.type = 'error'>
+                        <#if messagesPerField.existsError('username')>
                             <div class = "alert-box error-alert">
-                                <span class="${properties.kcFeedbackErrorIcon!}"></span>
-                                <span >${kcSanitize(message.summary)?no_esc}</span>
+                                <div class="alert-heading"><img src="${url.resourcesPath}/img/vector-alert.png" alt=""> Alert!</div>
+                                <div class="alert-message">${kcSanitize(message.summary)?no_esc}</div>
                             </div>
                         </#if>
                         <#if message.type = 'info'>
@@ -140,10 +143,10 @@
             </#if>
             
         </div>
-        <div class="container-wrapper title-wrapper">
-                <img class="" src="${url.resourcesPath}/img/vc-tenant-login-image.png" alt="">
+        <div class="image-wrapper ">
+                <img class="auth-flow-images" src="${url.resourcesPath}/img/vc-tenant-login-image.png" alt="">
         </div>
-        
+        </div>
     <#elseif section = "info" >
         <#if realm.password && realm.registrationAllowed && !registrationDisabled??>
             <div id="kc-registration-container">
@@ -154,5 +157,5 @@
             </div>
         </#if>
     </#if>
-
+    </div>
 </@layout.registrationLayout>
