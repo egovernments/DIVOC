@@ -1,5 +1,6 @@
 .navbar {
     box-shadow: 0 6px 20px #C1CFD933;
+    padding: 0;
 }
 
 .nav-link {
@@ -7,4 +8,34 @@
     font-size: 12px;
     padding-left: 1rem !important;
     padding-right: 1rem !important;
+}
+.dropdown-menu.show {
+    border: none;
+    margin-top: 1.5rem;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+.header-profile {
+    margin: 0 0.5rem;
+    width: 40px;
+    height: 40px;
+}
+.profile-dropdown {
+    padding: 0.5rem 0;
+    margin: 0;
+    right: 10px;
+    left: auto;
+    display: block;
+    top: 100%;
+    background-color: white;
+    list-style: none;
+    position:absolute ;
+    border: none;
+    border-radius: 4%;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+.profile-dropdown li:hover {
+    background-color: rgba(235, 235, 235, 0.6);
+}
+.profile-dropdown li {
+    padding: 0.25rem 1rem;
 }

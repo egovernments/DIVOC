@@ -17,4 +17,21 @@
 .alertCard {
     color: #639CD1;
     background-color: #F2F9FF;
+    border:none;
+}
+.page-content{
+    padding: 0 3rem;
+}
+@media (min-width: 768px){
+    .page-content{
+        padding: 0 5rem;
+    }
+}
+@media (min-width: 992px){
+    .page-content{
+        padding: 0 6rem;
+    }
+}
+.page-image {
+    max-width: 80%;
 }
