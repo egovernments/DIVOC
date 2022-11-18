@@ -90,7 +90,7 @@
                                         type="submit" name="cancel-aia" value="true" />${msg("doCancel")}</button>
                                     <#else>
                                         <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
-                                               type="submit" value="${msg("doUpdate")}"/>
+                                               type="submit" value="${msg("doReset")}"/>
                                     </#if>
                                 </div>
                             </div>
@@ -98,7 +98,7 @@
                     </div>
                 </div>
                 <div class="image-wrapper">
-                        <img class="" src="${url.resourcesPath}/img/forgot_password.png" alt="">
+                        <img class="auth-flow-images" src="${url.resourcesPath}/img/forgot_password.png" alt="">
                 </div>
             </div>
         </div>

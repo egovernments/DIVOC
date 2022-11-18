@@ -13,9 +13,15 @@
                     <div class="keycloak-form">
                         <div class="success-response">
                             <img src="${url.resourcesPath}/img/check_circle_outline.png">
-                            <p> ${message.summary}</p>
+                            <#if message.summary == msg("accountUpdatedMessage")>
+                                <p> ${kcSanitize(msg("passwordUpdateSuccess1"))?no_esc}</p>
+                            <#else> <p>${message.summary}</p>
+                            </#if>
                         </div>
                         <div id="kc-info-message">
+                           <#if message.summary == msg("accountUpdatedMessage")>
+                                <p class="instruction"> ${kcSanitize(msg("passwordUpdateSuccess2"))?no_esc}</p>
+                            </#if>
                             <p class="instruction"><#if requiredActions??><#list requiredActions>: <b><#items as reqActionItem>${msg("requiredAction.${reqActionItem}")}<#sep>, </#items></b></#list><#else></#if></p>
                                 <#if pageRedirectUri?has_content>
                                     <div class="${properties.kcFormOptionsWrapperClass!}">
@@ -36,7 +42,7 @@
                     </div>
                 </div>
                 <div class="image-wrapper">
-                    <img src="${url.resourcesPath}/img/reset-password-success.png" alt="">
+                    <img class="auth-flow-images" src="${url.resourcesPath}/img/reset-password-success.png" alt="">
                 </div>
             </div>
         </div>

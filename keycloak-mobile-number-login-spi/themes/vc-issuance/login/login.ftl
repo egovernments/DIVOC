@@ -104,7 +104,7 @@
                                     <span >${kcSanitize(message.summary)?no_esc}</span>
                                 </div>
                             </#if>
-                            <#if messagesPerField.existsError('username')>
+                            <#if messagesPerField.existsError('username','password')>
                                 <div class = "alert-box error-alert">
                                     <div class="alert-heading"><img src="${url.resourcesPath}/img/vector-alert.png" alt=""> Alert!</div>
                                     <div class="alert-message">${kcSanitize(message.summary)?no_esc}</div>
