@@ -47,8 +47,8 @@
                     </div>
 
                 </div>
-                <div class="container-wrapper image-wrapper">
-                    <img src="${url.resourcesPath}/img/forgot_password.png" alt="">
+                <div class="image-wrapper">
+                    <img class="auth-flow-images" src="${url.resourcesPath}/img/forgot_password.png" alt="">
                 </div>
             </div>
         </div>

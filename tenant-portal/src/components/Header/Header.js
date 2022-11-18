@@ -7,10 +7,10 @@ import { useTranslation } from "react-i18next";
 import { Dropdown, NavDropdown } from "react-bootstrap";
 import UserLogo from "../../assets/img/user-logo.png";
 import { useState, useEffect } from "react";
-
 function Header() {
   const {keycloak} = useKeycloak();
   const [showProfile, setShowProfile] = useState(false);
+  const [profileName, setProfileName] = useState("");
   const { i18n } = useTranslation();
   const lngs = {
     en: { nativeName: "English" },
@@ -24,15 +24,17 @@ function Header() {
     setShowProfile(false);
   };
   useEffect(() => {
+    var profileName = keycloak.idTokenParsed.preferred_username.split("@")[0];
+    profileName = profileName.charAt(0).toUpperCase()+ profileName.slice(1);
+    setProfileName(profileName);
     window.addEventListener('click', handleClick);
     return () => {
       window.removeEventListener('click', handleClick);
     };
   }, []);
-  
   function logout(){
     keycloak.logout();
-    return 
+    return
   }
   return (
     <Navbar fixed="top" bg="white" className="px-3 py-2">
@@ -44,9 +46,8 @@ function Header() {
         />
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
-
       <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
-        <Nav className="">{<Nav.Link href="#">Council Software</Nav.Link>}</Nav>
+        <Nav className="">{<Nav.Link href="#">{profileName}</Nav.Link>}</Nav>
         <NavDropdown
           title={lngs[i18n.language]?.nativeName || "English"}
           id="basic-nav-dropdown"
@@ -77,5 +78,4 @@ function Header() {
     </Navbar>
   );
 }
-
 export default Header;

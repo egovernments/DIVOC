@@ -5,7 +5,7 @@
     <#elseif section = "form">
         <div class="form-wrapper">
             <div class="${properties.kcFormOptionsWrapperClass!}">
-                    <span><a href="${url.loginUrl}"><img src="${url.resourcesPath}/img/vector-arrow.png"
+                    <span><a href="${client.baseUrl}"><img src="${url.resourcesPath}/img/vector-arrow.png"
                                                          alt=""> ${kcSanitize(msg("backToLogin"))?no_esc}</a></span>
             </div>
             <div class="ndear-login-wrapper">
@@ -90,7 +90,7 @@
                                         type="submit" name="cancel-aia" value="true" />${msg("doCancel")}</button>
                                     <#else>
                                         <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
-                                               type="submit" value="${msg("doUpdate")}"/>
+                                               type="submit" value="${msg("doReset")}"/>
                                     </#if>
                                 </div>
                             </div>
@@ -98,7 +98,7 @@
                     </div>
                 </div>
                 <div class="image-wrapper">
-                        <img class="" src="${url.resourcesPath}/img/forgot_password.png" alt="">
+                        <img class="auth-flow-images" src="${url.resourcesPath}/img/forgot_password.png" alt="">
                 </div>
             </div>
         </div>

@@ -39,7 +39,7 @@ function App() {
     <div>
       <Router>
       <Header/>
-      <div style={{marginTop: "6rem"}}>
+      <div style={{marginTop: "6rem", marginBottom: "3rem"}}>
         <Routes>
           <Route exact path={config.urlPath + "/login"} element={<Login />} />
           <Route path={config.urlPath + "/"}
