@@ -1,4 +1,4 @@
-FROM node:lts-alpine as verification_app_build
+FROM node:lts-alpine3.13 as verification_app_build
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 ENV REACT_APP_CERTIFICATE_STATUS_VC 'true'

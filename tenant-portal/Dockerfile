@@ -1,4 +1,4 @@
-FROM node:lts-alpine as tenant_portal_build
+FROM node:lts-alpine3.13 as tenant_portal_build
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json ./
