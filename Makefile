@@ -1,5 +1,5 @@
 IMAGES:=divoc/gateway divoc/portal_api divoc/registration_api divoc/vaccination_api divoc/certificate_processor divoc/analytics_feed divoc/notification-service divoc/digilocker_support_api divoc/certificate_signer divoc/test_certificate_signer divoc/registry-es divoc/keycloak divoc/certificate_api
-VC_IMAGES:=divoc/vc-management-service divoc/vc-certification-service divoc/vc-certify-consumer
+VC_IMAGES:=divoc/vc-management-service divoc/vc-certification-service divoc/vc-certify-consumer divoc/tenant-portal divoc/verification-app
 ifeq ($(RELEASE_VERSION), )
 RELEASE_VERSION := 3.0.2
 endif
@@ -16,6 +16,8 @@ docker:
 	$(MAKE) -C keycloak
 	$(MAKE) -C backend
 	$(MAKE) -C registry
+	$(MAKE) -C verification-app
+	$(MAKE) -C tenant-portal
 test:
 	echo "Starting services in e2e testing mode"
 	docker-compose -f docker-compose.yml -f docker-compose.e2e.yml --env-file .env.example up -d

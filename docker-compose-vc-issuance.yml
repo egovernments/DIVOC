@@ -228,9 +228,7 @@ services:
 
   tenant-portal:
     image: divoc/tenant-portal
-    ports:
-      - "3000:80"
-
+  
   verification-app:
     image: divoc/verification-app
 
