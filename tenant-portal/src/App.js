@@ -40,11 +40,16 @@ function App() {
     <div>
       <Router>
       <Header/>
-      <div style={{marginTop: "6rem"}}>
-      <BreadcrumbComponent />
+      <div style={{marginTop: "6rem", marginBottom: "3rem"}}>
         <Routes>
-          <Route exact path={config.urlPath + "/"} element={<Home />} />
           <Route exact path={config.urlPath + "/login"} element={<Login />} />
+          <Route path={config.urlPath + "/"}
+             element={
+                        <PrivateRoute>
+                          <Home />
+                        </PrivateRoute>
+                     }
+           ></Route>
           <Route path={config.urlPath + "/create-schema"}
              element={
                         <PrivateRoute>
@@ -64,7 +69,7 @@ function App() {
            <Route path={config.urlPath + "/generate-token/view-token"}
              element={
                         <PrivateRoute>
-                          <GenerateToken /> 
+                          <GenerateToken />
                         </PrivateRoute>
                      }
            >

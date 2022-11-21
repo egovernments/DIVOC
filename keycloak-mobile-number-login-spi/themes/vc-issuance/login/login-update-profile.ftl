@@ -3,6 +3,7 @@
     <#if section = "header">
         ${msg("loginProfileTitle")}
     <#elseif section = "form">
+    <div class="ndear-login-wrapper container-wrapper">
         <div class="${properties.kcLabelWrapperClass!}">
             <h3 class="d-flex align-items-center"><a onclick="window.history.back()"><img
                             src="${url.resourcesPath}/img/next-btn.svg" alt="" class="pr-3"></a> Update Profile</h3>
@@ -117,5 +118,6 @@
                 </div>
             </div>
         </form>
+    </div>
     </#if>
 </@layout.registrationLayout>
