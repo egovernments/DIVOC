@@ -24,20 +24,30 @@
 }
 @media (min-width: 768px){
     .page-content{
-        padding: 0 5rem;
+        padding: 0 1rem 0 5rem;
     }
 }
 @media (min-width: 992px){
     .page-content{
-        padding: 0 6rem;
+        padding: 0 3rem 0 6rem;
     }
 }
 .page-image {
     max-width: 80%;
+    margin-bottom: 3rem;
 }
-.bc {
+.breadcrumb {
     align-items: center;
     white-space: nowrap;
     overflow: hidden;
     display: flex;
-  }
+}
+.breadcrumb-item {
+    text-decoration: none;
+    padding-inline: 0.25rem;
+}
+.disabled {
+    cursor: default;
+    pointer-events: none;
+    color: #484646;
+}

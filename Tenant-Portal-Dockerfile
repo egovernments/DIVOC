@@ -1,6 +1,7 @@
 FROM node:lts-alpine as tenant_portal_build
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
+ENV PUBLIC_URL /tenant-portal
 COPY tenant-portal/package.json ./
 COPY tenant-portal/package-lock.json ./
 RUN npm i --silent

@@ -1,15 +1,16 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import useBreadcrumbs from "use-react-router-breadcrumbs";
-import config from "../../config.json";
+
 const BreadcrumbComponent = () => {
     const breadcrumbs = useBreadcrumbs();
   return (
-    <div className="d-flex">
+    <div className="d-flex flex-wrap ms-4">
       {breadcrumbs.map(({ breadcrumb, match }, index) => (
-        <div className="bc" key={match.url}>
-          <Link to={config.urlPath+"/"+match.url || config.urlPath}>{breadcrumb}</Link>
-          {index < breadcrumbs.length - 1 && "/"}
+        <div className="breadcrumb" key={match.pathname}> 
+            <a href={match.pathname}
+             className={(index==0 || index==breadcrumbs.length-1)? 
+              'breadcrumb-item disabled':'breadcrumb-item'}>{breadcrumb}</a>
+            {index < breadcrumbs.length - 1 && "/"}
         </div>
       ))}
     </div>

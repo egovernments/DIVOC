@@ -61,6 +61,14 @@ function App() {
                      }
            >
            </Route>
+           <Route path={config.urlPath + "/generate-token/view-token"}
+             element={
+                        <PrivateRoute>
+                          <GenerateToken /> 
+                        </PrivateRoute>
+                     }
+           >
+           </Route>
         </Routes>
         </div>
         <ToastComponent/>
