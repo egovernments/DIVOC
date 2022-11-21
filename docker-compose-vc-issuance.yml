@@ -228,8 +228,9 @@ services:
 
   tenant-portal:
     image: divoc/tenant-portal
-    ports:
-      - "3000:80"
+  
+  verification-app:
+    image: divoc/verification-app
 
   vc-certify-consumer:
     image: divoc/vc-certify-consumer:3.0.0-alpha
