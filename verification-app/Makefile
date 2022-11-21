@@ -1,4 +1,4 @@
-IMAGE:=divoc/verification-app
+IMAGE:=divoc/vc-verification-webapp
 docker:
 	@docker build . -t $(IMAGE)
 publish:

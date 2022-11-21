@@ -1,7 +1,7 @@
 IMAGES:=divoc/gateway divoc/portal_api divoc/registration_api divoc/vaccination_api divoc/certificate_processor divoc/analytics_feed divoc/notification-service divoc/digilocker_support_api divoc/certificate_signer divoc/test_certificate_signer divoc/registry-es divoc/keycloak divoc/certificate_api
-VC_IMAGES:=divoc/vc-management-service divoc/vc-certification-service divoc/vc-certify-consumer divoc/tenant-portal divoc/verification-app
+VC_IMAGES:=divoc/vc-management-service divoc/vc-certification-service divoc/vc-certify-consumer divoc/vc-verification-webapp
 ifeq ($(RELEASE_VERSION), )
-RELEASE_VERSION := 3.0.2
+RELEASE_VERSION := 3.1.0-generic
 endif
 $(info RELEASE VERSION $(RELEASE_VERSION))
 
