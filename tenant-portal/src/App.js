@@ -41,6 +41,7 @@ function App() {
       <Router>
       <Header/>
       <div style={{marginTop: "6rem", marginBottom: "3rem"}}>
+      <BreadcrumbComponent />
         <Routes>
           <Route exact path={config.urlPath + "/login"} element={<Login />} />
           <Route path={config.urlPath + "/"}

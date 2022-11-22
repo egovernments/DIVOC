@@ -4,8 +4,6 @@ ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json ./
 COPY package-lock.json ./
 ENV PUBLIC_URL /tenant-portal
-COPY tenant-portal/package.json ./
-COPY tenant-portal/package-lock.json ./
 RUN npm i --silent
 COPY . ./
 RUN npm run build
