@@ -13,6 +13,7 @@ import ToastComponent from './components/Toast/Toast';
 import axios from 'axios';
 import './i18n';
 
+
 function App() {
   const { initialized, keycloak } = useKeycloak();
   axios.interceptors.response.use(
@@ -37,6 +38,7 @@ function App() {
 
   return (
     <div>
+      
       <Router>
       <Header/>
       <div style={{marginTop: "6rem", marginBottom: "3rem"}}>
