@@ -19,12 +19,12 @@ async function getTransaction(req,res){
         
     }catch(err){
         console.error("Error in fetching transaction details",err);
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data || err
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
         });
-    };
+    }
 
-};
+}
 
 module.exports = {
     getTransaction
