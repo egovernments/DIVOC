@@ -22,8 +22,8 @@ async function addContext(req, res, minioClient) {
     }
     catch(err) {
         console.error(err);
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
         });
     }
 }
@@ -54,9 +54,9 @@ async function updateContext(req,res,minioClient){
         });
     }
     catch(err){
-        console.error(err?.response);
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data
+        console.error(err);
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
         });
     }
 }
@@ -79,8 +79,8 @@ async function getContext(req, res, minioClient) {
         return await getContextFromMinio(req, res, minioClient);
     } catch(err) {
         console.error(err);
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
         });
     }
 }
@@ -124,8 +124,8 @@ async function deleteContext(req, res, minioClient) {
     }
     catch(err) {
         console.error(err);
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
         });
     }
 }

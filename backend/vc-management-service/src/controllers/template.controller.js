@@ -23,8 +23,8 @@ async function uploadTemplate(req, res) {
         })
     } catch(err) {
         console.error(err);
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data || err
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
         });
     }
 }
