@@ -319,9 +319,3 @@ test('should call sunbird to check if certificate is valid during verification',
     await certificateController.verifyCertificate(req, res);
     expect(res.status).toHaveBeenCalledWith(406);
 });
-
-// test('test issuer format', async () => {
-//     expect(validationService.isURIFormat("2342343334")).toBe(false);
-//     expect(validationService.isURIFormat("http://test.com/123")).toBe(true);
-//     expect(validationService.isURIFormat("did:in.gov.uidai.aadhaar:2342343334")).toBe(true);
-// });
