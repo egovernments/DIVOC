@@ -3,6 +3,7 @@ WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json ./
 COPY package-lock.json ./
+ENV PUBLIC_URL /tenant-portal
 RUN npm i --silent
 COPY . ./
 RUN npm run build
