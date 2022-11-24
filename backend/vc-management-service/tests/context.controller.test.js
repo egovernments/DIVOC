@@ -19,13 +19,16 @@ describe('when redis is disabled', () => {
     jest.mock('../src/services/sunbird.service', () => {
         return {
             createEntity: jest.fn(),
-            getEntity: jest.fn()
+            getEntity: jest.fn(),
+            deleteEntity: jest.fn(),
+            updateEntity: jest.fn()
         }
     });
     jest.mock('../src/services/redis.service', () => {
         return {
             storeKeyWithExpiry: jest.fn(),
-            getKey: jest.fn()
+            getKey: jest.fn(),
+            deleteKey: jest.fn()
         }
     });
     jest.mock('../src/services/keycloak.service', () => {
@@ -69,6 +72,46 @@ describe('when redis is disabled', () => {
         expect(redisService.storeKeyWithExpiry).not.toHaveBeenCalled();
     });
 
+    test('should update context in minio, registry', async () =>{
+        const req = {
+            baseUrl: '/vc-management/v1/context',
+            params: {
+                osid: '1'
+            },
+            file: {
+                buffer: '456',
+                originalname: 'context.json'
+            },
+            header: jest.fn().mockReturnValue('header')
+        };
+        const res = {
+            send: function(){},
+            set: function() {
+                return this;
+            },
+            json: function(d) {
+            },
+            status: function(s) {
+                this.statusCode = s;
+                return this;
+            }
+        };
+        let minioClient = {
+            putObject: jest.fn(),
+            removeObject: jest.fn()
+        };
+        jest.spyOn(res, 'status');
+        jest.spyOn(res, 'json');
+        jest.spyOn(sunbirdRegistryService, 'getEntity').mockReturnValue({url: '/vc-management/v1/context/123'});
+        jest.spyOn(minioClient, 'removeObject').mockReturnValue('removed object');
+        await contextController.updateContext(req, res, minioClient);
+        const matchingString = /^(\/vc\-management\/v1\/context\/\d{13}\-context\.json)?$/;
+        expect(minioClient.putObject).toHaveBeenCalledWith('context', expect.stringMatching(matchingString), '456');
+        expect(sunbirdRegistryService.updateEntity).toHaveBeenCalledWith('localhost:8081/api/v1/ContextURL/1', {url: expect.stringMatching(matchingString)}, 'header');
+        expect(redisService.storeKeyWithExpiry).not.toHaveBeenCalledWith();
+        expect(res.status).toHaveBeenCalledWith(200);
+    })
+
     test('should get context from minio', async() => {
         const req = {
             baseUrl: '/vc-management/v1/context',
@@ -105,13 +148,45 @@ describe('when redis is disabled', () => {
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.json).toHaveBeenCalledWith({key: '123', value: '456'});
     });
+    test('should delete context from minio', async () => {
+        const req = {
+            baseUrl: '/vc-management/v1/context',
+            params: {
+                osid: '1'
+            },
+            header: jest.fn().mockReturnValue('header')
+        }
+        const res = {
+            send: function(){},
+            set: function() {
+                return this;
+            },
+            json: function(d) {
+            },
+            status: function(s) {
+                this.statusCode = s;
+                return this;
+            }
+        };
+        let minioClient = {
+            removeObject: jest.fn()
+        }
+        jest.spyOn(res, 'status');
+        jest.spyOn(res, 'json');
+        jest.spyOn(minioClient, 'removeObject').mockReturnValue('removed from minio');
+        jest.spyOn(sunbirdRegistryService, 'getEntity').mockReturnValue({url: '/vc-management/v1/context/123'});
+        jest.spyOn(sunbirdRegistryService, 'deleteEntity').mockReturnValue({url: '/vc-management/v1/context/123'});
+        await contextController.deleteContext(req, res, minioClient);
+        mockedStream.destroy();
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(redisService.deleteKey).not.toHaveBeenCalled();
+    });
 })
 
 describe('when redis is enabled', () => {
     jest.resetModules();
     const sunbirdRegistryService = require('../src/services/sunbird.service');
     const contextController = require('../src/controllers/context.controller');
-    const contants = require('../src/configs/constants');
     const {PassThrough} = require('stream');
     const mockedStream = new PassThrough();
     const redisService = require('../src/services/redis.service');
@@ -125,13 +200,16 @@ describe('when redis is enabled', () => {
     jest.mock('../src/services/sunbird.service', () => {
         return {
             createEntity: jest.fn(),
-            getEntity: jest.fn()
+            getEntity: jest.fn(),
+            updateEntity: jest.fn(),
+            deleteEntity: jest.fn()
         }
     });
     jest.mock('../src/services/redis.service', () => {
         return {
             storeKeyWithExpiry: jest.fn(),
-            getKey: jest.fn()
+            getKey: jest.fn(),
+            deleteKey: jest.fn()
         }
     });
     const config = require('../src/configs/config');
@@ -174,6 +252,80 @@ describe('when redis is enabled', () => {
         expect(sunbirdRegistryService.createEntity).toHaveBeenCalledWith('localhost:8081/api/v1/ContextURL', {url:expect.stringMatching(matchingString)}, '1');
         expect(redisService.storeKeyWithExpiry).toHaveBeenCalledWith('123', '456');
     });
+
+    test('should delete context from redis', async() => {
+        const req = {
+            baseUrl: '/vc-management/v1/context',
+            params: {
+                osid: '1'
+            },
+            header: jest.fn().mockReturnValue('header')
+        }
+        const res = {
+            send: function(){},
+            set: function() {
+                return this;
+            },
+            json: function(d) {
+            },
+            status: function(s) {
+                this.statusCode = s;
+                return this;
+            }
+        };
+        let minioClient = {
+            removeObject: jest.fn()
+        }
+        jest.spyOn(res, 'status');
+        jest.spyOn(res, 'json');
+        jest.spyOn(minioClient, 'removeObject').mockReturnValue('removed from minio');
+        jest.spyOn(sunbirdRegistryService, 'getEntity').mockReturnValue({url: '/vc-management/v1/context/123'});
+        jest.spyOn(sunbirdRegistryService, 'deleteEntity').mockReturnValue({url: '/vc-management/v1/context/123'});
+        await contextController.deleteContext(req, res, minioClient);
+        //only one entry in redis so key===1
+        expect(redisService.deleteKey).toHaveBeenCalledWith('1');
+        expect(res.status).toHaveBeenCalledWith(200);
+        
+    });
+
+    test('should update context in registry, minio and redis', async () => {
+        const req = {
+            baseUrl: '/vc-management/v1/context',
+            params: {
+                osid: '1'
+            },
+            file: {
+                buffer: '456',
+                originalname: 'context.json'
+            },
+            header: jest.fn().mockReturnValue('header')
+        };
+        const res = {
+            send: function(){},
+            set: function() {
+                return this;
+            },
+            json: function(d) {
+            },
+            status: function(s) {
+                this.statusCode = s;
+                return this;
+            }
+        };
+        let minioClient = {
+            putObject: jest.fn(),
+            removeObject: jest.fn()
+        }
+        jest.spyOn(res, 'status');
+        jest.spyOn(res, 'json');
+        jest.spyOn(sunbirdRegistryService, 'getEntity').mockReturnValue({url: '/vc-management/v1/context/123'});
+        jest.spyOn(minioClient, 'removeObject').mockReturnValue('removed object');
+        await contextController.updateContext(req, res, minioClient);
+        const matchingString = /^(\/vc\-management\/v1\/context\/\d{13}\-context\.json)?$/;
+        expect(minioClient.putObject).toHaveBeenCalledWith('context', expect.stringMatching(matchingString), '456');
+        expect(sunbirdRegistryService.updateEntity).toHaveBeenCalledWith('localhost:8081/api/v1/ContextURL/1', {url: expect.stringMatching(matchingString)}, 'header');
+        expect(res.status).toHaveBeenCalledWith(200);
+    })
 
     test('should get context from redis if available', async() => {
         const req = {
@@ -243,7 +395,7 @@ describe('when redis is enabled', () => {
         expect(res.json).toHaveBeenCalledWith({key: '123', value: '456'});
     });
 
-    test('should throw error if something is broken', async() => {
+    test('should throw error if something is broken in getContext', async() => {
         const req = {
             baseUrl: '/vc-management/v1/context',
             params: {
@@ -276,5 +428,75 @@ describe('when redis is enabled', () => {
         await contextController.getContext(req, res, minioClient);
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.json).toHaveBeenCalledWith({message: undefined});
-    })
+    });
+
+    test('should throw error if something is broken in deleteContext', async() => {
+        const req = {
+            baseUrl: '/vc-management/v1/context',
+            file: {
+                buffer: '456',
+                originalname: 'context.json'
+            },
+            header: jest.fn().mockReturnValue('1')
+        }
+        const res = {
+            send: function(){},
+            set: function() {
+                return this;
+            },
+            json: function(d) {
+            },
+            status: function(s) {
+                this.statusCode = s;
+                return this;
+            }
+        };
+        let minioClient = {
+            putObject: jest.fn()
+        }
+        jest.spyOn(res, 'status');
+        jest.spyOn(res, 'json');
+        jest.spyOn(redisService, 'storeKeyWithExpiry').mockReturnValue(undefined);
+        jest.spyOn(minioClient, 'putObject').mockReturnValue(mockedStream);
+        jest.spyOn(sunbirdRegistryService, 'createEntity').mockReturnValue(Promise.reject('some error'))
+        await contextController.addContext(req, res, minioClient);
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({message: undefined});
+    });
+
+    // test('should throw error if something is broken in createContext', async() => {
+    //     const req = {
+    //         baseUrl: '/vc-management/v1/context',
+    //         file: {
+    //             buffer: '456',
+    //             originalname: 'context.json'
+    //         },
+    //         header: jest.fn().mockReturnValue('1')
+    //     };
+    //     const res = {
+    //         send: function(){},
+    //         set: function() {
+    //             return this;
+    //         },
+    //         json: function(d) {
+    //         },
+    //         status: function(s) {
+    //             this.statusCode = s;
+    //             return this;
+    //         }
+    //     };
+    //     let minioClient = {
+    //         putObject: jest.fn(),
+    //         removeObject: jest.fn()
+    //     }
+    //     jest.spyOn(res, 'status');
+    //     jest.spyOn(res, 'json');
+    //     jest.spyOn(redisService, 'storeKeyWithExpiry').mockReturnValue({1:'200000'});
+    //     jest.spyOn(minioClient, 'putObject').mockReturnValue(mockedStream);
+    //     jest.spyOn(sunbirdRegistryService, 'getEntity').mockReturnValue(Promise.reject('some error'))
+    //     await contextController.addContext(req, res, minioClient);
+    //     expect(res.status).toHaveBeenCalledWith(500);
+    //     expect(res.json).toHaveBeenCalledWith({message: undefined});
+    // });
+    
 });
