@@ -27,8 +27,8 @@ async function createCertificate(req, res, kafkaProducer) {
         });
     } catch (err) {
         console.error(err);
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
         });
     }
 }
@@ -59,8 +59,8 @@ async function getCertificate(req, res) {
         data.pipe(res);
     } catch (err) {
         console.error(err);
-        res.status(err?.response?.status || 500).json({
-            message: err
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err || err?.message
         });
     }
 }
@@ -81,8 +81,8 @@ async function updateCertificate(req, res, kafkaProducer) {
         });
     } catch (err) {
         console.error(err);
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
         });
     }
 }
@@ -130,10 +130,10 @@ async function revokeCertificate(req, res) {
             })
         }
     }).catch(err => {
-        console.log('ERROR : ',err?.response?.status || '');
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data
-        })
+        console.log('ERROR : ',err?.response?.status || err?.status || '');
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
+        });
     })
 }
 function getRevokeBody(req) {
@@ -204,7 +204,7 @@ async function verifyCertificate (req,res){
     } catch(err) {
         console.log('ERROR : ',err);
         res.status(500).json({
-            message: err?.response?.data
+            message: err?.response?.data || err?.message
         })
     }
 }
@@ -281,10 +281,10 @@ async function deleteRevokeCertificate(req, res, kafkaProducer) {
         }
     }
     catch (err) {
-        console.log('ERROR : ', err?.response?.status || '');
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data
-        })
+        console.log('ERROR : ', err?.response?.status || err?.status || '');
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
+        });
     }
 }
 

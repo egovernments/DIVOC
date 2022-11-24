@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import GenTokenImg from "../../assets/img/generate_viewToken.png";
 import CopyIcon from "../../assets/img/copyIcon.png"
@@ -11,17 +11,28 @@ import {useTranslation} from "react-i18next";
 import { Container, Card, Col, Row, Form } from 'react-bootstrap';
 import InfoCard from '../InfoCard/InfoCard';
 import config from '../../config.json';
+import { Link, useNavigate } from 'react-router-dom';
 const axios = require('axios');
 
 function GenerateToken() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate("/tenant-portal/generate-token")
+  }, []);
+  
   const [token, setToken] = useState("");
   const { t } = useTranslation();
   const {keycloak} = useKeycloak();
-  function copyToken() {
+  
+  async function copyToken() {
     var copyText = document.getElementById("token");
     copyText.select();
     copyText.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(copyText.value);
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(copyText.value);
+    } else {
+      document.execCommand('copy', true, copyText.value);
+    }
   }
 
   function downloadToken() {
@@ -51,7 +62,7 @@ function GenerateToken() {
       const access_token = await getToken();
       setToken(access_token)
   }
-
+ 
   return (
     <div className='d-flex flex-wrap'>
         <div className='col-md-6 col-sm-12 page-content'>
@@ -61,7 +72,10 @@ function GenerateToken() {
               <div className='mb-3'>{t('genTokenPage.text')}</div>
               <div className='mb-3'>{t('genTokenPage.buttonClickInfo')}</div>
               </div>           
-              <div onClick={() => outputToken()}><GenericButton img='' text={t('genTokenPage.buttonText')} type='primary' /></div>
+              <Link to={`${config.urlPath}/generate-token/view-token`}
+               onClick={ async () => await outputToken()} >
+                <GenericButton img='' text={t('genTokenPage.buttonText')} type='primary' />
+              </Link>
             </div>}
             {token && <div>
               <div className='text'>
@@ -71,7 +85,7 @@ function GenerateToken() {
               <Form.Control className={`my-3 ${styles['token']}`} size="lg" type="text" readOnly id='token' defaultValue={token} />
               <div className='container-fluid my-3 px-0'>
                 <div className='px-0 mx-0 d-flex flex-wrap'>
-                  <div className='col-12 col-lg-6 my-2 pe-0 pe-lg-2' onClick={() => copyToken()}>
+                  <div className='col-12 col-lg-6 my-2 pe-0 pe-lg-2' onClick={async () => await copyToken()}>
                   <GenericButton img={CopyIcon} text='Copy' type='primary' />
                   </div>
                   <div className='col-12 col-lg-6 my-2 ps-0 ps-lg-2' onClick={() =>  downloadToken()}>

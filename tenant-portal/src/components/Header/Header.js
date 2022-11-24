@@ -24,8 +24,8 @@ function Header() {
     setShowProfile(false);
   };
   useEffect(() => {
-    var profileName = keycloak.idTokenParsed.preferred_username.split("@")[0];
-    profileName = profileName.charAt(0).toUpperCase()+ profileName.slice(1);
+    var profileName = keycloak?.idTokenParsed?.preferred_username.split("@")[0];
+    profileName = profileName?.charAt(0).toUpperCase()+ profileName?.slice(1);
     setProfileName(profileName);
     window.addEventListener('click', handleClick);
     return () => {

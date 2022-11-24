@@ -17,8 +17,8 @@ async function createSchema(req, res) {
         });
     } catch (err) {
         console.error(err);
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
         });
     }
 }
@@ -35,8 +35,8 @@ async function getSchema(req, res) {
         });
     } catch (err) {
         console.error(err);
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
         });
     }
 }
@@ -54,8 +54,8 @@ async function updateSchema(req, res) {
         });
     } catch (err) {
         console.error(err);
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
         });
     }
 }
@@ -80,8 +80,8 @@ async function updateTemplate(req, res) {
         });
     } catch (err) {
         console.error(err);
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
         });
     }
 }
@@ -98,8 +98,8 @@ async function updateTemplateUrls(req, res) {
         });
     } catch (err) {
         console.error(err);
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
         });
     }
 }
@@ -148,17 +148,17 @@ function validateEvidence(vcEvidence) {
     if (vcEvidence) {
         return Array.isArray(vcEvidence) ? vcEvidence[0] : vcEvidence;
     } else {
-        throw new CustomError("evidence not available in VC", 400).error();
+        throw new CustomError("evidence not available in VC", 400);
     }
 }
 
 function validateEvidenceType(vcEvidenceType, schemaName) {
     if (vcEvidenceType) {
         if ((Array.isArray(vcEvidenceType) && !vcEvidenceType.includes(schemaName)) || (!Array.isArray(vcEvidenceType) && (vcEvidenceType !== schemaName))) {
-            throw new CustomError("evidence type doesn't match with schema", 400).error();
+            throw new CustomError("evidence type doesn't match with schema", 400);
         }
     } else {
-        throw new CustomError("evidence doesn't have a valid type", 400).error();
+        throw new CustomError("evidence doesn't have a valid type", 400);
     }
 }
 
@@ -193,9 +193,9 @@ async function checkInContextsForEvidenceType(credentialTemplate, schemaName) {
                 return
             }
         }
-        throw new CustomError("evidence type isn't defined in any context", 400).error();
+        throw new CustomError("evidence type isn't defined in any context", 400);
     }
-    throw new CustomError("context is not available", 400).error();
+    throw new CustomError("context is not available", 400);
 }
 
 function addInRequiredFields(reqFields, totalMandatoryFields){
