@@ -95,7 +95,7 @@ async function revokeCertificate(req, res) {
         return;
     }
     const token = req.header("Authorization");
-    getEntity(req.body.certificateId,"certificateId",req.body.entityName,token)
+    return getEntity(req.body.certificateId,"certificateId",req.body.entityName,token)
     .then(async(result) => {
         if(result.length >= 1) {
             const filters = {
