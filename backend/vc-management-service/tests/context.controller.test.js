@@ -424,10 +424,9 @@ describe('when redis is enabled', () => {
         jest.spyOn(redisService, 'getKey').mockReturnValue(undefined);
         jest.spyOn(keycloakService, 'getAdminToken').mockReturnValue('123');
         jest.spyOn(minioClient, 'getObject').mockReturnValue(mockedStream);
-        jest.spyOn(sunbirdRegistryService, 'getEntity').mockReturnValue(Promise.reject('some error'))
+        jest.spyOn(sunbirdRegistryService, 'getEntity').mockReturnValueOnce(Promise.reject('some error'))
         await contextController.getContext(req, res, minioClient);
         expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({message: undefined});
     });
 
     test('should throw error if something is broken in deleteContext', async() => {
@@ -452,51 +451,83 @@ describe('when redis is enabled', () => {
             }
         };
         let minioClient = {
+            removeObject: jest.fn()
+        }
+        jest.spyOn(res, 'status');
+        jest.spyOn(res, 'json');
+        jest.spyOn(minioClient, 'removeObject').mockReturnValue('removed from minio');
+        jest.spyOn(sunbirdRegistryService, 'getEntity').mockImplementationOnce((a, b) => Promise.reject(Error));
+        jest.spyOn(sunbirdRegistryService, 'deleteEntity').mockImplementationOnce((a, b) => Promise.reject(Error));
+        await contextController.deleteContext(req, res, minioClient);
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+    test('should throw error if something is broken in createContext', async() => {
+        const req = {
+            baseUrl: '/vc-management/v1/context',
+            file: {
+                buffer: '456',
+                originalname: 'context.json'
+            },
+            header: jest.fn().mockReturnValue('1')
+        };
+        const res = {
+            send: function(){},
+            set: function() {
+                return this;
+            },
+            json: function(d) {
+            },
+            status: function(s) {
+                this.statusCode = s;
+                return this;
+            }
+        };
+        let minioClient = {
             putObject: jest.fn()
         }
         jest.spyOn(res, 'status');
         jest.spyOn(res, 'json');
-        jest.spyOn(redisService, 'storeKeyWithExpiry').mockReturnValue(undefined);
+        jest.spyOn(redisService, 'storeKeyWithExpiry').mockReturnValue({1:'200000'});
         jest.spyOn(minioClient, 'putObject').mockReturnValue(mockedStream);
-        jest.spyOn(sunbirdRegistryService, 'createEntity').mockReturnValue(Promise.reject('some error'))
+        jest.spyOn(sunbirdRegistryService, 'createEntity').mockReturnValueOnce(Promise.reject('some error'))
         await contextController.addContext(req, res, minioClient);
         expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({message: undefined});
     });
-
-    // test('should throw error if something is broken in createContext', async() => {
-    //     const req = {
-    //         baseUrl: '/vc-management/v1/context',
-    //         file: {
-    //             buffer: '456',
-    //             originalname: 'context.json'
-    //         },
-    //         header: jest.fn().mockReturnValue('1')
-    //     };
-    //     const res = {
-    //         send: function(){},
-    //         set: function() {
-    //             return this;
-    //         },
-    //         json: function(d) {
-    //         },
-    //         status: function(s) {
-    //             this.statusCode = s;
-    //             return this;
-    //         }
-    //     };
-    //     let minioClient = {
-    //         putObject: jest.fn(),
-    //         removeObject: jest.fn()
-    //     }
-    //     jest.spyOn(res, 'status');
-    //     jest.spyOn(res, 'json');
-    //     jest.spyOn(redisService, 'storeKeyWithExpiry').mockReturnValue({1:'200000'});
-    //     jest.spyOn(minioClient, 'putObject').mockReturnValue(mockedStream);
-    //     jest.spyOn(sunbirdRegistryService, 'getEntity').mockReturnValue(Promise.reject('some error'))
-    //     await contextController.addContext(req, res, minioClient);
-    //     expect(res.status).toHaveBeenCalledWith(500);
-    //     expect(res.json).toHaveBeenCalledWith({message: undefined});
-    // });
     
+    test('should throw error if something is broken in updateContext', async() => {
+        const req = {
+            baseUrl: '/vc-management/v1/context',
+            file: {
+                buffer: '456',
+                originalname: 'context.json'
+            },
+            header: jest.fn().mockReturnValue('1')
+        };
+        const res = {
+            send: function(){},
+            set: function() {
+                return this;
+            },
+            json: function(d) {
+            },
+            status: function(s) {
+                this.statusCode = s;
+                return this;
+            }
+        };
+        let minioClient = {
+            putObject: jest.fn(),
+            removeObject: jest.fn()
+        }
+        jest.spyOn(res, 'status');
+        jest.spyOn(res, 'json');
+        jest.spyOn(redisService, 'storeKeyWithExpiry').mockReturnValue({1:'200000'});
+        jest.spyOn(minioClient, 'putObject').mockReturnValue(mockedStream);
+        jest.spyOn(minioClient, 'removeObject').mockReturnValue('removed object from minio');
+        jest.spyOn(sunbirdRegistryService, 'getEntity').mockImplementationOnce(() => Promise.reject(Error));
+        jest.spyOn(sunbirdRegistryService, 'updateEntity').mockImplementationOnce(() => Promise.reject(Error));
+        await contextController.updateContext(req, res, minioClient);
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
 });

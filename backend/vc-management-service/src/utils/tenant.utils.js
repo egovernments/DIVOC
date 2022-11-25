@@ -4,7 +4,6 @@ const {ROLE_SUFFIX} = require('../configs/constants');
 async function createAndAssignNewRole(userName, token) {
     console.log("creating new role");
     const roleName = userName + ROLE_SUFFIX;
-    const adminRoleName = "admin";
     try {
         await keycloakService.createNewRole(roleName, token);
         const users = await keycloakService.getUserInfo(userName, token);
