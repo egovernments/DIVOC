@@ -1,6 +1,8 @@
 const axios = require('axios');
 jest.mock('axios');
 const sunbirdRegistryService = require('../src/services/sunbird.service');
+const config = require('../src/configs/config')
+const constants = require('../src/configs/constants')
 
 jest.mock('../src/configs/constants', () => {
     return {
@@ -132,29 +134,30 @@ test('error update entity in registry', async () => {
     expect(sunbirdRegistryService.updateEntity(UPDATE_URL, data, token)).rejects.toThrow('some problem');
 });
 
-// test('get transaction id from transaction request', async () => {
-//     jest.resetModules();
-//     const expectedResponse = {
-//         data : {
-//             message: 123456
-//         }
-//     };
-//     const transactionRequest = {
-//         "filters": {
-//             "transactionId": {
-//                 "eq": 1235
-//             }
-//         }
-//     };
-//     axios.post.mockImplementation((url, body, headers) => Promise.resolve(expectedResponse));
-//     const SUNBIRD_GET_TRANSACTION_URL = '/api/v1/TransactionCertificateMap/search';
-//     const token = 456;
-//     const transactionId =  123;
-//     const actualResponse = await sunbirdRegistryService.getTransaction(transactionId, token);
-//     await expect(axios.post).toHaveBeenCalledWith(SUNBIRD_GET_TRANSACTION_URL, transactionRequest, {headers: {Authorization: token}});
-//     expect(actualResponse).toEqual(expectedResponse.data);
+test('get transaction id from transaction request', async () => {
+    jest.resetModules();
+    const expectedResponse = {
+        data : {
+            message: 'transaction successfull',
+            transactionResponse : {}
+        }
+    };
+    const transactionRequest = {
+        "filters": {
+            "transactionId": {
+                "eq": 123
+            }
+        }
+    };
+    axios.post.mockImplementation((url, body, headers) => Promise.resolve(expectedResponse));
+    const SUNBIRD_GET_TRANSACTION_URL = '/api/v1/TransactionCertificateMap/search';
+    const token = 456;
+    const transactionId =  123;
+    const actualResponse = await sunbirdRegistryService.getTransaction(transactionId, token);
+    expect(axios.post).toHaveBeenCalledWith(SUNBIRD_GET_TRANSACTION_URL, transactionRequest, {headers: {Authorization: token}});
+    expect(actualResponse).toEqual(expectedResponse.data);
 
-// });
+});
 
 test('error get transaction id from transaction request', async () => {
     const token = 456;
@@ -164,6 +167,21 @@ test('error get transaction id from transaction request', async () => {
 
 });
 
-test('upload template ', async () => {
 
-})
+test('get tenant id', async () => {
+    const expectedResponse = {
+        data:[{osid: '1-123'}]
+    };
+    axios.get.mockImplementation((url, token) => Promise.resolve(expectedResponse));
+    const token = 456;
+    const actualResponse = await sunbirdRegistryService.getTenantId(token);
+    const SUNBIRD_REGISTRY_URL = config.SUNBIRD_REGISTRY_URL;
+    expect(axios.get).toHaveBeenCalledWith(`${SUNBIRD_REGISTRY_URL}/api/v1/Tenant`, {headers: {Authorization: token}});
+    expect(actualResponse).toEqual('123')
+});
+
+test(' error get tenant id', async () => {
+    axios.get.mockImplementation((url, token) => Promise.reject(new Error('some problem')));
+    const token = 456;
+    expect(sunbirdRegistryService.getTenantId(token)).rejects.toThrow('some problem');
+});

@@ -87,7 +87,7 @@ test('should not upload template if tenant name is not valid', async () => {
     expect(res.status).toHaveBeenCalledWith(400);
 });
 
-test('should upload template successfully', async () => {
+test('upload template error', async () => {
     const req = {
         baseUrl: '/vc-management/v1/templates/tenant',
         file: {

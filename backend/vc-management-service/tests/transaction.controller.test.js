@@ -15,7 +15,6 @@ jest.mock('../src/services/sunbird.service', () => {
         "status":        'dummy'
     }];
     return {
-        // getTransaction: jest.fn().mockImplementation((a, b) => {throw new CustomError('some problem')})
         getTransaction: jest.fn().mockImplementation((a, b) => Promise.resolve(response))
     }
 });

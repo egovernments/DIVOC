@@ -5,7 +5,7 @@ beforeEach(() => {
 
 const utils = require('../src/utils/utils');
 
-test('check if id if valid user id', () => {
+test('check if id is valid user id', () => {
     expect(utils.isValidUserId('abc@xyz.com')).toBe(true);
     expect(utils.isValidUserId('@xyz.com')).toBe(false);
     expect(utils.isValidUserId('abc@.com')).toBe(false);
