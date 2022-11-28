@@ -66,11 +66,6 @@ function Header() {
             </NavDropdown.Item>
           ))}
         </NavDropdown>
-        <Dropdown title={<img src={UserLogo} />} >
-          <Dropdown.Menu>
-            <Dropdown.Item>bhanu</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
         <div style={{cursor:"pointer",}}>
           <img src={UserLogo} className="header-profile " onClick={toggleProfile} />
           <ul className={(showProfile) ? "profile-dropdown": "d-none" }>
