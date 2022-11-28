@@ -2,6 +2,7 @@ const sunbirdRegistryService = require('../services/sunbird.service')
 const keycloakService = require('../services/keycloak.service')
 const utils = require('../utils/utils')
 const {ROLE_SUFFIX} = require('../configs/constants');
+const { createAndAssignNewRole } = require('../utils/tenant.utils')
 
 async function createTenant(req, res) {
     try {
@@ -31,29 +32,6 @@ async function createTenant(req, res) {
         res.status(err?.response?.status || err?.status || 500).json({
             message: err?.response?.data || err?.message
         });
-    }
-}
-
-async function createAndAssignNewRole(userName, token) {
-    console.log("creating new role");
-    const roleName = userName + ROLE_SUFFIX;
-    const adminRoleName = "admin";
-    try {
-        await keycloakService.createNewRole(roleName, token);
-        const users = await keycloakService.getUserInfo(userName, token);
-        const userId = users[0]?.id;
-        const role = await keycloakService.getRoleInfo(roleName, token);
-        const roleId = role?.id;
-        const assigningRoles = [
-            {
-                "id": roleId,
-                "name": roleName
-            }
-        ]
-        await keycloakService.assignNewRole(assigningRoles, userId, token);
-    } catch (err) {
-        console.log("error while creating and assigning role to a user ", err)
-        throw err;
     }
 }
 

@@ -117,5 +117,6 @@ module.exports = {
     uploadTemplate,
     updateEntity,
     getEntity,
-    getTransaction
+    getTransaction,
+    getTenantId
 }

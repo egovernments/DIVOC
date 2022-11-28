@@ -2,7 +2,7 @@ const FormData = require('form-data');
 
 function isValidUserId(userId) {
     let userIdRegex = new RegExp("^\\S+@\\S+\\.\\S+$")
-    return userId && userIdRegex.test(userId)
+    return userId!=="" && userIdRegex.test(userId)
 }
 
 function getFormData(req) {
