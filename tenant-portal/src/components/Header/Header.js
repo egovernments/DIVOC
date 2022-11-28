@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 import { Dropdown, NavDropdown } from "react-bootstrap";
 import UserLogo from "../../assets/img/user-logo.png";
 import { useState, useEffect } from "react";
-import { Link } from 'react-router-dom';
 function Header() {
   const {keycloak} = useKeycloak();
   const [showProfile, setShowProfile] = useState(false);
@@ -37,7 +36,7 @@ function Header() {
     keycloak.logout();
     return
   }
-  function changepw() {
+  function changePassword() {
     keycloak.login({action: "UPDATE_PASSWORD"});
     return
   }
@@ -75,7 +74,7 @@ function Header() {
         <div style={{cursor:"pointer",}}>
           <img src={UserLogo} className="header-profile " onClick={toggleProfile} />
           <ul className={(showProfile) ? "profile-dropdown": "d-none" }>
-            <li onClick={changepw}><span>
+            <li onClick={changePassword}><span>
               Change Password</span></li>
             <li onClick={logout} href="#"><span>Logout</span></li>
           </ul>
