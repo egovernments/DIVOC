@@ -8,7 +8,7 @@ const BreadcrumbComponent = () => {
       {breadcrumbs.map(({ breadcrumb, match }, index) => (
         <div className="breadcrumb" key={match.pathname}> 
             <a href={match.pathname}
-             className={(index==0 || index==breadcrumbs.length-1)? 
+             className={(index==breadcrumbs.length-1)?
               'breadcrumb-item disabled':'breadcrumb-item'}>{breadcrumb}</a>
             {index < breadcrumbs.length - 1 && "/"}
         </div>
