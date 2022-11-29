@@ -30,7 +30,7 @@ function Home() {
                 <Container fluid>
                     <Row gutterX='3' xs={1} sm={2}>
                         <Col className="my-2">
-                        <Link to='/tenant-portal/generate-token' style={{textDecoration: 'none', }}>
+                        <Link to='generate-token' style={{textDecoration: 'none', }}>
                             <Card style={{ cursor: "pointer" }} className={styles['card']}>
                                 <Card.Body className="d-grid">
                                     <Card.Title className={styles['card-title']}>{t('homePage.genTokenCard.title')}</Card.Title>

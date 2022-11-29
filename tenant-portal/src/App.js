@@ -13,6 +13,7 @@ import ToastComponent from './components/Toast/Toast';
 import axios from 'axios';
 import './i18n';
 import BreadcrumbComponent from "./components/BreadcrumbComponent/BreadcrumbComponent";
+import ManageSchemaHome from "./components/ManageSchemaHome/ManageSchemaHome";
 
 function App() {
   const { initialized, keycloak } = useKeycloak();
@@ -75,6 +76,13 @@ function App() {
                      }
            >
            </Route>
+           <Route path={config.urlPath + "/manage-schema"}
+             element={
+                        <PrivateRoute>
+                          <ManageSchemaHome /> 
+                        </PrivateRoute>
+                     }
+           ></Route>
         </Routes>
         </div>
         <ToastComponent/>
