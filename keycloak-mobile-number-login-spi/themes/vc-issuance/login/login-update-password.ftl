@@ -3,6 +3,19 @@
     <#if section = "header">
         ${msg("updatePasswordTitle")}
     <#elseif section = "form">
+        <script>
+            function validateForm()
+                {
+                    const password = document.forms["form"]["password-new"].value;
+                    const passwordFormat = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+                    if(password.match(passwordFormat)){
+                        return true;
+                    }else{
+                        document.getElementById("invalidForm").innerHTML = '<div class="alert-box error-alert"><div class="alert-heading"><img src="${url.resourcesPath}/img/vector-alert.png" alt="">Alert!</div><div class="alert-message fst-italic">Please enter the password in valid format!</div></div>';
+                        return false;
+                    }              
+                }
+        </script>
         <div class="form-wrapper">
             <div class="${properties.kcFormOptionsWrapperClass!}">
                     <button type="submit" form="kc-passwd-update-form" name="cancel-aia" value="true" style="background:none; border:none; color:#5976D2"/>
@@ -12,9 +25,13 @@
             <div class="ndear-login-wrapper">
                 <div class="ndear-login-card-wrapper">
                     <div class="keycloak-form">
+                    <#if isAppInitiatedAction??>
                         <p class="login-title">Change Password</p>
-                        <form id="kc-passwd-update-form" class="${properties.kcFormClass!} "
-                              action="${url.loginAction}" method="post">
+                    <#else>
+                        <p class="login-title">Reset Password</p>
+                    </#if>
+                        <form id="kc-passwd-update-form" name="form" class="${properties.kcFormClass!} "
+                              action="${url.loginAction}" onsubmit="return validateForm()" method="post">
                             <input type="text" id="username" name="username" value="${username}" autocomplete="username"
                                    readonly="readonly" style="display:none;"/>
                             <input type="password" id="password" name="password" autocomplete="current-password" style="display:none;"/>
@@ -39,6 +56,7 @@
                                              id="pass-new-message"
                                              class="${properties.kcPasswordStrengthmessage!}"
                                               aria-invalid="<#if messagesPerField.existsError('password-new')>true</#if>">
+                                              ${msg("passwordFormat")}
                                              </label>
                                      </div>
 
@@ -96,10 +114,15 @@
                                 </div>
                             </div>
                         </form>
+                        <div id="invalidForm"></div>
                     </div>
                 </div>
                 <div class="image-wrapper">
+                <#if isAppInitiatedAction??>
+                        <img class="auth-flow-images" src="${url.resourcesPath}/img/vc-tenant-login-image.png" alt="">
+                <#else>
                         <img class="auth-flow-images" src="${url.resourcesPath}/img/forgot_password.png" alt="">
+                </#if>        
                 </div>
             </div>
         </div>

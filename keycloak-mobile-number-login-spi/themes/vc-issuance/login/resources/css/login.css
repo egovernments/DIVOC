@@ -346,6 +346,8 @@ font-size: 10px;
 }
 
 .alert-heading {
+  display: flex;
+  align-items: center;
   font-family: 'Open Sans', sans-serif;
   font-style: normal;
   font-weight: 600;
@@ -353,11 +355,22 @@ font-size: 10px;
   line-height: 25px;
   padding: 0.5rem;
 }
-
+.alert-heading img{
+  padding-right: 0.5rem;
+}
 .alert-message {
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 19px;
   padding: 0.5rem;
+}
+
+.password-strength-message {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 15px;
+  color: #989898;
 }
