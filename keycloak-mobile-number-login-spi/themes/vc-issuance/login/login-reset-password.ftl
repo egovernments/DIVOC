@@ -3,6 +3,19 @@
     <#if section = "header">
         ${msg("emailForgotTitle")}
     <#elseif section = "form">
+        <script>
+            function validateForm()
+                {
+                    const email = document.forms["form"]["username"].value;
+                    const emailformat = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                    if(email.match(emailformat)){
+                        return true;
+                    }else{
+                        document.getElementById("invalidForm").innerHTML = '<div class="alert-box error-alert"><div class="alert-heading"><img src="${url.resourcesPath}/img/vector-alert.png" alt="">Alert!</div><div class="alert-message fst-italic">Please enter a valid email address!</div></div>';
+                        return false;
+                    }              
+                }
+        </script>
         <div class="form-wrapper">
             <div class="${properties.kcFormOptionsWrapperClass!}">
                 <span><a href="${url.loginUrl}"><img src="${url.resourcesPath}/img/vector-arrow.png"
@@ -13,7 +26,7 @@
                     <div class="keycloak-form">
                         <p class="login-title">Forgot Password</p>
                         <div id="kc-form-wrapper">
-                            <form id="kc-reset-password-form" action="${url.loginAction}" method="post">
+                            <form id="kc-reset-password-form" action="${url.loginAction}" name="form" method="post" onsubmit="return validateForm()">
                                 <div class="${properties.kcFormGroupClass!}">
                                     <label for="username" class="${properties.kcLabelClass!}">Enter the registered email
                                         address</label>
@@ -43,6 +56,7 @@
                                     </div>
                                 </#if>
                             </form>
+                            <div id="invalidForm"></div>
                         </div>
                     </div>
 

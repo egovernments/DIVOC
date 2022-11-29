@@ -3,6 +3,19 @@
     <#if section = "header">
         ${msg("loginAccountTitle")}
 <#elseif section = "form">
+    <script>
+        function validateForm()
+            {
+                const email = document.forms["form"]["username"].value;
+                const emailformat = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                if(email.match(emailformat)){
+                    return true;
+                }else{
+                    document.getElementById("invalidForm").innerHTML = '<div class="alert-box error-alert"><div class="alert-heading"><img src="${url.resourcesPath}/img/vector-alert.png" alt="">Alert!</div><div class="alert-message fst-italic">Please enter a valid email address!</div></div>';
+                    return false;
+                }              
+            }
+    </script>
     <div class="form-wrapper">
         <div class="ndear-login-wrapper">
         <div id="kc-form" class="ndear-login-card-wrapper">
@@ -10,8 +23,8 @@
                 <p class="login-title">Login to Administrator Portal</p>
                 <div id="kc-form-wrapper">
                     <#if realm.password>
-                        <form id="kc-form-login" onsubmit="login.disabled = true; return true;" action="${url.loginAction}"
-                              method="post">
+                        <form id="kc-form-login" onsubmit="return validateForm();" name="form" action="${url.loginAction}"
+                              method="post" >
                             <div class="${properties.kcFormGroupClass!}">
                                 <label for="username"
                                        class="${properties.kcLabelClass!}">${msg("email")}</label>
@@ -71,7 +84,6 @@
                                        class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
                                        name="login" id="kc-login" type="submit" value="${msg("doLogIn")}"/>
                             </div>
-
                             <div class="${properties.kcFormOptionsWrapperClass!} text-center">
                                 <#if realm.resetPasswordAllowed>
                                     <span><a tabindex="5"
@@ -79,6 +91,7 @@
                                 </#if>
                             </div>
                         </form>
+                        <div id="invalidForm"></div>
                     </#if>
                     <#if  message?has_content && (message.type != 'warning' || !isAppInitiatedAction??)>
                         <div class="pf-c-alert__icon">
