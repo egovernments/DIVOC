@@ -12,7 +12,11 @@
             <div class="ndear-login-wrapper">
                 <div class="ndear-login-card-wrapper">
                     <div class="keycloak-form">
+                    <#if isAppInitiatedAction??>
                         <p class="login-title">Change Password</p>
+                    <#else>
+                        <p class="login-title">Reset Password</p>
+                    </#if>
                         <form id="kc-passwd-update-form" class="${properties.kcFormClass!} "
                               action="${url.loginAction}" method="post">
                             <input type="text" id="username" name="username" value="${username}" autocomplete="username"
@@ -99,7 +103,11 @@
                     </div>
                 </div>
                 <div class="image-wrapper">
+                <#if isAppInitiatedAction??>
+                        <img class="auth-flow-images" src="${url.resourcesPath}/img/vc-tenant-login-image.png" alt="">
+                <#else>
                         <img class="auth-flow-images" src="${url.resourcesPath}/img/forgot_password.png" alt="">
+                </#if>        
                 </div>
             </div>
         </div>
