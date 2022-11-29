@@ -18,8 +18,9 @@
         </script>
         <div class="form-wrapper">
             <div class="${properties.kcFormOptionsWrapperClass!}">
-                    <span><a href="${client.baseUrl}"><img src="${url.resourcesPath}/img/vector-arrow.png"
-                                                         alt=""> ${kcSanitize(msg("backToLogin"))?no_esc}</a></span>
+                    <button type="submit" form="kc-passwd-update-form" name="cancel-aia" value="true" style="background:none; border:none; color:#5976D2"/>
+                    <img src="${url.resourcesPath}/img/vector-arrow.png" alt=""> 
+                    ${kcSanitize(msg("backToLogin"))?no_esc}</button>
             </div>
             <div class="ndear-login-wrapper">
                 <div class="ndear-login-card-wrapper">
@@ -99,9 +100,9 @@
                                     <#if isAppInitiatedAction??>
                                         <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
                                                type="submit" value="${msg("doUpdate")}"/>
-                                        <button
+                                        <#-- <button
                                         class="${properties.kcButtonClass!} ${properties.kcButtonDefaultClass!} ${properties.kcButtonLargeClass!}"
-                                        type="submit" name="cancel-aia" value="true" />${msg("doCancel")}</button>
+                                        type="submit" name="cancel-aia" value="true" />${msg("doCancel")}</button> -->
                                     <#else>
                                         <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
                                                type="submit" value="${msg("doReset")}"/>

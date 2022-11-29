@@ -30,6 +30,12 @@ test('should call set in redis when adding a value', () => {
     expect(mockClient.set).toHaveBeenCalledWith('abc', 'xyz');
 });
 
+test('should call del in redis when deleting a value', () => {
+    jest.spyOn(mockClient, 'del');
+    redisService.deleteKey('abc');
+    expect(mockClient.del).toHaveBeenCalledWith('abc');
+});
+
 test('should call get stored value from redis', async(done) => {
     try {
         await redisService.getKey('abc');

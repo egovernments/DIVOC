@@ -36,6 +36,10 @@ function Header() {
     keycloak.logout();
     return
   }
+  function changePassword() {
+    keycloak.login({action: "UPDATE_PASSWORD"});
+    return
+  }
   return (
     <Navbar fixed="top" bg="white" className="px-3 py-2">
       <Navbar.Brand href={"/tenant-portal"}>
@@ -62,15 +66,11 @@ function Header() {
             </NavDropdown.Item>
           ))}
         </NavDropdown>
-        <Dropdown title={<img src={UserLogo} />} >
-          <Dropdown.Menu>
-            <Dropdown.Item>bhanu</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
         <div style={{cursor:"pointer",}}>
           <img src={UserLogo} className="header-profile " onClick={toggleProfile} />
           <ul className={(showProfile) ? "profile-dropdown": "d-none" }>
-            <li><span>Change Password</span></li>
+            <li onClick={changePassword}><span>
+              Change Password</span></li>
             <li onClick={logout} href="#"><span>Logout</span></li>
           </ul>
         </div>
