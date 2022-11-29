@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { Dropdown, NavDropdown } from "react-bootstrap";
 import UserLogo from "../../assets/img/user-logo.png";
 import { useState, useEffect } from "react";
+import config from '../../config.json'
 function Header() {
   const {keycloak} = useKeycloak();
   const [showProfile, setShowProfile] = useState(false);
@@ -42,7 +43,7 @@ function Header() {
   }
   return (
     <Navbar fixed="top" bg="white" className="px-3 py-2">
-      <Navbar.Brand href={"/tenant-portal"}>
+      <Navbar.Brand href={`${config.urlPath}/`}>
         <img
           src={NavbarLogo}
           width="90%"

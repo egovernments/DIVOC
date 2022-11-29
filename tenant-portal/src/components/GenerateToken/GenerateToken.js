@@ -17,7 +17,7 @@ const axios = require('axios');
 function GenerateToken() {
   const navigate = useNavigate();
   useEffect(() => {
-    navigate("/tenant-portal/generate-token")
+    navigate(`${config.urlPath}/generate-token`)
   }, []);
   
   const [token, setToken] = useState("");
