@@ -50,3 +50,7 @@
     pointer-events: none;
     color: #484646;
 }
+.btn-outline-light {
+    color: #646d82!important;
+    font-size: 0.75rem;
+}

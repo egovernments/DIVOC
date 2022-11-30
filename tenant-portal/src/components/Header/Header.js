@@ -4,18 +4,21 @@ import "./Header.css";
 import { useKeycloak } from "@react-keycloak/web";
 import Nav from "react-bootstrap/Nav";
 import { useTranslation } from "react-i18next";
-import { Dropdown, NavDropdown } from "react-bootstrap";
 import UserLogo from "../../assets/img/user-logo.png";
 import { useState, useEffect } from "react";
 import config from '../../config.json'
+import DropdownComponent from "../DropdownComponent/DropdownComponent";
 function Header() {
   const {keycloak} = useKeycloak();
   const [showProfile, setShowProfile] = useState(false);
   const [profileName, setProfileName] = useState("");
   const { i18n } = useTranslation();
-  const lngs = {
-    en: { nativeName: "English" },
-    hi: { nativeName: "Hindi" },
+  const languagesObj = {
+    en : "English",
+    hi : "Hindi"
+  };
+  const changeLanguageFunc = (lng) => {
+    return i18n.changeLanguage(lng);
   };
   const toggleProfile = (event) => {
     event.stopPropagation();
@@ -53,20 +56,12 @@ function Header() {
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
         <Nav className="">{<Nav.Link href="#">{profileName}</Nav.Link>}</Nav>
-        <NavDropdown
-          title={lngs[i18n.language]?.nativeName || "English"}
-          id="basic-nav-dropdown"
-          align="end"
-        >
-          {Object.keys(lngs).map((lng) => (
-            <NavDropdown.Item
-              key={lng}
-              onClick={() => i18n.changeLanguage(lng)}
-            >
-              {lngs[lng].nativeName}
-            </NavDropdown.Item>
-          ))}
-        </NavDropdown>
+        <DropdownComponent
+          obj={languagesObj} 
+          fn={changeLanguageFunc} 
+          variant = "outline-light"
+          align = 'end'
+          title={languagesObj[i18n.language] || "English"} />
         <div style={{cursor:"pointer",}}>
           <img src={UserLogo} className="header-profile " onClick={toggleProfile} />
           <ul className={(showProfile) ? "profile-dropdown": "d-none" }>
