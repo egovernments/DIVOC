@@ -13,6 +13,7 @@ import ToastComponent from './components/Toast/Toast';
 import axios from 'axios';
 import './i18n';
 import BreadcrumbComponent from "./components/BreadcrumbComponent/BreadcrumbComponent";
+import InbuiltAttributesComponent from "./components/InbuiltAttributesComponent/InbuiltAttributesComponent";
 
 function App() {
   const { initialized, keycloak } = useKeycloak();
@@ -71,6 +72,14 @@ function App() {
              element={
                         <PrivateRoute>
                           <GenerateToken />
+                        </PrivateRoute>
+                     }
+           >
+           </Route>
+           <Route path={config.urlPath + "/manage-schema/view-inbuilt-attributes"}
+             element={
+                        <PrivateRoute>
+                          <InbuiltAttributesComponent />
                         </PrivateRoute>
                      }
            >
