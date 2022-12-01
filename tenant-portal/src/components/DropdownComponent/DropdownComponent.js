@@ -3,7 +3,7 @@ import {Dropdown, DropdownButton} from 'react-bootstrap';
 
 const DropdownComponent = (props) => {
   return (
-    <DropdownButton
+    <DropdownButton className={props.className}
     variant = {props.variant}
     align = {props.align}
     title={props.title}>

@@ -17,9 +17,22 @@ function Header() {
     en : "English",
     hi : "Hindi"
   };
+  const profileObj = {
+    cp: "Change Password",
+    lo: "LogOut"
+  }
   const changeLanguageFunc = (lng) => {
     return i18n.changeLanguage(lng);
   };
+  const profileFunc = (task) => {
+    if(task=="cp") {
+      keycloak.login({action: "UPDATE_PASSWORD"});
+      return
+    } else if(task=="lo") {
+      keycloak.logout();
+      return
+    }
+  }
   const toggleProfile = (event) => {
     event.stopPropagation();
     setShowProfile(!showProfile)
@@ -62,14 +75,12 @@ function Header() {
           variant = "outline-light"
           align = 'end'
           title={languagesObj[i18n.language] || "English"} />
-        <div style={{cursor:"pointer",}}>
-          <img src={UserLogo} className="header-profile " onClick={toggleProfile} />
-          <ul className={(showProfile) ? "profile-dropdown": "d-none" }>
-            <li onClick={changePassword}><span>
-              Change Password</span></li>
-            <li onClick={logout} href="#"><span>Logout</span></li>
-          </ul>
-        </div>
+          <DropdownComponent className="profile"
+            obj={profileObj}
+            fn={profileFunc}
+            variant = "outline-light"
+            align = 'end'
+            title={<img src={UserLogo} />} />
       </Navbar.Collapse>
     </Navbar>
   );
