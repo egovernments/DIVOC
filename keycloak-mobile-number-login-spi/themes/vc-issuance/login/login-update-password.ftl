@@ -6,21 +6,32 @@
         <script>
             function validateForm()
                 {
-                    const password = document.forms["form"]["password-new"].value;
-                    const passwordFormat = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
-                    if(password.match(passwordFormat)){
-                        return true;
-                    }else{
-                        document.getElementById("invalidForm").innerHTML = '<div class="alert-box error-alert"><div class="alert-heading"><img src="${url.resourcesPath}/img/vector-alert.png" alt="">Alert!</div><div class="alert-message fst-italic">Please enter the password in valid format!</div></div>';
-                        return false;
-                    }              
+                        const cancel = document.forms["form"]["cancel-aia"]?.value || "false";
+                        if(cancel === "false"){
+                            const password = document.forms["form"]["password-new"].value;
+                            const passwordFormat = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+                            if(password.match(passwordFormat)){ 
+                                return true;
+                            }else{
+                                document.getElementById("invalidForm").innerHTML = '<div class="alert-box error-alert"><div class="alert-heading"><img src="${url.resourcesPath}/img/vector-alert.png" alt="">Alert!</div><div class="alert-message fst-italic">Please enter the password in valid format!</div></div>';
+                                return false;
+                            }
+                        }
                 }
+            function ChangeValue(){
+                document.forms["form"]["cancel-aia"].value = "true";
+            }
         </script>
         <div class="form-wrapper">
             <div class="${properties.kcFormOptionsWrapperClass!}">
-                    <button type="submit" form="kc-passwd-update-form" name="cancel-aia" value="true" style="background:none; border:none; color:#5976D2"/>
+                <#if isAppInitiatedAction??>
+                    <button type="submit" form="kc-passwd-update-form" name="cancel-aia" value="false" onclick="ChangeValue()" style="background:none; border:none; color:#5976D2"/>
                     <img src="${url.resourcesPath}/img/vector-arrow.png" alt=""> 
                     ${kcSanitize(msg("backToLogin"))?no_esc}</button>
+                <#else>
+                    <div><img src="${url.resourcesPath}/img/vector-arrow.png" alt=""> 
+                           <a id="backToApplication" href="${client.baseUrl}" style="text-decoration: none; color:#5976D2">${kcSanitize(msg("backToLogin"))?no_esc} </a></div>
+                </#if> 
             </div>
             <div class="ndear-login-wrapper">
                 <div class="ndear-login-card-wrapper">

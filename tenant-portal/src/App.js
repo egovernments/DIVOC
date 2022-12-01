@@ -14,6 +14,7 @@ import axios from 'axios';
 import './i18n';
 import BreadcrumbComponent from "./components/BreadcrumbComponent/BreadcrumbComponent";
 import ManageSchemaHome from "./components/ManageSchemaHome/ManageSchemaHome";
+import InbuiltAttributesComponent from "./components/InbuiltAttributesComponent/InbuiltAttributesComponent";
 
 function App() {
   const { initialized, keycloak } = useKeycloak();
@@ -76,10 +77,18 @@ function App() {
                      }
            >
            </Route>
+           <Route path={config.urlPath + "/manage-schema/view-inbuilt-attributes"}
+             element={
+                        <PrivateRoute>
+                          <InbuiltAttributesComponent />
+                        </PrivateRoute>
+                     }
+           >
+           </Route>
            <Route path={config.urlPath + "/manage-schema"}
              element={
                         <PrivateRoute>
-                          <ManageSchemaHome /> 
+                          <ManageSchemaHome />
                         </PrivateRoute>
                      }
            ></Route>
