@@ -1,18 +1,25 @@
 import React from 'react';
 import {Dropdown, DropdownButton} from 'react-bootstrap';
 
-const DropdownComponent = (props) => {
+const DropdownComponent = ({
+  options,
+  handleChange,
+  variant,
+  title,
+  align,
+  className
+}) => {
   return (
-    <DropdownButton className={props.className}
-    variant = {props.variant}
-    align = {props.align}
-    title={props.title}>
-        {Object.keys(props.obj).map((objKey) => (
+    <DropdownButton className={className}
+      variant = {variant}
+      align = {align}
+      title={title}>
+        {Object.keys(options).map((objKey) => (
             <Dropdown.Item
               key={objKey}
-              onClick={() => props.fn(objKey)}
+              onClick={() => handleChange(objKey)}
             >
-              {props.obj[objKey]}
+              {options[objKey]}
             </Dropdown.Item>
           ))}
     </DropdownButton>
