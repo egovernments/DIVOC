@@ -15,7 +15,7 @@ function InbuiltAttributesComponent() {
                 <p className="title">{t('inbuiltAtrributesPage.inbuiltAttributes')}</p>
                 <p className="mb-0">{t('inbuiltAtrributesPage.inbuiltAttributesHeading1')}</p>
                 <p>{t('inbuiltAtrributesPage.inbuiltAttributesHeading2')}</p>
-                <div className="p-3 border overflow-auto">
+                <div className="p-3 border overflow-auto d-xxl-inline-block">
                     <p className="table-heading">{t('inbuiltAtrributesPage.fields')}</p>
                     <table className={styles["inbuiltAttributesTable"]}>
                         <thead className="table-col-header">

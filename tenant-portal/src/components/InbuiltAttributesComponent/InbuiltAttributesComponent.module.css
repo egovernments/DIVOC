@@ -2,25 +2,34 @@
     margin: 2rem
 }
 
+.inbuiltAttributesTable {
+    width: 1000px;
+}
+
 @media (min-width:768px) {
     .inbuiltAttributes {
-        margin: 2rem 3rem 2rem 3rem
+        margin: 2rem 3rem
     }
 }
 
 @media (min-width: 992px) {
     .inbuiltAttributes {
-        margin: 2rem 5rem 2rem 5rem
+        margin: 2rem 5rem
+    }
+
+    .inbuiltAttributesTable {
+        max-width: 100%;
     }
 }
 
 @media (min-width: 1200px) {
     .inbuiltAttributes {
-        margin: 2rem 5rem 2rem 15rem
+        margin: 2rem 5rem 2rem 10rem
     }
 }
 
-.inbuiltAttributesTable {
-    min-width: 950px;
-    width: 100%;
+@media (min-width: 1400px) {
+    .inbuiltAttributes {
+        margin: 2rem 5rem 2rem 15rem
+    }
 }
