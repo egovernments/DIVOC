@@ -5,25 +5,26 @@ import config from "../../config.json";
 import GenericButton from "../GenericButton/GenericButton";
 import {Link} from "react-router-dom";
 import React from "react";
+import styles from "./InbuiltAttributesComponent.module.css";
 
 function InbuiltAttributesComponent() {
     const { t } = useTranslation();
     return(
-        <div>
-            <div>
-                <p className="title">{t('Inbuilt Attributes')}</p>
-                <p>View the inbuilt attributes below that are required as a part of W3C standards.</p>
-                <p>These inbuilt attributes are common across schemas and no new fields can be added and existing fields be deleted.</p>
-                <div className="p-3">
-                    <p>Fields</p>
-                    <table>
-                        <thead>
-                            <th>Label</th>
-                            <th>Field Type</th>
-                            <th>Mandatory</th>
-                            <th>Indexed</th>
-                            <th>Unique</th>
-                            <th>Description</th>
+        <div className="d-flex flex-column justify-content-between">
+            <div className={styles["inbuiltAttributes"]}>
+                <p className="title">{t('inbuiltAtrributesPage.inbuiltAttributes')}</p>
+                <p className="mb-0">{t('inbuiltAtrributesPage.inbuiltAttributesHeading1')}</p>
+                <p>{t('inbuiltAtrributesPage.inbuiltAttributesHeading2')}</p>
+                <div className="p-3 border overflow-auto">
+                    <p className="table-heading">{t('inbuiltAtrributesPage.fields')}</p>
+                    <table className={styles["inbuiltAttributesTable"]}>
+                        <thead className="table-col-header">
+                            <th>{t('inbuiltAtrributesPage.label')}</th>
+                            <th>{t('inbuiltAtrributesPage.fieldType')}</th>
+                            <th className="text-center">{t('inbuiltAtrributesPage.mandatory')}</th>
+                            <th className="text-center">{t('inbuiltAtrributesPage.indexed')}</th>
+                            <th className="text-center">{t('inbuiltAtrributesPage.unique')}</th>
+                            <th>{t('inbuiltAtrributesPage.description')}</th>
                         </thead>
                         <tbody>
                         {
@@ -36,9 +37,12 @@ function InbuiltAttributesComponent() {
                 </div>
             </div>
             <div>
-                <Link to={`${config.urlPath}/manage-schema`}>
-                    <GenericButton img='' text='Back to Manage Schema' type='primary' />
-                </Link>
+                <hr/>
+                <div className="d-flex justify-content-center justify-content-md-end px-md-4 px-lg-5">
+                    <Link to={`${config.urlPath}/manage-schema`}>
+                        <GenericButton img='' text={t('inbuiltAtrributesPage.backButton')} type='primary' />
+                    </Link>
+                </div>
             </div>
         </div>
     );

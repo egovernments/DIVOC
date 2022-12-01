@@ -34,5 +34,20 @@
             "text": "Make sure to store this safely. Once you leave this page, you will not be able to access this token again",
             "imptext":"This token is valid for 1 year."
         }   
+    },
+
+    "inbuiltAtrributesPage": {
+        "label": "Label",
+        "fieldType": "Field Type",
+        "mandatory": "Mandatory",
+        "indexed": "Indexed",
+        "unique": "Unique",
+        "description": "Description",
+        "action": "Action",
+        "inbuiltAttributes": "Inbuilt Attributes",
+        "inbuiltAttributesHeading1": "View the inuilt attributes below that are required as a part of W3C standards.",
+        "inbuiltAttributesHeading2": "These inbuilt attributes are common across schemas and no new fields can be added and existing fields be deleted.",
+        "fields": "Fields",
+        "backButton": "Back to Manage Schema"
     }
 }
