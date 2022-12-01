@@ -20,13 +20,12 @@
 .card{
     padding: 1rem 0;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
-    border: none;
+    border: 1px solid transparent;
     display: flex;
     height: 100%;
 }
 
 .card:hover{
-    border: 1px solid transparent;
     border-radius: 4%;
     background: 
         linear-gradient(to right, white, white), 
