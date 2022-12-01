@@ -5,7 +5,7 @@ import { useKeycloak } from "@react-keycloak/web";
 import Nav from "react-bootstrap/Nav";
 import { useTranslation } from "react-i18next";
 import { Dropdown, NavDropdown } from "react-bootstrap";
-import UserLogo from "../../assets/img/user-logo.png";
+import UserLogo from "../../assets/img/profile.svg";
 import { useState, useEffect } from "react";
 import config from '../../config.json'
 function Header() {

@@ -24,7 +24,7 @@
             <div class="ndear-login-wrapper">
                 <div id="kc-form" class="ndear-login-card-wrapper">
                     <div class="keycloak-form">
-                        <p class="login-title">Forgot Password</p>
+                        <p class="login-title">Forgot Password ?</p>
                         <div id="kc-form-wrapper">
                             <form id="kc-reset-password-form" action="${url.loginAction}" name="form" method="post" onsubmit="return validateForm()">
                                 <div class="${properties.kcFormGroupClass!}">
