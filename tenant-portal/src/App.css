@@ -65,3 +65,61 @@
 .profile .dropdown-toggle::after {
     content: none;
 }
+
+.table-heading {
+    font-family: Open Sans, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 25px;
+    text-align: left;
+}
+
+.table-col-header {
+    font-family: Open Sans, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+    text-align: left;
+    background-color: #F3F3F3;
+    color: #484646;
+}
+
+/*table tr {*/
+
+/*}*/
+
+table tbody tr td {
+    font-family: Open Sans, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 19px;
+    padding: 5px 0;
+    color: #484646;
+}
+.table-heading {
+    font-family: Open Sans, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 25px;
+    text-align: left;
+}
+
+.table-col-header {
+    font-family: Open Sans, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+    text-align: left;
+    background-color: #F3F3F3;
+    color: #484646;
+}
+
+/*table tr {*/
+
+/*}*/
+
+table tbody tr td {
+    font-family: Open Sans, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+}
