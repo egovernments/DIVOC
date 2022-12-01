@@ -1,17 +1,19 @@
 import React, { useState , useEffect} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import GenTokenImg from "../../assets/img/generate_viewToken.png";
-import CopyIcon from "../../assets/img/copyIcon.png"
-import DownloadIcon from "../../assets/img/downloadIcon.png"
-import AlertIcon from '../../assets/img/alertIcon.png';
+import CopyIcon from "../../assets/img/copy.svg";
+import DownloadIcon from "../../assets/img/download.svg";
+import AlertIcon from '../../assets/img/alert.svg';
 import GenericButton from '../GenericButton/GenericButton';
 import styles from './GenerateToken.module.css';
 import {useKeycloak} from '@react-keycloak/web'
 import {useTranslation} from "react-i18next";
-import { Container, Card, Col, Row, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import InfoCard from '../InfoCard/InfoCard';
 import config from '../../config.json';
 import { Link, useNavigate } from 'react-router-dom';
+import ToastComponent from '../ToastComponent/ToastComponent';
+
 const axios = require('axios');
 
 function GenerateToken() {
@@ -21,9 +23,17 @@ function GenerateToken() {
   }, []);
   
   const [token, setToken] = useState("");
+  const [toast, setToast] = useState("");
   const { t } = useTranslation();
   const {keycloak} = useKeycloak();
-  
+
+  const showToastFunc = () => {
+    setToast (<ToastComponent header="Copied the token to Clipboard"
+          variant="success" delay='3000' position="top-center" className="copy-toast" />);
+          setTimeout(() => {
+            setToast("");
+          }, 3000);
+  }
   async function copyToken() {
     var copyText = document.getElementById("token");
     copyText.select();
@@ -57,7 +67,7 @@ function GenerateToken() {
       console.error(error);
       throw error;
   });
-  }
+  };
   const outputToken = async () => {
       const access_token = await getToken();
       setToken(access_token)
@@ -65,6 +75,7 @@ function GenerateToken() {
  
   return (
     <div className='d-flex flex-wrap'>
+      {toast}
         <div className='col-md-6 col-sm-12 page-content'>
             <div className='title'>{t('genTokenPage.title')}</div>
             {token==='' && <div>
@@ -85,7 +96,8 @@ function GenerateToken() {
               <Form.Control className={`my-3 ${styles['token']}`} size="lg" type="text" readOnly id='token' defaultValue={token} />
               <div className='container-fluid my-3 px-0'>
                 <div className='px-0 mx-0 d-flex flex-wrap'>
-                  <div className='col-12 col-lg-6 my-2 pe-0 pe-lg-2' onClick={async () => await copyToken()}>
+                  <div className='col-12 col-lg-6 my-2 pe-0 pe-lg-2' 
+                  onClick={async () => {await copyToken(); showToastFunc();}}>
                   <GenericButton img={CopyIcon} text='Copy' type='primary' />
                   </div>
                   <div className='col-12 col-lg-6 my-2 ps-0 ps-lg-2' onClick={() =>  downloadToken()}>
