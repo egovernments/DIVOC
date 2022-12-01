@@ -48,7 +48,22 @@
 .disabled {
     cursor: default;
     pointer-events: none;
-    color: #484646;
+    color: #505A5F !important;
+}
+.btn-outline-light {
+    color: #646d82!important;
+    font-size: 0.75rem;
+}
+.copy-toast {
+    z-index: 10;
+    margin-top: 5rem;
+    position: fixed;
+     box-shadow: 0px 6px 20px #C1CFD933;
+     border-radius: 5px;
+
+}
+.profile .dropdown-toggle::after {
+    content: none;
 }
 
 .table-heading {
@@ -80,8 +95,4 @@ table tbody tr td {
     line-height: 19px;
     padding: 5px 0;
     color: #484646;
-}
-.btn-outline-light {
-    color: #646d82!important;
-    font-size: 0.75rem;
 }

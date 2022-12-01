@@ -4,7 +4,7 @@ import "./Header.css";
 import { useKeycloak } from "@react-keycloak/web";
 import Nav from "react-bootstrap/Nav";
 import { useTranslation } from "react-i18next";
-import UserLogo from "../../assets/img/user-logo.png";
+import UserLogo from "../../assets/img/profile.svg";
 import { useState, useEffect } from "react";
 import config from '../../config.json'
 import DropdownComponent from "../DropdownComponent/DropdownComponent";
@@ -70,8 +70,8 @@ function Header() {
       <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
         <Nav className="">{<Nav.Link href="#">{profileName}</Nav.Link>}</Nav>
         <DropdownComponent
-          obj={languagesObj} 
-          fn={changeLanguageFunc} 
+          obj={languagesObj}
+          fn={changeLanguageFunc}
           variant = "outline-light"
           align = 'end'
           title={languagesObj[i18n.language] || "English"} />

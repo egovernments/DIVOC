@@ -6,7 +6,7 @@ const BreadcrumbComponent = () => {
   return (
     <div className="d-flex flex-wrap ms-4">
       {breadcrumbs.map(({ breadcrumb, match }, index) => (
-        <div className="breadcrumb" key={match.pathname}> 
+        <div className={(breadcrumbs.length==1)? "d-none" :"breadcrumb"} key={match.pathname}> 
             <a href={match.pathname}
              className={(index==breadcrumbs.length-1)?
               'breadcrumb-item disabled':'breadcrumb-item'}>{breadcrumb}</a>
