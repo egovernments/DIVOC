@@ -1,0 +1,36 @@
+.title{
+    font-style: normal;
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 38px;
+    color: #484646;
+}    
+
+.card-text{
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 22px; 
+    text-align: center;
+    background: linear-gradient(270deg, #5367CA 0%, #73BAF4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.card{
+    padding: 1rem 0;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
+    border: none;
+    display: flex;
+    height: 100%;
+}
+
+.card:hover{
+    border: 1px solid transparent;
+    border-radius: 4%;
+    background: 
+        linear-gradient(to right, white, white), 
+        linear-gradient(270deg, #5367CA, #73BAF4); 
+    background-clip: padding-box, border-box;
+    background-origin: padding-box, border-box;
+}

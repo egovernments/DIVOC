@@ -19,29 +19,24 @@
     line-height: 18px;
     color: #898383;
 }
-.input-group{
-    padding-bottom: 2rem;
-    display: flex;
-    flex-direction: column;
-}
+
 .input-box{
     border: 1px solid #C4C4C4;
     border-radius: 4px;
 }
 
 .custom-footer{
-    height: 10%;
     background: #FFFFFF;
-    box-shadow: 0px -0.5px 2px rgba(0, 0, 0, 0.15);
-    display: flex;
-    flex-direction: row;
-    justify-content: end;
-    padding: 1rem 2rem 1rem 2rem;
+    box-shadow: 0px -0.5px 5px rgba(0, 0, 0, 0.15);
+    margin-bottom: 2rem; 
+    position: fixed; 
+    bottom: 0;
 }
 .btn-primary {
     width: 15%;
     border-radius: 4px;
-    padding: 4px 16px;
+    padding: 4px 18px;
+    margin: 0 8px 0 8px;
     gap: 10px;
     border: 1px;
     color:  #FFFFFF;
