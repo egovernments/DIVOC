@@ -49,5 +49,21 @@
         "inbuiltAttributesHeading2": "These inbuilt attributes are common across schemas and no new fields can be added and existing fields be deleted.",
         "fields": "Fields",
         "backButton": "Back to Manage Schema"
+    },
+    "schemaDetails": {
+        "title": "Add Schema Details",
+        "label1": "Name of the Schema",
+        "label2": "Description",
+        "labelOptional": "(optional)"
+    },
+    "createSchema": {
+        "title": "Create New Schema",
+        "text": "Create new schema by selecting one of the options below",
+        "view": "View",
+        "trainingMaterial": "Training Material",
+        "or": "or",
+        "videosLink": "Videos",
+        "addText": "Add Manually",
+        "uploadText": "Upload JSON"
     }
 }

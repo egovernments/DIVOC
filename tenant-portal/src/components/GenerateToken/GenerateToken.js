@@ -85,7 +85,7 @@ function GenerateToken() {
               </div>           
               <Link to={`${config.urlPath}/generate-token/view-token`}
                onClick={ async () => await outputToken()} >
-                <GenericButton img='' text={t('genTokenPage.buttonText')} type='primary' />
+                <GenericButton img='' text={t('genTokenPage.buttonText')} type='button' variant='primary' />
               </Link>
             </div>}
             {token && <div>
@@ -96,12 +96,11 @@ function GenerateToken() {
               <Form.Control className={`my-3 ${styles['token']}`} size="lg" type="text" readOnly id='token' defaultValue={token} />
               <div className='container-fluid my-3 px-0'>
                 <div className='px-0 mx-0 d-flex flex-wrap'>
-                  <div className='col-12 col-lg-6 my-2 pe-0 pe-lg-2' 
-                  onClick={async () => {await copyToken(); showToastFunc();}}>
-                  <GenericButton img={CopyIcon} text='Copy' type='primary' />
+                  <div className='col-12 col-lg-6 my-2 pe-0 pe-lg-2' onClick={async () => await copyToken()}>
+                  <GenericButton img={CopyIcon} text='Copy' type='button' variant='primary' />
                   </div>
                   <div className='col-12 col-lg-6 my-2 ps-0 ps-lg-2' onClick={() =>  downloadToken()}>
-                  <GenericButton img={DownloadIcon} text='Download' type='primary' />
+                  <GenericButton img={DownloadIcon} text='Download' type='button' variant='primary' />
                   </div>
                   </div>
               </div>

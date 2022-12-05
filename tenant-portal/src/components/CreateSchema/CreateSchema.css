@@ -4,41 +4,33 @@
     font-size: 26px;
     line-height: 38px;
     color: #484646;
-}
-.input-label{
+}    
+
+.card-text{
     font-style: normal;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 16px;
-    line-height: 22px;
-    color: #484646;
-}
-.secondary-label {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 18px;
-    color: #898383;
-}
-
-.input-box{
-    border: 1px solid #C4C4C4;
-    border-radius: 4px;
-}
-
-.custom-footer{
-    background: #FFFFFF;
-    box-shadow: 0px -0.5px 5px rgba(0, 0, 0, 0.15);
-    margin-bottom: 2rem; 
-    position: fixed; 
-    bottom: 0;
-}
-.btn-primary {
-    width: 15%;
-    border-radius: 4px;
-    padding: 4px 18px;
-    margin: 0 8px 0 8px;
-    gap: 10px;
-    border: 1px;
-    color:  #FFFFFF;
+    line-height: 22px; 
+    text-align: center;
     background: linear-gradient(270deg, #5367CA 0%, #73BAF4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.card{
+    padding: 1rem 0;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
+    border: none;
+    display: flex;
+    height: 100%;
+}
+
+.card:hover{
+    border: 1px solid transparent;
+    border-radius: 4%;
+    background: 
+        linear-gradient(to right, white, white), 
+        linear-gradient(270deg, #5367CA, #73BAF4); 
+    background-clip: padding-box, border-box;
+    background-origin: padding-box, border-box;
 }
