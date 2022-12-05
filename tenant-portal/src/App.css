@@ -48,5 +48,78 @@
 .disabled {
     cursor: default;
     pointer-events: none;
+    color: #505A5F !important;
+}
+.btn-outline-light {
+    color: #646d82!important;
+    font-size: 0.75rem;
+}
+.copy-toast {
+    z-index: 10;
+    margin-top: 5rem;
+    position: fixed;
+     box-shadow: 0px 6px 20px #C1CFD933;
+     border-radius: 5px;
+    
+}
+.profile .dropdown-toggle::after {
+    content: none;
+}
+
+.table-heading {
+    font-family: Open Sans, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 25px;
+    text-align: left;
+}
+
+.table-col-header {
+    font-family: Open Sans, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+    text-align: left;
+    background-color: #F3F3F3;
     color: #484646;
+}
+
+/*table tr {*/
+
+/*}*/
+
+table tbody tr td {
+    font-family: Open Sans, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 19px;
+    padding: 5px 0;
+    color: #484646;
+}
+.table-heading {
+    font-family: Open Sans, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 25px;
+    text-align: left;
+}
+
+.table-col-header {
+    font-family: Open Sans, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+    text-align: left;
+    background-color: #F3F3F3;
+    color: #484646;
+}
+
+/*table tr {*/
+
+/*}*/
+
+table tbody tr td {
+    font-family: Open Sans, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
 }

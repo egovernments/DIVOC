@@ -9,10 +9,12 @@ import Header from "./components/Header/Header"
 import config from "./config.json"
 import Footer from "./components/Footer/Footer";
 import GenerateToken from "./components/GenerateToken/GenerateToken";
-import ToastComponent from './components/Toast/Toast';
+import ToastComponent from "./components/ToastComponent/ToastComponent";
 import axios from 'axios';
 import './i18n';
 import BreadcrumbComponent from "./components/BreadcrumbComponent/BreadcrumbComponent";
+import InbuiltAttributesComponent from "./components/InbuiltAttributesComponent/InbuiltAttributesComponent";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   const { initialized, keycloak } = useKeycloak();
@@ -75,9 +77,16 @@ function App() {
                      }
            >
            </Route>
+           <Route path={config.urlPath + "/manage-schema/view-inbuilt-attributes"}
+             element={
+                        <PrivateRoute>
+                          <InbuiltAttributesComponent />
+                        </PrivateRoute>
+                     }
+           >
+           </Route>
         </Routes>
         </div>
-        <ToastComponent/>
       <div><Footer/></div>
       </Router>
     </div>
