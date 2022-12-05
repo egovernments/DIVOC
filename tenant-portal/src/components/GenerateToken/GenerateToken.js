@@ -98,7 +98,7 @@ function GenerateToken() {
                 <div className='px-0 mx-0 d-flex flex-wrap'>
                   <div className='col-12 col-lg-6 my-2 pe-0 pe-lg-2' 
                   onClick={async () => {await copyToken(); showToastFunc();}}>
-                  <GenericButton img={CopyIcon} text='Copy' type='primary' />
+                  <GenericButton img={CopyIcon} text='Copy' type='button' variant='primary' />
                   </div>
                   <div className='col-12 col-lg-6 my-2 ps-0 ps-lg-2' onClick={() =>  downloadToken()}>
                   <GenericButton img={DownloadIcon} text='Download' type='button' variant='primary' />
