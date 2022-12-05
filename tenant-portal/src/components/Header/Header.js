@@ -4,43 +4,41 @@ import "./Header.css";
 import { useKeycloak } from "@react-keycloak/web";
 import Nav from "react-bootstrap/Nav";
 import { useTranslation } from "react-i18next";
-import { Dropdown, NavDropdown } from "react-bootstrap";
 import UserLogo from "../../assets/img/profile.svg";
 import { useState, useEffect } from "react";
 import config from '../../config.json'
+import DropdownComponent from "../DropdownComponent/DropdownComponent";
 function Header() {
   const {keycloak} = useKeycloak();
-  const [showProfile, setShowProfile] = useState(false);
   const [profileName, setProfileName] = useState("");
   const { i18n } = useTranslation();
-  const lngs = {
-    en: { nativeName: "English" },
-    hi: { nativeName: "Hindi" },
+  const languagesObj = {
+    en : "English",
+    hi : "Hindi"
   };
-  const toggleProfile = (event) => {
-    event.stopPropagation();
-    setShowProfile(!showProfile)
+  const profileObj = {
+    cp: "Change Password",
+    lo: "LogOut"
   }
-  const handleClick = () => {
-    setShowProfile(false);
+  
+  const changeLanguageFunc = (lng) => {
+    return i18n.changeLanguage(lng);
   };
+  const profileFunc = (request) => {
+    if(request=="cp") {
+      keycloak.login({action: "UPDATE_PASSWORD"});
+      return
+    } else if(request=="lo") {
+      keycloak.logout();
+      return
+    }
+  }
   useEffect(() => {
     var profileName = keycloak?.idTokenParsed?.preferred_username.split("@")[0];
     profileName = profileName?.charAt(0).toUpperCase()+ profileName?.slice(1);
     setProfileName(profileName);
-    window.addEventListener('click', handleClick);
-    return () => {
-      window.removeEventListener('click', handleClick);
-    };
   }, []);
-  function logout(){
-    keycloak.logout();
-    return
-  }
-  function changePassword() {
-    keycloak.login({action: "UPDATE_PASSWORD"});
-    return
-  }
+  
   return (
     <Navbar fixed="top" bg="white" className="px-3 py-2">
       <Navbar.Brand href={`${config.urlPath}/`}>
@@ -53,28 +51,20 @@ function Header() {
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
         <Nav className="">{<Nav.Link href="#">{profileName}</Nav.Link>}</Nav>
-        <NavDropdown
-          title={lngs[i18n.language]?.nativeName || "English"}
-          id="basic-nav-dropdown"
-          align="end"
-        >
-          {Object.keys(lngs).map((lng) => (
-            <NavDropdown.Item
-              key={lng}
-              onClick={() => i18n.changeLanguage(lng)}
-            >
-              {lngs[lng].nativeName}
-            </NavDropdown.Item>
-          ))}
-        </NavDropdown>
-        <div style={{cursor:"pointer",}}>
-          <img src={UserLogo} className="header-profile " onClick={toggleProfile} />
-          <ul className={(showProfile) ? "profile-dropdown": "d-none" }>
-            <li onClick={changePassword}><span>
-              Change Password</span></li>
-            <li onClick={logout} href="#"><span>Logout</span></li>
-          </ul>
-        </div>
+        <DropdownComponent
+          options={languagesObj}
+          handleChange={changeLanguageFunc}
+          variant = "outline-light"
+          align = 'end'
+          title={languagesObj[i18n.language] || "English"} 
+        />
+        <DropdownComponent className="profile"
+          options={profileObj}
+          handleChange={profileFunc}
+          variant = "outline-light"
+          align = 'end'
+          title={<img src={UserLogo} />} 
+        />
       </Navbar.Collapse>
     </Navbar>
   );
