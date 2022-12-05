@@ -78,7 +78,9 @@
             ,"Enter the ‘Label Name, Placeholder, Description, Data, Validation wherever applicable and click Save"
             ,"The attribute that you created is populated in the table. If you wish to add another field, click ‘Add field’. Once all the attributes are added, click on ‘Save & Next’  which will take you to the ‘Test & Publish’ screen"
             ,"Next, you can add sample data for the attributes that you created and check the QR code sizing and configuration. Click on ‘Publish’ to create the schema. Once you publish the schema, it cannot be edited"
-        ]
+        ],
+        "viewAttributesBtn": "View Inbuilt Attributes",
+        "createSchemaBtn": "Create Schema"
     },
     "schemasHomePage": {
         "createNewSchemas": {
