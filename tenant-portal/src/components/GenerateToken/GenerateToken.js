@@ -96,8 +96,9 @@ function GenerateToken() {
               <Form.Control className={`my-3 ${styles['token']}`} size="lg" type="text" readOnly id='token' defaultValue={token} />
               <div className='container-fluid my-3 px-0'>
                 <div className='px-0 mx-0 d-flex flex-wrap'>
-                  <div className='col-12 col-lg-6 my-2 pe-0 pe-lg-2' onClick={async () => await copyToken()}>
-                  <GenericButton img={CopyIcon} text='Copy' type='button' variant='primary' />
+                  <div className='col-12 col-lg-6 my-2 pe-0 pe-lg-2' 
+                  onClick={async () => {await copyToken(); showToastFunc();}}>
+                  <GenericButton img={CopyIcon} text='Copy' type='primary' />
                   </div>
                   <div className='col-12 col-lg-6 my-2 ps-0 ps-lg-2' onClick={() =>  downloadToken()}>
                   <GenericButton img={DownloadIcon} text='Download' type='button' variant='primary' />

@@ -24,14 +24,12 @@ return (
                         <Col>{t('createSchema.view')} <Link to={''} className="text-decoration-none">{t('createSchema.trainingMaterial')}</Link> {t('createSchema.or')} <Link to={''} class="text-decoration-none">{t('createSchema.videosLink')}</Link></Col>
                         <Row xs={1} sm={2} className="pt-4">
                             <Col>
-                                {/* <Link to={''} className="text-decoration-none"> */}
-                                    <Card className="card" onClick={() => setSchemaDetails(true)}>
-                                        <Card.Body className="">
-                                            <Card.Title className="text-center"><Image src={addVector}/></Card.Title>
-                                            <Card.Text className="card-text">{t('createSchema.addText')}</Card.Text>
-                                        </Card.Body>
-                                    </Card> 
-                                {/* </ Link> */}
+                                <Card className="card" onClick={() => setSchemaDetails(true)}>
+                                    <Card.Body className="">
+                                        <Card.Title className="text-center"><Image src={addVector}/></Card.Title>
+                                        <Card.Text className="card-text">{t('createSchema.addText')}</Card.Text>
+                                    </Card.Body>
+                                </Card> 
                             </Col>
                             <Col>
                                 <Link to={''} className="text-decoration-none">
