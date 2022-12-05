@@ -1,0 +1,34 @@
+.title{
+    font-style: normal;
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 38px;
+    color: #484646;
+}
+.input-label{
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 22px;
+    color: #484646;
+}
+.secondary-label {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 18px;
+    color: #898383;
+}
+
+.input-box{
+    border: 1px solid #C4C4C4;
+    border-radius: 4px;
+}
+
+.custom-footer{
+    background: #FFFFFF;
+    box-shadow: 0px -0.5px 5px rgba(0, 0, 0, 0.15);
+    margin-bottom: 2rem; 
+    position: fixed; 
+    bottom: 0;
+}

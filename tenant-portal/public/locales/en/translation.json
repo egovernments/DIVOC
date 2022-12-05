@@ -50,6 +50,22 @@
         "fields": "Fields",
         "backButton": "Back to Manage Schema"
     },
+    "schemaDetails": {
+        "title": "Add Schema Details",
+        "label1": "Name of the Schema",
+        "label2": "Description",
+        "labelOptional": "(optional)"
+    },
+    "createSchema": {
+        "title": "Create New Schema",
+        "text": "Create new schema by selecting one of the options below",
+        "view": "View",
+        "trainingMaterial": "Training Material",
+        "or": "or",
+        "videosLink": "Videos",
+        "addText": "Add Manually",
+        "uploadText": "Upload JSON"
+    },
 
     "noSchemaPage": {
         "title": "No Schema Added Yet!",
