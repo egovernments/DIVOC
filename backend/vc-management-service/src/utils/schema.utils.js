@@ -1,6 +1,7 @@
 const {MINIO_URL_SCHEME, MANDATORY_FIELDS, MANDATORY_EVIDENCE_FIELDS, SUNBIRD_SCHEMA_ADD_URL, SUNBIRD_SCHEMA_UPDATE_URL, SUNBIRD_GET_SCHEMA_URL} = require("../configs/constants");
 const {CustomError} = require("../models/error");
 const sunbirdRegistryService = require('../services/sunbird.service')
+const axios = require('axios');
 
 
 async function updateSchemaTemplateUrls(urlMap, schemaId, token) {

@@ -104,11 +104,37 @@ async function updateTemplateUrls(req, res) {
         });
     }
 }
+ async function previewSchema(req,res){
+    try {
+        const token = req.header("Authorization");
+        const {credentialTemplate, data, template} = req.body;
+        const createCertReq = {
+            credentialTemplate: credentialTemplate,
+            data : data
+        }
+        console.log("Create certificate request: ",createCertReq);
+        const createCertResp = await sunbirdRegistryService.createCertBySigner(JSON.stringify(createCertReq),token);
+        console.log("Signed certificate: ",createCertResp);
+        const getCertReq = {
+            certificate: JSON.stringify(createCertResp),
+            templateUrl: template
+        }
+        const acceptType = "application/pdf"
+        const getCert = await sunbirdRegistryService.getCertByApi(getCertReq,token,acceptType);
+        getCert.data.pipe(res);
+    }catch (err){
+        console.error(err);
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message
+        });
+    }
+ }
 
 module.exports = {
     createSchema,
     getSchema,
     updateSchema,
     updateTemplate,
-    updateTemplateUrls
+    updateTemplateUrls,
+    previewSchema
 }

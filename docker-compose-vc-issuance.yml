@@ -211,6 +211,8 @@ services:
       SUNBIRD_REGISTRY_FRONTEND_CLIENT: 'registry-frontend'
       KEYCLOCK_TOKEN_TYPE_REFRESH_TOKEN: 'urn:ietf:params:oauth:token-type:refresh_token'
       KEYCLOCK_GRANT_TYPE_TOKEN_EXCHANGE: 'urn:ietf:params:oauth:grant-type:token-exchange'
+      SUNBIRD_CERIFICATE_SIGNER_URL: 'http://sunbird-certificate-signer:8079'
+      SUNBIRD_CERIFICATE_API_URL: 'http://sunbird-certificate-api:8078'
     depends_on:
       vc-registry:
         condition: service_started
