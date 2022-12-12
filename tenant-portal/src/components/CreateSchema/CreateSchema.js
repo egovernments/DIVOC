@@ -19,7 +19,7 @@ return (
             <Row className="justify-content-between px-5" >
                 <Col md={5} >
                     <Stack gap={4}>
-                        <Row className={styles["title"]}>{t('createSchema.title')}</Row>
+                        <Row className={`${styles["title"]} gx-0`}>{t('createSchema.title')}</Row>
                         <Row className="gx-0">{t('createSchema.text')}</Row>
                         <Col>{t('createSchema.view')} <Link to={''} className="text-decoration-none">{t('createSchema.trainingMaterial')}</Link> {t('createSchema.or')} <Link to={''} class="text-decoration-none">{t('createSchema.videosLink')}</Link></Col>
                         <Row xs={1} sm={2} className="pt-4">
