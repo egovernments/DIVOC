@@ -20,7 +20,7 @@ const IS_CLOUD_STORAGE = process.env.IS_CLOUD_STORAGE || false;
 const STORAGE_REGION = process.env.STORAGE_REGION;
 const SUNBIRD_CERIFICATE_SIGNER_URL = process.env.SUNBIRD_CERIFICATE_SIGNER_URL || "";
 const SUNBIRD_CERIFICATE_API_URL = process.env.SUNBIRD_CERIFICATE_API_URL || "";
-
+const MINIO_REGISTRY_BUCKET = process.env.MINIO_REGISTRY_BUCKET || 'issuance';
 module.exports = {
     SUNBIRD_REGISTRY_URL,
     MINIO_URL,
@@ -29,6 +29,7 @@ module.exports = {
     MINIO_SECRETKEY,
     MINIO_USESSL,
     MINIO_BUCKET_NAME,
+    MINIO_REGISTRY_BUCKET,
     REDIS_URL,
     REDIS_ENABLED,
     PORT,

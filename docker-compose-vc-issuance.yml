@@ -198,6 +198,7 @@ services:
       # MINIO_ACCESSKEY: 'AKIAZ4W766BK5Z3WC65T'
       # MINIO_SECRETKEY: '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'
       MINIO_BUCKET_NAME: 'divoc-vc-storage'
+      MINIO_REGISTRY_BUCKET: 'issuance'
       ROOT_URL: ''
       REDIS_ENABLED: 'true'
       REDIS_URL: 'redis://redis:6379'
