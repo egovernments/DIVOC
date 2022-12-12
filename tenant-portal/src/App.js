@@ -54,7 +54,7 @@ function App() {
                         </PrivateRoute>
                      }
            ></Route>
-          <Route path={config.urlPath + "/create-schema"}
+          <Route path={config.urlPath + "/manage-schema/create-schema"}
              element={
                         <PrivateRoute>
                           <CreateSchema />

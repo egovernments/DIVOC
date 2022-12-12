@@ -13,7 +13,6 @@ const axios = require('axios');
 const ManageSchemaHome = () => {
     const { keycloak } = useKeycloak();
     const { t } = useTranslation();
-    const[schemaCheck, setSchemaCheck] = useState(false);
     const[schemasList, setSchemasList] = useState([]);
     const [searchSchemaInput, setSearchSchemaInput] = useState('');
     
@@ -38,7 +37,6 @@ const ManageSchemaHome = () => {
             setSchemasList(schemasList);
         }    
         setSchemListFunc();
-        if(schemasList.length>0){setSchemaCheck(true)};
     }, [])
     
     const getUserId = async () => {    
@@ -55,8 +53,8 @@ const ManageSchemaHome = () => {
     });
     };
   return (
-    <div className={!schemaCheck? "page-content": ""}>
-        {!schemaCheck && 
+    <div className={schemasList.length>0 ? "row": ""}>
+        {!schemasList.length>0 && 
         <div >
             <h1>{t('noSchemaPage.title')}</h1>
             <h3>{t('noSchemaPage.subtitle')}</h3>
@@ -70,7 +68,7 @@ const ManageSchemaHome = () => {
                 <li className="pb-2">{t('noSchemaPage.info.6')}</li>
             </ul>
         </div>}
-        {schemaCheck && 
+        {schemasList.length>0 && 
         <div className='d-flex flex-wrap'>
             <div className='col-md-3 col-sm-4 col-xs-12 px-4'>
                 <h3>Schemas Created</h3>
@@ -117,6 +115,7 @@ const ManageSchemaHome = () => {
         </div>
         }
         <div >
+            <hr />
         <Row gutter='3' xs={1} sm={2} md={3} lg={4} className="justify-content-end">
             <Col className="my-1 h-100">
                 <Link to={`${config.urlPath}/manage-schema/view-inbuilt-attributes`} >
@@ -124,7 +123,7 @@ const ManageSchemaHome = () => {
                 </Link>
             </Col>
             <Col className="my-1 h-100">
-                <Link to={`${config.urlPath}/manage-schema/view-inbuilt-attributes`} >
+                <Link to={`${config.urlPath}/manage-schema/create-schema`} >
                     <GenericButton img='' text={t('noSchemaPage.createSchemaBtn')} type='primary' style={{height:'100%'}}/> 
                 </Link>
             </Col>
