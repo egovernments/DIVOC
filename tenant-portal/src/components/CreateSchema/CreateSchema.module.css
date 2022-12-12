@@ -23,10 +23,10 @@
     border: none;
     display: flex;
     height: 100%;
+    border: 1px solid transparent;
 }
 
 .card:hover{
-    border: 1px solid transparent;
     border-radius: 4%;
     background: 
         linear-gradient(to right, white, white), 
