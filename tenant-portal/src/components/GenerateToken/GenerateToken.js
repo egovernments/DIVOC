@@ -29,10 +29,10 @@ function GenerateToken() {
 
   const showToastFunc = () => {
     setToast (<ToastComponent header="Copied the token to Clipboard"
-          variant="success" delay='200000' position="top-center" className="copy-toast" />);
+          variant="success" delay='3000' position="top-center" className="copy-toast" />);
           setTimeout(() => {
             setToast("");
-          }, 200000);
+          }, 3000);
   }
   async function copyToken() {
     var copyText = document.getElementById("token");
