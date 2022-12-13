@@ -1,6 +1,6 @@
 import {useTranslation} from "react-i18next";
 
-function SchemaAttribute(props) {
+function Attribute(props) {
 
     const { t } = useTranslation();
     const attributeTypes = [
@@ -47,4 +47,4 @@ function SchemaAttribute(props) {
     );
 }
 
-export default SchemaAttribute;
+export default Attribute;
