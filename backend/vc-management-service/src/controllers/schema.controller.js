@@ -2,11 +2,11 @@ const sunbirdRegistryService = require('../services/sunbird.service')
 const {getFormData} = require("../utils/utils");
 const {TENANT_NAME,MINIO_REGISTRY_BUCKET,IS_MINIO,MINIO_PORT,MINIO_URL,MINIO_USESSL,MINIO_ACCESSKEY,MINIO_SECRETKEY} = require("../configs/config");
 const {MINIO_URL_SCHEME, SUNBIRD_SCHEMA_ADD_URL, SUNBIRD_SCHEMA_UPDATE_URL, SUNBIRD_GET_SCHEMA_URL} = require("../configs/constants");
-const axios = require("axios");
 const {CustomError} = require("../models/error");
 const {addMandatoryFields, validateSchema, updateSchemaTemplateUrls} = require('../utils/schema.utils')
 const minio = require('minio');
 
+let minioClient;
 (async function() {
     try {
         let minioOptions = {
