@@ -1,13 +1,11 @@
 import Keycloak from 'keycloak-js';
-import {useKeycloak} from '@react-keycloak/web';
 import config from '../config.json';
 const axios = require('axios');
 
 const keycloak = new Keycloak('/keycloak.json');
 
 const getUserId = async () => {
-    const { reactKeycloak } = useKeycloak();
-    const userInfo = await reactKeycloak.loadUserInfo();
+    const userInfo = await keycloak.loadUserInfo();
     return userInfo.email;
 }
 const getToken = async () => {
