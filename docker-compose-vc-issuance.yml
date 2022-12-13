@@ -198,6 +198,7 @@ services:
       # MINIO_ACCESSKEY: 'AKIAZ4W766BK5Z3WC65T'
       # MINIO_SECRETKEY: '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'
       MINIO_BUCKET_NAME: 'divoc-vc-storage'
+      MINIO_REGISTRY_BUCKET: 'issuance'
       ROOT_URL: ''
       REDIS_ENABLED: 'true'
       REDIS_URL: 'redis://redis:6379'
@@ -211,6 +212,8 @@ services:
       SUNBIRD_REGISTRY_FRONTEND_CLIENT: 'registry-frontend'
       KEYCLOCK_TOKEN_TYPE_REFRESH_TOKEN: 'urn:ietf:params:oauth:token-type:refresh_token'
       KEYCLOCK_GRANT_TYPE_TOKEN_EXCHANGE: 'urn:ietf:params:oauth:grant-type:token-exchange'
+      SUNBIRD_CERIFICATE_SIGNER_URL: 'http://sunbird-certificate-signer:8079'
+      SUNBIRD_CERIFICATE_API_URL: 'http://sunbird-certificate-api:8078'
     depends_on:
       vc-registry:
         condition: service_started

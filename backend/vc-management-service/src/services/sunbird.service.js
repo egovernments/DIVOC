@@ -110,6 +110,25 @@ const getTransaction = async (transactionId, token) => {
             });
 }
 
+const createCertBySigner = async (body,token) => {
+    const url = config.SUNBIRD_CERIFICATE_SIGNER_URL + "/sign" ;
+    return axios.post(url, body,{headers:{Authorization: token}})
+            .then(res => res.data)
+            .catch(error => {
+                console.log(error);
+                throw error;
+            });
+}
+
+const getCertByApi = async (body,token, acceptType) => {
+    const url = config.SUNBIRD_CERIFICATE_API_URL + "/api/v1/certificate" ;
+    return axios.post(url,body, {responseType: "stream",headers:{Authorization:token, Accept: acceptType}})
+            .catch(error =>{
+                console.log(error);
+                throw error;
+            });
+}
+
 module.exports = {
     createTenant,
     createEntity,
@@ -118,5 +137,7 @@ module.exports = {
     updateEntity,
     getEntity,
     getTransaction,
-    getTenantId
+    getTenantId,
+    createCertBySigner,
+    getCertByApi
 }

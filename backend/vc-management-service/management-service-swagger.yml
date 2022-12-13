@@ -74,6 +74,41 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/Error'
+  /v1/schema/preview:
+    post:
+      tags:
+        - preview
+      summary: create schema preview
+      consumes:
+        - application/json
+      produces:
+        - application/pdf
+      operationId: schemaPreviewV1
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/GetSchemaPreview'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/pdf:
+              schema:
+                type: file
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
   /v1/schema/{schemaId}:
     get:
       tags:
@@ -324,6 +359,39 @@ definitions:
     required:
       - name
       - schema
+  GetSchemaPreview:
+    type: object
+    properties:
+      credentialTemplate:
+        type: object
+        properties:
+          context:
+            type: array
+            items:
+              type: string
+          type: 
+            type: array
+            items:
+              type: string
+          credentialSubject:
+            type: object
+          issuer:
+            type: string
+            minLength: 1
+          issuanceDate:
+            type: string
+            minLength: 1
+          evidence: 
+            type: object
+      data:
+        type: object
+      template: 
+        type: string
+        minLength: 1
+    required: 
+      - credentialTemplate
+      - data
+      - template
   SchemaList:
     type: object
     properties:

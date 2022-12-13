@@ -1,10 +1,32 @@
 const sunbirdRegistryService = require('../services/sunbird.service')
 const {getFormData} = require("../utils/utils");
-const {TENANT_NAME} = require("../configs/config");
+const {TENANT_NAME,MINIO_REGISTRY_BUCKET,IS_MINIO,MINIO_PORT,MINIO_URL,MINIO_USESSL,MINIO_ACCESSKEY,MINIO_SECRETKEY} = require("../configs/config");
 const {MINIO_URL_SCHEME, SUNBIRD_SCHEMA_ADD_URL, SUNBIRD_SCHEMA_UPDATE_URL, SUNBIRD_GET_SCHEMA_URL} = require("../configs/constants");
-const axios = require("axios");
 const {CustomError} = require("../models/error");
 const {addMandatoryFields, validateSchema, updateSchemaTemplateUrls} = require('../utils/schema.utils')
+const minio = require('minio');
+
+let minioClient;
+(async function() {
+    try {
+        let minioOptions = {
+            endPoint: MINIO_URL,
+            useSSL: MINIO_USESSL,
+            accessKey: MINIO_ACCESSKEY,
+            secretKey:MINIO_SECRETKEY
+        }
+        if(IS_MINIO) {
+            minioOptions = {
+                port: parseInt(MINIO_PORT),
+                ...minioOptions
+            }
+        }
+        minioClient = new minio.Client(minioOptions);
+    } catch(err) {
+        console.error(err);
+    }
+})();
+
 
 async function createSchema(req, res) {
     try {
@@ -104,11 +126,39 @@ async function updateTemplateUrls(req, res) {
         });
     }
 }
+ async function previewSchema(req,res){
+    try {
+        const token = req.header("Authorization");
+        const {credentialTemplate, data, template} = req.body;
+        const createCertReq = {
+            credentialTemplate: credentialTemplate,
+            data : data
+        }
+        console.log("Create certificate request: ",createCertReq);
+        const createCertResp = await sunbirdRegistryService.createCertBySigner(createCertReq,token);
+        console.log("Signed certificate: ",createCertResp);
+        let templateSignedUrl = await minioClient.presignedGetObject(MINIO_REGISTRY_BUCKET, template, 24*60*60);
+        console.log("templateSignedUrl : ",templateSignedUrl)
+        const getCertReq = {
+            certificate: JSON.stringify(createCertResp),
+            templateUrl: templateSignedUrl
+        }
+        const acceptType = "application/pdf"
+        const getCert = await sunbirdRegistryService.getCertByApi(getCertReq,token,acceptType);
+        getCert.data.pipe(res);
+    }catch (err){
+        console.error(err);
+        res.status(err?.response?.status || err?.status || 500).json({
+            message: err?.response?.data || err?.message || err
+        });
+    }
+ }
 
 module.exports = {
     createSchema,
     getSchema,
     updateSchema,
     updateTemplate,
-    updateTemplateUrls
+    updateTemplateUrls,
+    previewSchema
 }
