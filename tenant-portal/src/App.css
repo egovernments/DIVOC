@@ -14,13 +14,39 @@
     width: 100%;
     background: linear-gradient(270deg, #5367CA 0%, #73BAF4 100%);
 }
+.btn-outline-primary {
+    width: 100%;
+    color: #6493E0 !important;
+    background: 
+        linear-gradient(to right, white, white), 
+        linear-gradient(270deg, #5367CA, #73BAF4) !important; 
+}
 .alertCard {
     color: #639CD1;
     background-color: #F2F9FF;
     border:none;
 }
+input.search-icon {
+    background: url("./assets/img/Search.svg") no-repeat right;
+}
 .page-content{
     padding: 0 3rem;
+}
+.schema-list {
+    margin: 1rem 0;
+    border-radius: 3%;
+    border: 1px solid rgb(187, 181, 181);
+    max-height: 299px;
+    overflow: auto;
+    padding: 2px;
+}
+.schema-list-items {
+    padding: 1rem 0.5rem;
+    border-bottom: 1px solid rgb(192, 188, 188);
+}
+.schema-list-items:hover {
+    background-color: rgb(221, 212, 212);
+    cursor: pointer;
 }
 @media (min-width: 768px){
     .page-content{
@@ -49,10 +75,6 @@
     cursor: default;
     pointer-events: none;
     color: #505A5F !important;
-}
-.btn-outline-light {
-    color: #646d82!important;
-    font-size: 0.75rem;
 }
 .copy-toast {
     z-index: 10;

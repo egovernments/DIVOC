@@ -6,11 +6,8 @@ import HomeImg from "../../assets/img/home-img.png";
 import styles from './Home.module.css';
 import {useTranslation} from "react-i18next";
 import config from '../../config.json';
-import {useKeycloak} from '@react-keycloak/web'
 
 function Home() {
-    const {keycloak} = useKeycloak();
-    const navigate = useNavigate();
     const { t } = useTranslation();
     
     return(
@@ -30,6 +27,7 @@ function Home() {
                 <Container fluid>
                     <Row gutterX='3' xs={1} sm={2}>
                         <Col className="my-2">
+
                         <Link to={`${config.urlPath}/generate-token`} style={{textDecoration: 'none', }}>
                             <Card style={{ cursor: "pointer" }} className={styles['card']}>
                                 <Card.Body className="d-grid">
