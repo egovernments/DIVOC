@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useLayoutEffect} from 'react';
 import {useTranslation} from "react-i18next";
 import GenericButton from '../GenericButton/GenericButton';
 import { Link } from 'react-router-dom';
@@ -6,12 +6,10 @@ import config from '../../config.json'
 import { Col, Row } from 'react-bootstrap';
 import DraftIcon from '../../assets/img/Loaders.svg';
 import PublishedIcon from '../../assets/img/done_all.svg';
-import {useKeycloak} from '@react-keycloak/web';
+import {getToken, getUserId} from '../../utils/keycloak'
 const axios = require('axios');
 
-
 const ManageSchemaHome = () => {
-    const { keycloak } = useKeycloak();
     const { t } = useTranslation();
     const[schemasList, setSchemasList] = useState([]);
     const [searchSchemaInput, setSearchSchemaInput] = useState('');
@@ -21,10 +19,9 @@ const ManageSchemaHome = () => {
           (schemas.name).toLowerCase().includes(searchSchemaInput.toLowerCase())
         );
       });
-    useEffect(() => {
+      useLayoutEffect(() => {
         const getSchemaList = async () =>{
             const userToken = await getToken();
-            console.log(userToken);
             return axios.get(`/vc-management/v1/schema`, {headers:{"Authorization" :`Bearer ${userToken}`}}).then(res =>
                 res.data.schemas
             ).catch(error => {
@@ -38,20 +35,6 @@ const ManageSchemaHome = () => {
         }    
         setSchemListFunc();
     }, [])
-    
-    const getUserId = async () => {    
-        const userInfo = await keycloak.loadUserInfo();
-        return userInfo.email;
-    }
-    const getToken = async () => {
-      const userId = await getUserId();
-      return axios.get(`${config.tokenEndPoint}/${userId}`).then(res =>
-      res.data.access_token.access_token
-    ).catch(error => {
-      console.error(error);
-      throw error;
-    });
-    };
   return (
     <div className={schemasList.length>0 ? "row": ""}>
         {!schemasList.length>0 && 

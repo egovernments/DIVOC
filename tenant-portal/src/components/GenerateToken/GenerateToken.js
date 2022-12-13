@@ -6,13 +6,13 @@ import DownloadIcon from "../../assets/img/download.svg";
 import AlertIcon from '../../assets/img/alert.svg';
 import GenericButton from '../GenericButton/GenericButton';
 import styles from './GenerateToken.module.css';
-import {useKeycloak} from '@react-keycloak/web'
 import {useTranslation} from "react-i18next";
 import { Form } from 'react-bootstrap';
 import InfoCard from '../InfoCard/InfoCard';
 import config from '../../config.json';
 import { Link, useNavigate } from 'react-router-dom';
 import ToastComponent from '../ToastComponent/ToastComponent';
+import {getToken, getUserId} from '../../utils/keycloak'
 
 const axios = require('axios');
 
@@ -25,7 +25,6 @@ function GenerateToken() {
   const [token, setToken] = useState("");
   const [toast, setToast] = useState("");
   const { t } = useTranslation();
-  const {keycloak} = useKeycloak();
 
   const showToastFunc = () => {
     setToast (<ToastComponent header="Copied the token to Clipboard"
@@ -55,19 +54,6 @@ function GenerateToken() {
     element.click();
   }
 
-  const getUserId = async () => {    
-      const userInfo = await keycloak.loadUserInfo();
-      return userInfo.email;
-  }
-  const getToken = async () => {
-      const userId = await getUserId();
-      return axios.get(`${config.tokenEndPoint}/${userId}`).then(res =>
-      res.data.access_token.access_token
-  ).catch(error => {
-      console.error(error);
-      throw error;
-  });
-  };
   const outputToken = async () => {
       const access_token = await getToken();
       setToken(access_token)

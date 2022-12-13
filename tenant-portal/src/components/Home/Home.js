@@ -6,11 +6,8 @@ import HomeImg from "../../assets/img/home-img.png";
 import styles from './Home.module.css';
 import {useTranslation} from "react-i18next";
 import config from '../../config.json';
-import {useKeycloak} from '@react-keycloak/web'
 
 function Home() {
-    const {keycloak} = useKeycloak();
-    const navigate = useNavigate();
     const { t } = useTranslation();
     
     return(

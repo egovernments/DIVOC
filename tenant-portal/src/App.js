@@ -54,14 +54,6 @@ function App() {
                         </PrivateRoute>
                      }
            ></Route>
-          <Route path={config.urlPath + "/manage-schema/create-schema"}
-             element={
-                        <PrivateRoute>
-                          <CreateSchema />
-                        </PrivateRoute>
-                     }
-           >
-           </Route>
            <Route path={config.urlPath + "/generate-token"}
              element={
                         <PrivateRoute>
@@ -78,6 +70,21 @@ function App() {
                      }
            >
            </Route>
+           <Route path={config.urlPath + "/manage-schema"}
+             element={
+                        <PrivateRoute>
+                          <ManageSchemaHome />
+                        </PrivateRoute>
+                     }
+           ></Route>
+           <Route path={config.urlPath + "/manage-schema/create-schema"}
+              element={
+                         <PrivateRoute>
+                           <CreateSchema />
+                         </PrivateRoute>
+                      }
+            >
+            </Route>
            <Route path={config.urlPath + "/manage-schema/view-inbuilt-attributes"}
              element={
                         <PrivateRoute>
@@ -86,13 +93,6 @@ function App() {
                      }
            >
            </Route>
-           <Route path={config.urlPath + "/manage-schema"}
-             element={
-                        <PrivateRoute>
-                          <ManageSchemaHome />
-                        </PrivateRoute>
-                     }
-           ></Route>
         </Routes>
         </div>
       <div><Footer/></div>

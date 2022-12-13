@@ -36,7 +36,7 @@ input.search-icon {
     margin: 1rem 0;
     border-radius: 3%;
     border: 1px solid rgb(187, 181, 181);
-    height: 299px;
+    max-height: 299px;
     overflow: auto;
     padding: 2px;
 }
