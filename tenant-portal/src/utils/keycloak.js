@@ -4,9 +4,9 @@ import config from '../config.json';
 const axios = require('axios');
 
 const keycloak = new Keycloak('/keycloak.json');
-const { reactKeycloak } = useKeycloak();
 
-const getUserId = async () => {    
+const getUserId = async () => {
+    const { reactKeycloak } = useKeycloak();
     const userInfo = await reactKeycloak.loadUserInfo();
     return userInfo.email;
 }
