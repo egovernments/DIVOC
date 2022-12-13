@@ -30,6 +30,7 @@ const ManageSchemaHome = () => {
             });
         }) ();
     }, [])
+    
   return (
     <div className={schemasList.length>0 ? "row": ""}>
         {!schemasList.length>0 && 
