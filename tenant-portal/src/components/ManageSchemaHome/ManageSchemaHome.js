@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect} from 'react';
+import React, { useState, useEffect} from 'react';
 import {useTranslation} from "react-i18next";
 import GenericButton from '../GenericButton/GenericButton';
 import { Link } from 'react-router-dom';
@@ -19,21 +19,16 @@ const ManageSchemaHome = () => {
           (schemas.name).toLowerCase().includes(searchSchemaInput.toLowerCase())
         );
       });
-      useLayoutEffect(() => {
-        const getSchemaList = async () =>{
+      useEffect(() => {
+        (async () =>{
             const userToken = await getToken();
             return axios.get(`/vc-management/v1/schema`, {headers:{"Authorization" :`Bearer ${userToken}`}}).then(res =>
-                res.data.schemas
+                setSchemasList(res.data.schemas)
             ).catch(error => {
                 console.error(error);
                 throw error;
             });
-        };
-        const setSchemListFunc = async () => {
-            const schemasList  = await getSchemaList();
-            setSchemasList(schemasList);
-        }    
-        setSchemListFunc();
+        }) ();
     }, [])
   return (
     <div className={schemasList.length>0 ? "row": ""}>
