@@ -50,6 +50,17 @@
         "fields": "खेत",
         "backButton": "मैनेज स्कीमा पर वापस"
     },
+    "schemaAttributesPage": {
+        "label": "लेबल",
+        "fieldType": "क्षेत्र के जैसा",
+        "mandatory": "अनिवार्य",
+        "indexed": "इंडेक्स किए गए",
+        "unique": "अद्वितीय",
+        "description": "विवरण",
+        "action": "गतिविधि",
+        "fields": "खेत",
+        "backButton": "मैनेज स्कीमा पर वापस"
+    },
     "schemaDetails": {
         "title": "स्कीमा विवरण जोड़ें",
         "label1": "स्कीम का नाम",

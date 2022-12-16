@@ -12,35 +12,35 @@ function Attribute(props) {
         <tr>
             <td>
                 {
-                    props.schemaAttribute.readOnly ? props.schemaAttribute.label :
-                        <input type="text" defaultValue={props.schemaAttribute.label} readOnly={props.schemaAttribute.readOnly}/>
+                    props.schemaAttribute.editMode ? 
+                        <input type="text" defaultValue={props.schemaAttribute.label} /> : props.schemaAttribute.label 
                 }
             </td>
             <td>
                 {
-                    props.schemaAttribute.readOnly ? props.schemaAttribute.type :
+                    props.schemaAttribute.editMode ? 
                         <select defaultValue={props.schemaAttribute.type}>
                             {
                                 attributeTypes.map(function(attributeType) {
                                     return <option value={attributeType.value}>{attributeType.label}</option>
                                 })
                             }
-                        </select>
+                        </select> : props.schemaAttribute.type 
                 }
             </td>
             <td className="text-center">
-                <input type="checkbox" id="mandatoryAttribute" name="mandatoryAttribute" readOnly={props.schemaAttribute.readOnly} checked={props.schemaAttribute.isMandatory}/>
+                <input type="checkbox" id="mandatoryAttribute" name="mandatoryAttribute" checked={props.schemaAttribute.isMandatory}/>
             </td>
             <td className="text-center">
-                <input type="checkbox" id="indexedAttribute" name="indexedAttribute" readOnly={props.schemaAttribute.readOnly} checked={props.schemaAttribute.indexed}/>
+                <input type="checkbox" id="indexedAttribute" name="indexedAttribute" checked={props.schemaAttribute.isIndexField}/>
             </td>
             <td className="text-center">
-                <input type="checkbox" id="uniqueAttribute" name="uniqueAttribute" readOnly={props.schemaAttribute.readOnly} checked={props.schemaAttribute.unique}/>
+                <input type="checkbox" id="uniqueAttribute" name="uniqueAttribute" checked={props.schemaAttribute.isUniqueIndex}/>
             </td>
             <td>
                 {
-                    props.schemaAttribute.readOnly ? props.schemaAttribute.description :
-                        <input type="text" defaultValue={props.schemaAttribute.description} readOnly={props.schemaAttribute.readOnly}/>
+                    props.schemaAttribute.editMode ? 
+                        <input type="text" defaultValue={props.schemaAttribute.description} /> : props.schemaAttribute.description 
                 }
             </td>
         </tr>
