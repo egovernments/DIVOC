@@ -1,5 +1,5 @@
 import {useTranslation} from "react-i18next";
-import SchemaAttribute from "../SchemaAttribute/SchemaAttribute";
+import Attribute from "../Attribute/Attribute";
 import {INBUILT_ATTRIBUTES} from "../../constants"
 import config from "../../config.json";
 import GenericButton from "../GenericButton/GenericButton";
@@ -29,7 +29,7 @@ function InbuiltAttributesComponent() {
                         <tbody>
                         {
                             INBUILT_ATTRIBUTES.map((attribute) => {
-                                return <SchemaAttribute schemaAttribute={attribute}></SchemaAttribute>
+                                return <Attribute schemaAttribute={attribute}></Attribute>
                             })
                         }
                         </tbody>

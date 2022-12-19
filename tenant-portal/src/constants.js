@@ -1,56 +1,62 @@
-export const INBUILT_ATTRIBUTES =  [
+const INBUILT_ATTRIBUTES =  [
     {
-        "label": "Name",
+        "label": "issuanceDate",
         "type": "string",
         "isMandatory": true,
-        "indexed": false,
-        "unique": false,
-        "description": "Name of the holder",
-        "readOnly": true
-    },
-    {
-        "label": "Issued on",
-        "type": "string",
-        "isMandatory": true,
-        "indexed": false,
-        "unique": false,
+        "isIndexField": false,
+        "isUniqueIndex": false,
         "description": "Date certificate issued on",
-        "readOnly": true
+        "readOnly": true,
+        "editMode": false
     },
     {
         "label": "Issuer",
         "type": "string",
         "isMandatory": true,
-        "indexed": false,
-        "unique": false,
+        "isIndexField": false,
+        "isUniqueIndex": false,
         "description": "Name of the issuing authority",
-        "readOnly": true
+        "readOnly": true,
+        "editMode": false
     },
     {
         "label": "Certificate ID",
         "type": "string",
         "isMandatory": true,
-        "indexed": true,
-        "unique": true,
+        "isIndexField": true,
+        "isUniqueIndex": true,
         "description": "The unique Certificate ID",
-        "readOnly": true
+        "readOnly": true,
+        "editMode": false
     },
     {
         "label": "Valid From",
         "type": "string",
         "isMandatory": false,
-        "indexed": false,
-        "unique": false,
+        "isIndexField": false,
+        "isUniqueIndex": false,
         "description": "The date from which the credential is valid from",
-        "readOnly": true
+        "readOnly": true,
+        "editMode": false
     },
     {
         "label": "Valid To",
         "type": "string",
         "isMandatory": false,
-        "indexed": false,
-        "unique": false,
+        "isIndexField": false,
+        "isUniqueIndex": false,
         "description": "The date until which the credential is valid to",
-        "readOnly": true
+        "readOnly": true,
+        "editMode": false
     }
 ]
+
+const STANDARD_ATTRIBUTES = [
+    "certificateId",
+    "validFrom",
+    "validTill",
+    "issuer",
+    "issuanceDate"
+]
+
+export {INBUILT_ATTRIBUTES,STANDARD_ATTRIBUTES} 

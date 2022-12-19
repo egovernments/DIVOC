@@ -1,0 +1,17 @@
+.custom-footer{
+    background: #FFFFFF;
+    box-shadow: 0px -0.5px 5px rgba(0, 0, 0, 0.15);
+    margin-bottom: 2rem; 
+    position: fixed; 
+    bottom: 0;
+}
+.title{
+    font-style: normal;
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 38px;
+    color: #484646;
+}
+.SchemaAttributesTable {
+    width: 1000px;
+}

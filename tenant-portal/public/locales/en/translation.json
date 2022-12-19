@@ -50,6 +50,17 @@
         "fields": "Fields",
         "backButton": "Back to Manage Schema"
     },
+    "schemaAttributesPage": {
+        "label": "Label",
+        "fieldType": "Field Type",
+        "mandatory": "Mandatory",
+        "indexed": "Indexed",
+        "unique": "Unique",
+        "description": "Description",
+        "action": "Action",
+        "fields": "Fields",
+        "backButton": "Back to Manage Schema"
+    },
     "schemaDetails": {
         "title": "Add Schema Details",
         "label1": "Name of the Schema",
