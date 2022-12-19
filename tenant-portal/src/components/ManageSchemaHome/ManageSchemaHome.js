@@ -32,12 +32,14 @@ const ManageSchemaHome = () => {
     }, [])
     
   return (
-    <div className={schemasList.length>0 ? "row": ""}>
+    <div>
+        <div className={schemasList.length>0 ? "row w-100": "page-content"}>
         {!schemasList.length>0 && 
-        <div >
-            <h1>{t('noSchemaPage.title')}</h1>
-            <h3>{t('noSchemaPage.subtitle')}</h3>
-            <ul className="mr-4">
+        <div className='mx-5'>
+            <div className='title'>{t('noSchemaPage.title')}</div>
+            <div className='text p-0 lh-lg'> 
+            <div>{t('noSchemaPage.subtitle')}</div>
+            <ul>
                 <li className="pb-2">{t('noSchemaPage.info.0')}</li>
                 <li className="pb-2">{t('noSchemaPage.info.1')}</li>
                 <li className="pb-2">{t('noSchemaPage.info.2')}</li>
@@ -45,7 +47,7 @@ const ManageSchemaHome = () => {
                 <li className="pb-2">{t('noSchemaPage.info.4')}</li>
                 <li className="pb-2">{t('noSchemaPage.info.5')}</li>
                 <li className="pb-2">{t('noSchemaPage.info.6')}</li>
-            </ul>
+            </ul></div>
         </div>}
         {schemasList.length>0 && 
         <div className='d-flex flex-wrap'>
@@ -71,9 +73,9 @@ const ManageSchemaHome = () => {
                     ))}
                 </div>
             </div>
-            <div className='col-md-9 col-sm-8 col-xs-12'>
-                <h1>{t('schemasHomePage.createNewSchemas.title')}</h1>
-                <ol className="mr-4">
+            <div className='col-md-9 col-sm-8 col-xs-12 p-3'>
+                <h1 className='m-0'>{t('schemasHomePage.createNewSchemas.title')}</h1>
+                <ol className="ms-2 text lh-sm">
                     <li className="pb-2">{t('schemasHomePage.createNewSchemas.info.0')}</li>
                     <li className="pb-2">{t('schemasHomePage.createNewSchemas.info.1')}</li>
                     <li className="pb-2">{t('schemasHomePage.createNewSchemas.info.2')}</li>
@@ -84,26 +86,28 @@ const ManageSchemaHome = () => {
                     <li className="pb-2">{t('schemasHomePage.createNewSchemas.info.7')}</li>
                 </ol>
                 <h1>{t('schemasHomePage.manageSchema.title')}</h1>
-                <ol className="mr-4">
+                <ol className="ms-2 text lh-sm">
                     <li className="pb-2">{t('schemasHomePage.manageSchema.info.0')}</li>
                     <li className="pb-2">{t('schemasHomePage.manageSchema.info.1')}</li>
                     <li className="pb-2">{t('schemasHomePage.manageSchema.info.2')}</li>
                     <li className="pb-2">{t('schemasHomePage.manageSchema.info.3')}</li>
+                    <li className="pb-2">{t('schemasHomePage.manageSchema.info.4')}</li>
                 </ol>
             </div>
         </div>
         }
-        <div >
-            <hr />
+        </div>
+        <hr/>
+        <div className='page-content'>
         <Row gutter='3' xs={1} sm={2} md={3} lg={4} className="justify-content-end">
             <Col className="my-1 h-100">
                 <Link to={`${config.urlPath}/manage-schema/view-inbuilt-attributes`} >
-                    <GenericButton img='' text={t('noSchemaPage.viewAttributesBtn')} type='outline-primary' style={{height:'100%'}}/> 
+                    <GenericButton img='' text={t('noSchemaPage.viewAttributesBtn')} variant='outline-primary' /> 
                 </Link>
             </Col>
             <Col className="my-1 h-100">
                 <Link to={`${config.urlPath}/manage-schema/create-schema`} >
-                    <GenericButton img='' text={t('noSchemaPage.createSchemaBtn')} type='primary' style={{height:'100%'}}/> 
+                    <GenericButton img='' text={t('noSchemaPage.createSchemaBtn')} variant='primary' /> 
                 </Link>
             </Col>
         </Row>
