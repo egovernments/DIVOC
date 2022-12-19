@@ -15,7 +15,7 @@ const DropdownComponent = ({
       align = {align}
       title={title}>
         {Object.keys(options).map((objKey) => (
-            <Dropdown.Item
+            <Dropdown.Item style={{color:"#6F6F6F"}}
               key={objKey}
               onClick={() => handleChange(objKey)}
             >

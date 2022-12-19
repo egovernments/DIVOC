@@ -118,5 +118,11 @@
                 "‘Published Schemas’ are indicated by —- and ‘Saved as Draft Schemas’ are indicated by — "
             ]
         }
+    },
+    "testAndPublish": {
+        "title": "Test & Publish",
+        "text": "Add sample data to test the template",
+        "backButton":"Go Back",
+        "publishButton":"Publish"
     }
 }

@@ -14,6 +14,10 @@
     width: 100%;
     background: linear-gradient(270deg, #5367CA 0%, #73BAF4 100%);
 }
+.btn-outline-light {
+    width: 100%;
+    color: #666D80 !important;
+}
 .btn-outline-primary {
     width: 100%;
     color: #6493E0 !important;

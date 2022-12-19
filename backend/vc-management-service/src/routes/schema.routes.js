@@ -12,5 +12,6 @@ router.post(`/preview`, [tokenValidationMiddleware ], schemaController.previewSc
 router.get(`/:schemaId?`, [tokenValidationMiddleware], schemaController.getSchema)
 router.put(`/:schemaId/updateTemplate`, [tokenValidationMiddleware, upload.single('files')], schemaController.updateTemplate)
 router.put(`/:schemaId/updateTemplateUrl`, [tokenValidationMiddleware], schemaController.updateTemplateUrls)
+router.put(`/:schemaId`, [tokenValidationMiddleware], schemaController.updateSchema)
 
 module.exports = router;

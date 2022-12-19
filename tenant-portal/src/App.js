@@ -15,6 +15,7 @@ import './i18n';
 import BreadcrumbComponent from "./components/BreadcrumbComponent/BreadcrumbComponent";
 import ManageSchemaHome from "./components/ManageSchemaHome/ManageSchemaHome";
 import InbuiltAttributesComponent from "./components/InbuiltAttributesComponent/InbuiltAttributesComponent";
+import TestAndPublish from "./components/TestAndPublish/TestAndPublish";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -89,6 +90,14 @@ function App() {
              element={
                         <PrivateRoute>
                           <InbuiltAttributesComponent />
+                        </PrivateRoute>
+                     }
+           >
+           </Route>
+           <Route path={config.urlPath + "/manage-schema/test-and-publish"}
+             element={
+                        <PrivateRoute>
+                          <TestAndPublish />
                         </PrivateRoute>
                      }
            >
