@@ -12,7 +12,7 @@ function transformSchemaToAttributes (schema) {
     labels.map((label) => {
         const attribute = {
             "label": label,
-            "type" : properties[label].type,
+            "type" : properties[label]?.type || "NA",
             "isMandatory": requiredFields.includes(label),
             "isIndexField": indexFields.includes(label),
             "isUniqueIndex": uniqueIndex.includes(label),
