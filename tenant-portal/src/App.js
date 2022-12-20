@@ -102,6 +102,14 @@ function App() {
                      }
            >
            </Route>
+           <Route path={config.urlPath + "/manage-schema/create-new-schema"}
+             element={
+                        <PrivateRoute>
+                          <CreateSchema />
+                        </PrivateRoute>
+                     }
+           >
+           </Route>
         </Routes>
         </div>
       <div><Footer/></div>

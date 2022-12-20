@@ -77,7 +77,6 @@
         "addText": "Add Manually",
         "uploadText": "Upload JSON"
     },
-
     "noSchemaPage": {
         "title": "No Schema Added Yet!",
         "subtitle": "Begin by creating a separate schema for each certificate",
@@ -124,5 +123,13 @@
         "text": "Add sample data to test the template",
         "backButton":"Go Back",
         "publishButton":"Publish"
+    },
+    "jsonSchemaUpload": {
+        "title": "Upload JSON",
+        "uploadComment1": "Drag and drop files to upload",
+        "uploadComment2": "Select files to upload",
+        "or": "or",
+        "draftButtonText": "Save as draft",
+        "saveButtonText": "Save & Next"
     }
 }
