@@ -8,7 +8,7 @@ import PrintIcon from '../../assets/img/print.svg';
 import {getToken, getUserId} from '../../utils/keycloak';
 const axios = require('axios');
 
-const TestAndPublish = (props) => {
+const TestAndPublish = ({props}) => {
     const { t } = useTranslation();
     const schema = props.schema;
     const setAsPublish = async () => {
