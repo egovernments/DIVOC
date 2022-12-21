@@ -1,0 +1,18 @@
+.action-status-icon {
+    padding: 0;
+    width: 30px;
+}
+.success-action-message {
+    color: #4EA466;
+    font-weight: 500;
+    font-size: 28px;
+}
+.error-action-message {
+    color: #E84545;
+    font-weight: 500;
+    font-size: 28px;
+}
+.action-message-body {
+    font-size: 16px;
+    font-weight: 400;
+}

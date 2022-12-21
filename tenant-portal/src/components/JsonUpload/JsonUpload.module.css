@@ -1,0 +1,22 @@
+.upload-container {
+    max-width: 500px;
+}
+
+.upload-help-text {
+    font-family: Open Sans, sans-serif;
+    font-size: 16px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 22px;
+    text-align: center;
+    color: #898383;
+}
+
+.upload-instruction {
+    font-family: Open Sans, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 22px;
+    text-align: center;
+    color: #6493E0;
+}

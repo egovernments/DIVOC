@@ -7,14 +7,30 @@ import addVector from "../../assets/img/add-vector.svg";
 import uploadVector from "../../assets/img/upload-vector.svg";
 import {  Card, Col, Container , Image, Row, Stack } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import JsonUpload from "../JsonUpload/JsonUpload";
 
 function CreateSchema(){
     const { t } = useTranslation();
 
-    const [schemaDetails, setSchemaDetails] = useState(false);
+    const [createSchemaInitialized, setCreateSchemaInitialized] = useState(false);
+    const [manuallyCreateSchema, setManuallyCreateSchema] = useState(false);
+    const [jsonUploadSchema, setJsonUploadSchema] = useState(false);
+
+    function initManuallyCreateSchema() {
+        setCreateSchemaInitialized(true);
+        setManuallyCreateSchema(true);
+        setJsonUploadSchema(false);
+    }
+
+    function initJsonUploadCreateSchema() {
+        setCreateSchemaInitialized(true);
+        setJsonUploadSchema(true);
+        setManuallyCreateSchema(false);
+    }
+
 return (
 <div>
-    { !schemaDetails && <div>
+    { !createSchemaInitialized && <div>
         <Container fluid="md" className="py-4">
             <Row className="justify-content-between px-5" >
                 <Col md={5} >
@@ -24,7 +40,7 @@ return (
                         <Col>{t('createSchema.view')} <Link to={''} className="text-decoration-none">{t('createSchema.trainingMaterial')}</Link> {t('createSchema.or')} <Link to={''} class="text-decoration-none">{t('createSchema.videosLink')}</Link></Col>
                         <Row xs={1} sm={2} className="pt-4">
                             <Col>
-                                <Card className={styles['card']} onClick={() => setSchemaDetails(true)}>
+                                <Card className="card" onClick={initManuallyCreateSchema}>
                                     <Card.Body className="">
                                         <Card.Title className="text-center"><Image src={addVector}/></Card.Title>
                                         <Card.Text className={styles["card-text"]}>{t('createSchema.addText')}</Card.Text>
@@ -33,7 +49,7 @@ return (
                             </Col>
                             <Col>
                                 <Link to={''} className="text-decoration-none">
-                                    <Card  className={styles['card']}>
+                                    <Card  className={styles['card']} onClick={initJsonUploadCreateSchema}>
                                         <Card.Body className="">
                                             <Card.Title className="text-center"><Image src={uploadVector}/></Card.Title>
                                             <Card.Text className={styles["card-text"]}>{t('createSchema.uploadText')}</Card.Text>
@@ -51,7 +67,8 @@ return (
             </Row>               
         </Container>
     </div>}
-    {schemaDetails && <div><SchemaDetails/></div>}
+    {createSchemaInitialized && manuallyCreateSchema && <div><SchemaDetails/></div>}
+    {createSchemaInitialized && jsonUploadSchema && <div><JsonUpload/></div>}
     
 </div>
 );
