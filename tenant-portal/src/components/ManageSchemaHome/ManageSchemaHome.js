@@ -1,7 +1,7 @@
 import React, { useState, useEffect} from 'react';
 import {useTranslation} from "react-i18next";
 import GenericButton from '../GenericButton/GenericButton';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import config from '../../config.json'
 import { Col, Row } from 'react-bootstrap';
 import DraftIcon from '../../assets/img/Loaders.svg';
@@ -17,13 +17,12 @@ const ManageSchemaHome = () => {
     const[schemasList, setSchemasList] = useState([]);
     const [schemaPreview, setschemaPreview] = useState(false);
     const [searchSchemaInput, setSearchSchemaInput] = useState('');
-    const [schema, setSchema] = useState(false);
+    const [schemaClicked, setSchemaClicked] = useState(false);
     const [selectedSchema, setSelectedSchema] =useState();
     const schemaAttViewFunc = (schema) => {
         schema.schemaPreview=setschemaPreview;
         setSelectedSchema(schema);
-        setSchema(true)
-        console.log(Object.keys(selectedSchema))
+        setSchemaClicked(true)
     }
     const filteredData = schemasList.filter(schemas => {
         return Object.keys(schemas).some(key =>
@@ -47,6 +46,7 @@ const ManageSchemaHome = () => {
         <div className={schemasList.length>0 ? "row w-100": "page-content"}>
         {!schemasList.length>0 && !schemaPreview &&
         <div className='mx-5'>
+            <BreadcrumbComponent showBreadCrumb={true} />
             <div className='title'>{t('noSchemaPage.title')}</div>
             <div className='text p-0 lh-lg'> 
             <div>{t('noSchemaPage.subtitle')}</div>
@@ -61,8 +61,8 @@ const ManageSchemaHome = () => {
             </ul></div>
         </div>}
         {schemasList.length>0 && !schemaPreview &&
-        <div className='d-flex flex-wrap'>
-            <div className='col-3 px-4'>
+        <div className='d-flex flex-wrap sidebar'>
+            <div className={`col-3 px-4`}>
                 <h3>Schemas Created</h3>
                 <input 
                 className='search-icon w-100'
@@ -84,9 +84,9 @@ const ManageSchemaHome = () => {
                     ))}
                 </div>
             </div>
-            <div className='col-9 px-4'> 
+            <div className='col-9 px-4'>
                 <BreadcrumbComponent showBreadCrumb={true} />
-            {schema && <div className='col-md-9 col-sm-8 col-xs-12 p-3'>
+            {!schemaClicked && <div className='p-3'>
                 <h1 className='m-0'>{t('schemasHomePage.createNewSchemas.title')}</h1>
                 <ol className="ms-2 text lh-sm">
                     <li className="pb-2">{t('schemasHomePage.createNewSchemas.info.0')}</li>
@@ -107,7 +107,7 @@ const ManageSchemaHome = () => {
                     <li className="pb-2">{t('schemasHomePage.manageSchema.info.4')}</li>
                 </ol>
                 <hr/>
-            <Row gutter='3' xs={1} sm={2} md={3} lg={4} className="justify-content-end">
+            <Row gutter='3' xs={1} sm={2} md={3} className="justify-content-end">
             <Col className="my-1 h-100">
                 <Link to={`${config.urlPath}/manage-schema/view-inbuilt-attributes`} >
                     <GenericButton img='' text={t('noSchemaPage.viewAttributesBtn')} variant='outline-primary' /> 
@@ -120,10 +120,13 @@ const ManageSchemaHome = () => {
             </Col>
             </Row>
             </div>}
-            {schema && < SchemaAttributes props={selectedSchema}  />}
+            {schemaClicked && < SchemaAttributes props={selectedSchema} setschemaPreview={setschemaPreview}  />}
             </div>
         </div>}
-        {schemaPreview && <div><TestAndPublish {...selectedSchema}/></div>}
+        {schemaPreview && <div>
+            <BreadcrumbComponent showBreadCrumb={true} />
+            <TestAndPublish schema={selectedSchema}/>
+            </div>}
         </div>
     </div>
   )

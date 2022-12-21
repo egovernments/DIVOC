@@ -1,23 +1,22 @@
-import {React, useState} from 'react'
+import {React, useEffect, useState} from 'react'
 import { Col, Form, FormControl, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import {useTranslation} from "react-i18next";
 import config from '../../config.json';
 import GenericButton from '../GenericButton/GenericButton';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PrintIcon from '../../assets/img/print.svg';
-import {getToken, getUserId} from '../../utils/keycloak';
+import {getToken, getUserId, standardizeString} from '../../utils/keycloak';
 const axios = require('axios');
 
-const TestAndPublish = ({props}) => {
+const TestAndPublish = ({schema}) => {
     const { t } = useTranslation();
-    const schema = props.schema;
     const setAsPublish = async () => {
         const userToken = await getToken();
         schema.status = "PUBLISHED"
         const osid= schema.osid.slice(2);
         axios.put(`${config.schemaUrl}/${osid}`, schema, {headers:{"Authorization" :`Bearer ${userToken}`}})
-        .then(res =>res.data
-            ).catch(error => {
+        .then((res) => {window.location.reload(true)})
+        .catch(error => {
                 console.error(error);
                 throw error;
             });
@@ -28,7 +27,7 @@ const TestAndPublish = ({props}) => {
     const [data, setData] = useState(formObj);
     const previewReqBody = ({
             credentialTemplate:JSON.parse(schema.schema)._osConfig.credentialTemplate,
-            template: props.template,
+            template: JSON.parse(schema.schema)._osConfig.certificateTemplates.html,
             data: data
         })
 
@@ -57,26 +56,27 @@ const TestAndPublish = ({props}) => {
     const formInputHandler = (e) => {
         setData({...data, [e.target.name]:e.target.value})
     }
-  
+
   return (
-    <div>
+    <div >
         <div className='row mx-5 px-5'>
         <div className='col-6'>
             <h1>{t('testAndPublish.title')}</h1>
             <small>{t('testAndPublish.text')}</small>
             <Form style={{"max-height":"600px", "overflowY":"scroll"}}>
-                {Object.keys(data).map((index) => 
+                {data && Object.keys(data).map((index) => 
                 <div className='my-3'>
                     <FormGroup>
-                        <FormLabel>{index}</FormLabel>
-                        <FormControl type='text' name={index} placeholder={data[index]} onChange={formInputHandler} />
+                        <FormLabel>{standardizeString(index)}</FormLabel>
+                        <FormControl type='text' name={index} onChange={formInputHandler}
+                        required={index==="issuer" || index==="issuanceDate" ? true:false}/>
                     </FormGroup>
                 </div>)}
             </Form>
             <div onClick={previewSchemaFunc} className="my-3"><GenericButton img='' text='Test' variant='primary'/></div>
         </div>
         <div className='col-6'>
-            <div className='w-50 m-auto'>
+            <div className='w-50 m-auto border border-secondary'>
                 <iframe width="100%" height="400px"  id="ifmcontentPrint" src="" />
             </div>
             <div style={{margin:"auto"}} className='w-50' onClick={downloadPdf}>
@@ -88,7 +88,7 @@ const TestAndPublish = ({props}) => {
             <hr />
         <Row gutter='3' xs={1} sm={2} md={3} lg={4} className="justify-content-end">
             <Col className="my-1 h-100">
-                <Link to={`${config.urlPath}/manage-schema`} >
+                <Link to={`${config.urlPath}/manage-schema`} reloadDocument={true} >
                     <GenericButton img='' text={t('testAndPublish.backButton')} variant='outline-primary'/> 
                 </Link>
             </Col>

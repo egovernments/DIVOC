@@ -1,4 +1,5 @@
 import {useTranslation} from "react-i18next";
+import {standardizeString} from '../../utils/keycloak';
 
 function Attribute(props) {
 
@@ -13,7 +14,7 @@ function Attribute(props) {
             <td>
                 {
                     props.schemaAttribute.editMode ? 
-                        <input type="text" defaultValue={props.schemaAttribute.label} /> : props.schemaAttribute.label 
+                        <input type="text" defaultValue={props.schemaAttribute.label} /> : standardizeString(props.schemaAttribute.label) 
                 }
             </td>
             <td>

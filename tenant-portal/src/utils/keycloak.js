@@ -17,5 +17,7 @@ const getToken = async () => {
   throw error;
 });
 };
-
-export  {keycloak, getToken, getUserId};
+const standardizeString = (str) => {
+  return (str.charAt(0).toUpperCase()+str.slice(1)).match(/[A-Z][a-z]+|[0-9]+/g).join(" ");
+}
+export  {keycloak, getToken, getUserId, standardizeString};

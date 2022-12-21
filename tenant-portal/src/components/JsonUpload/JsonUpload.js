@@ -11,9 +11,11 @@ import {Link, useNavigate} from "react-router-dom";
 import {Col, Container} from "react-bootstrap";
 import ActionInfoComponent from "../ActionInfoComponent/ActionInfoComponent";
 import SchemaAttributes from "../SchemaAttributes/SchemaAttributes";
+import TestAndPublish from "../TestAndPublish/TestAndPublish";
 function JsonUpload() {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const [schemaPreview, setschemaPreview] = useState(false);
     const [fileUploaded, setFileUploaded] = useState(false);
     const [file, setFile] = useState(null);
     const [schema, setSchema] = useState(null);
@@ -54,7 +56,7 @@ function JsonUpload() {
                 if (res?.data) {
                     setSchemaCreated(true);
                     setUploadedSchema({
-                        "osid": res.data.schemaAddResponse?.result?.Schema?.osid.substring(2),
+                        "osid": res.data.schemaAddResponse?.result?.Schema?.osid,
                         ...addSchemaPayload
                     });
                 }
@@ -72,7 +74,7 @@ function JsonUpload() {
         }
     }
     return (
-        (!schemaUploaded &&
+        (!schemaUploaded && !schemaPreview &&
             <Container className="d-flex justify-content-between align-items-center flex-column flex-md-row my-3 offset-1 offset-md-2 col-10 col-md-9">
                 <Col className={`col-12 col-md-7 me-md-3 ${styles['upload-container']}`}>
                     <p className="title">{t('jsonSchemaUpload.title')}</p>
@@ -97,7 +99,7 @@ function JsonUpload() {
                         <div className='container-fluid my-3 px-0'>
                             <div className='px-0 mx-0 d-flex flex-wrap'>
                                 <Link onClick={uploadSchema} to='' className='col-12 col-lg-6 my-2 pe-0 pe-lg-2'>
-                                    <GenericButton img='' text={t('jsonSchemaUpload.draftButtonText')} type='button' variant='secondary'/>
+                                    <GenericButton img='' text={t('jsonSchemaUpload.draftButtonText')} type='button' variant='outline-primary'/>
                                 </Link>
                                 <Link onClick={uploadSchema} to='' className='col-12 col-lg-6 my-2 ps-0 ps-lg-2'>
                                     <GenericButton img='' text={t('jsonSchemaUpload.saveButtonText')} type='button' variant='primary'/>
@@ -111,7 +113,7 @@ function JsonUpload() {
                 </Col>
             </Container>
         ) || (
-            schemaUploaded && !viewSchema &&
+            schemaUploaded && !viewSchema && !schemaPreview &&
             <ActionInfoComponent
                 isActionSuccessful={schemaCreated}
                 actionHeaderMessage={schemaCreated ? t('jsonSchemaUpload.successfulUploadMessageTitle') : t('jsonSchemaUpload.errorUploadMessageTitle')}
@@ -121,8 +123,13 @@ function JsonUpload() {
                 nextActionHandler={handleNextAction}>
             </ActionInfoComponent>
         ) || (
-            schemaUploaded && viewSchema &&
-            <SchemaAttributes props={uploadedSchema}></SchemaAttributes>
+            schemaUploaded && viewSchema && !schemaPreview &&
+            <SchemaAttributes props={uploadedSchema} setschemaPreview={setschemaPreview}></SchemaAttributes>
+        ) || (
+            schemaPreview && 
+            <div>
+                <TestAndPublish schema={uploadedSchema}/>
+            </div>
         )
     )
 }
