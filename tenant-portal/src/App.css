@@ -33,9 +33,6 @@
 .btn-outline-primary {
     width: 100%;
     color: #6493E0 !important;
-    background: 
-        linear-gradient(to right, white, white), 
-        linear-gradient(270deg, #5367CA, #73BAF4) !important; 
 }
 .alertCard {
     color: #639CD1;
@@ -53,7 +50,17 @@ input.search-icon {
 }
 .schema-list::-webkit-scrollbar-thumb {
     background-color: rgba(217, 217, 217, 1);
-  }
+}
+.tp-form::-webkit-scrollbar {
+    width: 4px;
+}
+.tp-form::-webkit-scrollbar-thumb {
+    background-color: rgba(217, 217, 217, 1);
+}
+.tp-form {
+    max-height: 600px;
+    overflow-y: auto;
+}
 .schema-list {
     margin: 1rem 0;
     border-radius: 3%;
@@ -140,3 +147,16 @@ table tbody tr td {
     padding: 5px 0;
     color: #484646;
 }
+.custom-cb[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    outline: 1px solid #898383;
+    accent-color: white;
+}
+.toast-header {
+    border-bottom:none;
+}
+.toast {
+    border:none;
+}
+    

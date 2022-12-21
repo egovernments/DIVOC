@@ -63,7 +63,7 @@ const TestAndPublish = ({schema}) => {
         <div className='col-6'>
             <h1>{t('testAndPublish.title')}</h1>
             <small>{t('testAndPublish.text')}</small>
-            <Form style={{"max-height":"600px", "overflowY":"scroll"}}>
+            <Form className='tp-form'>
                 {data && Object.keys(data).map((index) => 
                 <div className='my-3'>
                     <FormGroup>

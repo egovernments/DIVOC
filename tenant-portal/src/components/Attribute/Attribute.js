@@ -10,7 +10,7 @@ function Attribute(props) {
         {"label": "Date/Time", "value":"date"}
     ]
     return(
-        <tr>
+        <tr className="border-bottom">
             <td>
                 {
                     props.schemaAttribute.editMode ? 
@@ -30,13 +30,13 @@ function Attribute(props) {
                 }
             </td>
             <td className="text-center">
-                <input type="checkbox" id="mandatoryAttribute" name="mandatoryAttribute" checked={props.schemaAttribute.isMandatory}/>
+                <input className="custom-cb" type="checkbox" id="mandatoryAttribute" name="mandatoryAttribute" checked={props.schemaAttribute.isMandatory}/>
             </td>
             <td className="text-center">
-                <input type="checkbox" id="indexedAttribute" name="indexedAttribute" checked={props.schemaAttribute.isIndexField}/>
+                <input className="custom-cb" type="checkbox" id="indexedAttribute" name="indexedAttribute" checked={props.schemaAttribute.isIndexField}/>
             </td>
             <td className="text-center">
-                <input type="checkbox" id="uniqueAttribute" name="uniqueAttribute" checked={props.schemaAttribute.isUniqueIndex}/>
+                <input className="custom-cb" type="checkbox" id="uniqueAttribute" name="uniqueAttribute" checked={props.schemaAttribute.isUniqueIndex}/>
             </td>
             <td>
                 {

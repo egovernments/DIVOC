@@ -43,10 +43,10 @@ const ManageSchemaHome = () => {
     
   return (
     <div>
+        {!schemasList.length>0 ? <BreadcrumbComponent showBreadCrumb={true} />: ""}
         <div className={schemasList.length>0 ? "row w-100": "page-content"}>
         {!schemasList.length>0 && !schemaPreview &&
         <div className='mx-5'>
-            <BreadcrumbComponent showBreadCrumb={true} />
             <div className='title'>{t('noSchemaPage.title')}</div>
             <div className='text p-0 lh-lg'> 
             <div>{t('noSchemaPage.subtitle')}</div>
@@ -61,7 +61,7 @@ const ManageSchemaHome = () => {
             </ul></div>
         </div>}
         {schemasList.length>0 && !schemaPreview &&
-        <div className='d-flex flex-wrap sidebar'>
+        <div className='d-flex flex-wrap'>
             <div className={`col-3 px-4 border-end`}>
                 <h3>Schemas Created</h3>
                 <input 
@@ -106,7 +106,11 @@ const ManageSchemaHome = () => {
                     <li className="pb-2">{t('schemasHomePage.manageSchema.info.3')}</li>
                     <li className="pb-2">{t('schemasHomePage.manageSchema.info.4')}</li>
                 </ol>
-                <hr/>
+            </div>}
+            {schemaClicked && < SchemaAttributes props={selectedSchema} setschemaPreview={setschemaPreview}  />}
+            </div>
+        </div>}
+        { !schemaClicked && <div><hr/>
             <Row gutter='3' xs={1} sm={2} md={3} className="justify-content-end">
             <Col className="my-1 h-100">
                 <Link to={`${config.urlPath}/manage-schema/view-inbuilt-attributes`} >
@@ -118,11 +122,7 @@ const ManageSchemaHome = () => {
                     <GenericButton img='' text={t('noSchemaPage.createSchemaBtn')} variant='primary' /> 
                 </Link>
             </Col>
-            </Row>
-            </div>}
-            {schemaClicked && < SchemaAttributes props={selectedSchema} setschemaPreview={setschemaPreview}  />}
-            </div>
-        </div>}
+            </Row></div>}
         {schemaPreview && <div>
             <BreadcrumbComponent showBreadCrumb={true} />
             <TestAndPublish schema={selectedSchema}/>
