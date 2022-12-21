@@ -28,7 +28,7 @@ function SchemaDetails() {
                 <Container fluid="md" className="py-3">
                 <Row className="justify-content-between px-5" >
                     <Col md={6}>
-                        <Row className="title gx-0">{t('schemaDetails.title')}</Row>
+                        <Row className="title gx-0">{t('createSchema.title')}</Row>
                         <Form id="schema-details"   >
                             <FormGroup className="py-3">
                                 <Form.Label className="input-label">{t('schemaDetails.label1')}</Form.Label>

@@ -62,11 +62,11 @@ const ManageSchemaHome = () => {
         </div>}
         {schemasList.length>0 && !schemaPreview &&
         <div className='d-flex flex-wrap sidebar'>
-            <div className={`col-3 px-4`}>
+            <div className={`col-3 px-4 border-end`}>
                 <h3>Schemas Created</h3>
                 <input 
                 className='search-icon w-100'
-                style={{borderRadius:'4px'}}
+                style={{borderRadius:'4px', borderColor:'#C4C4C4'}}
                 type='text'
                 value={searchSchemaInput}
                 placeholder='Search Schema name'
@@ -77,7 +77,7 @@ const ManageSchemaHome = () => {
                         <div key={schema.name} onClick={() =>{schemaAttViewFunc(schema);}}>
                             <div className='schema-list-items justify-content-between d-flex' >
                                 <div>{schema.name}</div>
-                             <div>{(schema.status).toLowerCase()=="published"? 
+                             <div>{(schema.status).toLowerCase()==="published"? 
                             <img src={PublishedIcon}/>:<img src={DraftIcon}/>}</div>
                             </div>
                         </div>

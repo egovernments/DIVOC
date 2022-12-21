@@ -10,7 +10,7 @@ const axios = require('axios');
 
 const TestAndPublish = ({schema}) => {
     const { t } = useTranslation();
-    const setAsPublish = async () => {
+    const Publish = async () => {
         const userToken = await getToken();
         schema.status = "PUBLISHED"
         const osid= schema.osid.slice(2);
@@ -93,7 +93,7 @@ const TestAndPublish = ({schema}) => {
                 </Link>
             </Col>
             <Col className="my-1 h-100">
-                <Link onClick={setAsPublish} to='/manage-schema'>
+                <Link onClick={Publish} to='/manage-schema'>
                     <GenericButton img='' text={t('testAndPublish.publishButton')} variant='primary'/> 
                 </Link>
             </Col>
