@@ -27,7 +27,7 @@ const ManageSchemaHome = () => {
     }
     const filteredData = schemasList.filter(schemas => {
         return Object.keys(schemas).some(key =>
-          (schemas?.name).toLowerCase().includes(searchSchemaInput.toLowerCase())
+          (schemas?.name)?.toLowerCase().includes(searchSchemaInput?.toLowerCase())
         );
       });
       useEffect(() => {

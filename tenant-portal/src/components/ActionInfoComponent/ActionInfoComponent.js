@@ -26,7 +26,7 @@ const ActionInfoComponent = ({
                                 <img src={isActionSuccessful ? SuccessCheckMark : ErrorAlert}
                                      className={styles['action-status-icon']} alt={'action status icon'}/>
                             }
-                            <p className={`mb-0 ${isActionSuccessful ? styles['success-action-message'] : styles['erro-action-message']}`}>
+                            <p className={`mb-0 ${isActionSuccessful ? styles['success-action-message'] : styles['error-action-message']}`}>
                                 {actionHeaderMessage}
                             </p>
                         </Row>
@@ -35,14 +35,22 @@ const ActionInfoComponent = ({
                         </Row>
                         <Row>
                             {
-                                secondaryButtonText && <GenericButton
-                                    text={secondaryButtonText} type='button'
-                                    variant='secondary' onClick={() => nextActionHandler(secondaryActionKey)}></GenericButton>
+                                secondaryButtonText &&
+                                <div className="ps-0" onClick={() => nextActionHandler(secondaryActionKey)}>
+                                    <GenericButton
+                                        text={secondaryButtonText} type='button'
+                                        variant='secondary'>
+                                    </GenericButton>
+                                </div>
                             }
                             {
-                                primaryButtonText && <GenericButton
-                                    text={primaryButtonText} type='button'
-                                    variant='primary' onClick={() => nextActionHandler(primaryActionKey)}></GenericButton>
+                                primaryButtonText &&
+                                <div className="ps-0" onClick={() => nextActionHandler(primaryActionKey)}>
+                                    <GenericButton
+                                        text={primaryButtonText} type='button'
+                                        variant='primary'>
+                                    </GenericButton>
+                                </div>
                             }
                         </Row>
                     </Container>

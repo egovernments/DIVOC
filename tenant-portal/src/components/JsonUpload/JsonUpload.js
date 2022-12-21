@@ -7,16 +7,20 @@ import {useState} from "react";
 import axios from "axios";
 import config from "../../config.json";
 import {getToken} from '../../utils/keycloak';
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {Col, Container} from "react-bootstrap";
 import ActionInfoComponent from "../ActionInfoComponent/ActionInfoComponent";
+import SchemaAttributes from "../SchemaAttributes/SchemaAttributes";
 function JsonUpload() {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [fileUploaded, setFileUploaded] = useState(false);
     const [file, setFile] = useState(null);
     const [schema, setSchema] = useState(null);
     const [schemaUploaded, setSchemaUploaded] = useState(false);
     const [schemaCreated, setSchemaCreated] = useState(false);
+    const [viewSchema, setViewSchema] = useState(false);
+    const [uploadedSchema, setUploadedSchema] = useState(null);
     const handleFileUpload = (e) => {
         e.preventDefault();
         const reader = new FileReader();
@@ -37,29 +41,34 @@ function JsonUpload() {
         if (!schema) {
             return
         }
-        const schemaName = schema?.title;
+        const schemaName = JSON.parse(schema)?.title;
         const addSchemaPayload = {
             "name": schemaName,
-            "schema": schema
+            "schema": schema,
+            "status": "DRAFT"
         }
         const userToken = await getToken();
         axios.post(`${config.schemaUrl}`, addSchemaPayload, {headers:{"Authorization" :`Bearer ${userToken}`}})
             .then((res) => {
                 setSchemaUploaded(true);
-                setSchemaCreated(true);
-                return res.data
-            }).catch(error => {
+                if (res?.data) {
+                    setSchemaCreated(true);
+                    setUploadedSchema({
+                        "osid": res.data.schemaAddResponse?.result?.Schema?.osid.substring(2),
+                        ...addSchemaPayload
+                    });
+                }
+            }).catch((error) => {
                 setSchemaUploaded(true);
                 setSchemaCreated(false);
                 console.error(error);
-                throw error;
             });
     }
     const handleNextAction = (action) => {
         if (action==="view") {
-            console.log(schema);
+            setViewSchema(true);
         } else if (action === "goBack") {
-            console.log("go back to manage schema");
+            navigate('/manage-schema');
         }
     }
     return (
@@ -102,7 +111,7 @@ function JsonUpload() {
                 </Col>
             </Container>
         ) || (
-            schemaUploaded &&
+            schemaUploaded && !viewSchema &&
             <ActionInfoComponent
                 isActionSuccessful={schemaCreated}
                 actionHeaderMessage={schemaCreated ? t('jsonSchemaUpload.successfulUploadMessageTitle') : t('jsonSchemaUpload.errorUploadMessageTitle')}
@@ -111,6 +120,9 @@ function JsonUpload() {
                 primaryActionKey={schemaCreated ? 'view' : 'goBack'}
                 nextActionHandler={handleNextAction}>
             </ActionInfoComponent>
+        ) || (
+            schemaUploaded && viewSchema &&
+            <SchemaAttributes props={uploadedSchema}></SchemaAttributes>
         )
     )
 }
