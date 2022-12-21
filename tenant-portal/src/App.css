@@ -16,19 +16,7 @@
 }
 .btn-secondary {
     width: 100%;
-    border: 1px solid transparent;
-    border-radius: 5px;
-    background:
-            linear-gradient(to right, white, white),
-            linear-gradient(270deg, #5367CA, #73BAF4);
-    background-clip: padding-box, border-box;
-    background-origin: padding-box, border-box;
-    color: #6493E0;
-
-}
-.btn-secondary:hover {
-    width: 100%;
-    border: 1px solid transparent;
+    border: 2px solid;
     border-radius: 5px;
     background:
             linear-gradient(to right, white, white),

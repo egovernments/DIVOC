@@ -130,6 +130,12 @@
         "uploadComment2": "Select files to upload",
         "or": "or",
         "draftButtonText": "Save as draft",
-        "saveButtonText": "Save & Next"
+        "saveButtonText": "Save & Next",
+        "successfulUploadMessageTitle": "JSON Uploaded Successfully",
+        "successfulUploadMessageBody": "The JSON file has been uploaded successfully. ",
+        "view": "View",
+        "errorUploadMessageTitle": "Unable to upload!",
+        "errorUploadMessageBody": "The JSON file upload failed",
+        "goBack": "Go Back"
     }
 }

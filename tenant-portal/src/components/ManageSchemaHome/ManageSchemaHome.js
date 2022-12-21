@@ -16,14 +16,14 @@ const ManageSchemaHome = () => {
     
     const filteredData = schemasList.filter(schemas => {
         return Object.keys(schemas).some(key =>
-          (schemas.name).toLowerCase().includes(searchSchemaInput.toLowerCase())
+          (schemas?.name).toLowerCase().includes(searchSchemaInput.toLowerCase())
         );
       });
       useEffect(() => {
         (async () =>{
             const userToken = await getToken();
             return axios.get(`/vc-management/v1/schema`, {headers:{"Authorization" :`Bearer ${userToken}`}}).then(res =>
-                setSchemasList(res.data.schemas)
+                setSchemasList(res.data?.schemas)
             ).catch(error => {
                 console.error(error);
                 throw error;
