@@ -20,7 +20,6 @@ const ManageSchemaHome = () => {
     const [schema, setSchema] = useState(false);
     const [selectedSchema, setSelectedSchema] =useState();
     const schemaAttViewFunc = (schema) => {
-        console.log(schema.name);
         schema.schemaPreview=setschemaPreview;
         setSelectedSchema(schema);
         setSchema(true)
