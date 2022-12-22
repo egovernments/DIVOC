@@ -17,6 +17,7 @@ const ETCD_AUTH_ENABLED = process.env.ETCD_AUTH_ENABLED === "true"
 const ETCD_USERNAME = process.env.ETCD_USERNAME;
 const ETCD_PASSWORD = process.env.ETCD_PASSWORD;
 const ENTITY_TYPES = process.env.ENTITY_TYPES;
+const FACILITY_COUNTRY_CODE = process.env.FACILITY_COUNTRY_CODE || '';
 module.exports = {
     REGISTRY_URL,
     JWT_PUBLIC_KEY,
@@ -36,5 +37,6 @@ module.exports = {
     ETCD_AUTH_ENABLED,
     ETCD_USERNAME,
     ETCD_PASSWORD,
-    ENTITY_TYPES
+    ENTITY_TYPES,
+    FACILITY_COUNTRY_CODE
 };
