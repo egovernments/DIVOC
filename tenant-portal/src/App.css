@@ -33,9 +33,6 @@
 .btn-outline-primary {
     width: 100%;
     color: #6493E0 !important;
-    background: 
-        linear-gradient(to right, white, white), 
-        linear-gradient(270deg, #5367CA, #73BAF4) !important; 
 }
 .alertCard {
     color: #639CD1;
@@ -43,25 +40,41 @@
     border:none;
 }
 input.search-icon {
-    background: url("./assets/img/Search.svg") no-repeat right;
+    background: url("./assets/img/Search.svg") no-repeat 95%;
 }
 .page-content{
     padding: 0 3rem;
 }
+.schema-list::-webkit-scrollbar {
+    width: 4px;
+}
+.schema-list::-webkit-scrollbar-thumb {
+    background-color: rgba(217, 217, 217, 1);
+}
+.tp-form::-webkit-scrollbar {
+    width: 4px;
+}
+.tp-form::-webkit-scrollbar-thumb {
+    background-color: rgba(217, 217, 217, 1);
+}
+.tp-form {
+    max-height: 600px;
+    overflow-y: auto;
+}
 .schema-list {
     margin: 1rem 0;
     border-radius: 3%;
-    border: 1px solid rgb(187, 181, 181);
+    border: 1px solid #EBEBEB;
     max-height: 299px;
     overflow: auto;
     padding: 2px;
 }
 .schema-list-items {
     padding: 1rem 0.5rem;
-    border-bottom: 1px solid rgb(192, 188, 188);
+    border-bottom: 1px solid #EBEBEB;
 }
 .schema-list-items:hover {
-    background-color: rgb(221, 212, 212);
+    background-color: #F6F6F6;
     cursor: pointer;
 }
 @media (min-width: 768px){
@@ -134,3 +147,16 @@ table tbody tr td {
     padding: 5px 0;
     color: #484646;
 }
+.custom-cb[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    outline: 1px solid #898383;
+    accent-color: white;
+}
+.toast-header {
+    border-bottom:none;
+}
+.toast {
+    border:none;
+}
+    

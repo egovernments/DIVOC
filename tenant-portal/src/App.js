@@ -94,14 +94,6 @@ function App() {
                      }
            >
            </Route>
-           <Route path={config.urlPath + "/manage-schema/test-and-publish"}
-             element={
-                        <PrivateRoute>
-                          <TestAndPublish />
-                        </PrivateRoute>
-                     }
-           >
-           </Route>
            <Route path={config.urlPath + "/manage-schema/create-new-schema"}
              element={
                         <PrivateRoute>

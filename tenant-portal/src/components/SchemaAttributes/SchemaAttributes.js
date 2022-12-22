@@ -1,12 +1,13 @@
 import React from "react";
 import 'react-bootstrap';
-import {  Stack, Row, Table, Container,Button } from "react-bootstrap";
+import {  Stack, Row, Table, Container,Button, Col } from "react-bootstrap";
 import styles from "./SchemaAttributes.module.css";
 import GenericButton from "../GenericButton/GenericButton";
 import {useTranslation} from "react-i18next";
 import {transformSchemaToAttributes} from "../../utils/schema.js"
 import Attribute  from "../Attribute/Attribute";
-function SchemaAttributes({props}){
+import { Link } from "react-router-dom";
+function SchemaAttributes({props, setschemaPreview}){
     const { t } = useTranslation();
 
     const Attributes = transformSchemaToAttributes(JSON.parse(props.schema));
@@ -40,20 +41,23 @@ function SchemaAttributes({props}){
             </Container>
             
 
-            <Row className={`${styles['custom-footer']} justify-content-end w-100 gx-1 p-4`} >
+            
                 { props.status === "DRAFT" && 
-                    <>
-                        <GenericButton img={''} text='Save as Draft' type='button' form="schema-attributes" variant='outline-primary' styles={{ width: "15%",marginLeft: "1rem" }} />
-                        <Button  onClick={()=> props.schemaPreview(true)} type='button' variant='primary' style={{ width: "15%" ,marginLeft: "1rem"}} >
-                            <strong>Save & Next</strong>
-                        </Button>
-                        
-                    </>
+                    <Row gutter='3' xs={1} sm={2} md={3} className="justify-content-end" >
+                    <Col onClick={()=> setschemaPreview(true)}>
+                        <GenericButton img={''} text='Save as Draft' type='button' form="schema-attributes" variant='outline-primary' />
+                     </Col>
+                     <Col onClick={()=> setschemaPreview(true)}>
+                        <GenericButton img={''} text='Save & Next' type='button' form="schema-attributes" variant='primary' />
+                    </Col>
+                    </Row>
+                    
                 }
-                { props.status === "PUBLISHED" && 
-                    <GenericButton img={''} text='Back to Manage Schema' type='button' variant='primary' styles={{width:"18%"}}/>
-                }
-            </Row>
+                {/* { props.status === "PUBLISHED" && 
+                <Link to="/manage-schema">
+                    <GenericButton img={''} text='Back to Manage Schema' type='button' variant='primary' />
+                </Link>
+                } */}
         </div>
     ); 
 }

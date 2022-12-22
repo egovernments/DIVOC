@@ -19,12 +19,12 @@ function InbuiltAttributesComponent() {
                     <p className="table-heading">{t('inbuiltAtrributesPage.fields')}</p>
                     <table className={styles["inbuiltAttributesTable"]}>
                         <thead className="table-col-header">
-                            <th>{t('inbuiltAtrributesPage.label')}</th>
-                            <th>{t('inbuiltAtrributesPage.fieldType')}</th>
-                            <th className="text-center">{t('inbuiltAtrributesPage.mandatory')}</th>
-                            <th className="text-center">{t('inbuiltAtrributesPage.indexed')}</th>
-                            <th className="text-center">{t('inbuiltAtrributesPage.unique')}</th>
-                            <th>{t('inbuiltAtrributesPage.description')}</th>
+                            <th className="col-2">{t('inbuiltAtrributesPage.label')}</th>
+                            <th className="col-2">{t('inbuiltAtrributesPage.fieldType')}</th>
+                            <th className="text-center col-2">{t('inbuiltAtrributesPage.mandatory')}</th>
+                            <th className="text-center col-2">{t('inbuiltAtrributesPage.indexed')}</th>
+                            <th className="text-center col-2">{t('inbuiltAtrributesPage.unique')}</th>
+                            <th className="col-2">{t('inbuiltAtrributesPage.description')}</th>
                         </thead>
                         <tbody>
                         {
