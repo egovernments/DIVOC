@@ -341,6 +341,7 @@ services:
       CONFIGURATION_LAYER: "etcd"
       ETCD_USERNAME: $ETCD_USERNAME
       ETCD_PASSWORD: $ETCD_PASSWORD
+      FACILITY_COUNTRY_CODE: $FACILITY_COUNTRY_CODE
     depends_on:
       kafka:
         condition: service_healthy
