@@ -4,8 +4,7 @@ import HelpIcon from "../../assets/img/Help.svg";
 import { Link, useLocation } from "react-router-dom";
 const BreadcrumbComponent = ({showBreadCrumb}) => {
   const location = useLocation();
-  var show;
-  show = showBreadCrumb ? showBreadCrumb : (!showBreadCrumb && (location.pathname!=='/manage-schema'));
+  var show = showBreadCrumb ? showBreadCrumb : (!showBreadCrumb && (location.pathname!=='/manage-schema'));
   const breadcrumbs = useBreadcrumbs();
   return (
     <div className={`d-flex flex-wrap ms-4 ${show? '':'d-none'}`}>
