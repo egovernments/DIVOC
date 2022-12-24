@@ -6,11 +6,22 @@ import GenericButton from '../GenericButton/GenericButton';
 import { Link, useNavigate } from 'react-router-dom';
 import PrintIcon from '../../assets/img/print.svg';
 import {getToken, getUserId} from '../../utils/keycloak';
-import { standardizeString, publish, previewSchemaFunc, downloadPdf} from '../../utils/customUtils';
+import { standardizeString, downloadPdf} from '../../utils/customUtils';
 const axios = require('axios');
 
 const TestAndPublish = ({schema}) => {
     const { t } = useTranslation();
+    const publish = async () => {
+        const userToken = await getToken();
+        schema.status = "PUBLISHED"
+        const osid= schema.osid.slice(2);
+        axios.put(`${config.schemaUrl}/${osid}`, schema, {headers:{"Authorization" :`Bearer ${userToken}`}})
+        .then((res) => {window.location.reload(true)})
+        .catch(error => {
+                console.error(error);
+                throw error;
+            });
+    };
     const [samplefile, setSamplefile] = useState(null);
     const requiredFeilds = (JSON.parse(schema.schema).definitions[schema.name].required).toString().split(",");
     var formObj = {}; requiredFeilds.forEach(key => formObj[key] = "");
@@ -21,9 +32,25 @@ const TestAndPublish = ({schema}) => {
             template: JSON.parse(schema.schema)._osConfig.certificateTemplates.html.split("://")[1],
             data: data
         });
+    const previewSchemaFunc = async () => {
+        const userToken = await getToken();
+        return axios.post(`${config.previewUrl}`, previewReqBody,
+        {headers:{Authorization :{userToken}},responseType:"arraybuffer"}
+        ).then(res =>{
+            const data = new Blob([res.data], {type: 'application/pdf'});
+            let file = URL.createObjectURL(data);
+            setSamplefile(file)
+            document.querySelector('#ifmcontentPrint').src = file+"#toolbar=0&navpanes=0&scrollbar=0";
+            file = URL.revokeObjectURL(data);
+            }
+        ).catch(error => {
+            console.error(error);
+            throw error;
+        });
+    };
     const formInputHandler = (e) => {
         setData({...data, [e.target.name]:e.target.value})
-    }
+    };
     const handleTest = () => {
         let errors={};
         if(data["issuer"]===""){errors.issuer="should be valid issuer"}
@@ -31,7 +58,7 @@ const TestAndPublish = ({schema}) => {
         setFormErrors(errors);
         console.log(formErrors);
         if(Object.keys(formErrors).length === 0) {
-            previewSchemaFunc(previewReqBody, setSamplefile);
+            previewSchemaFunc();
         }
     }
 
@@ -73,7 +100,7 @@ const TestAndPublish = ({schema}) => {
                 </Link>
             </Col>
             <Col className="my-1 h-100">
-                <Link onClick={() => {publish(schema)}} to='/manage-schema'>
+                <Link onClick={() => {publish()}} to='/manage-schema'>
                     <GenericButton img='' text={t('testAndPublish.publishButton')} variant='primary'/> 
                 </Link>
             </Col>
