@@ -80,7 +80,7 @@ const TestAndPublish = ({schema}) => {
                     </FormGroup>
                 </div>)}
             </Form>
-            <div onClick={() => {handleTest()}} className="my-3"><GenericButton img='' text='Test' variant='primary'/></div>
+            <div onClick={handleTest} className="my-3"><GenericButton img='' text='Test' variant='primary'/></div>
         </div>
         <div className='col-6'>
             <div className='w-50 m-auto border'>
@@ -100,7 +100,7 @@ const TestAndPublish = ({schema}) => {
                 </Link>
             </Col>
             <Col className="my-1 h-100">
-                <Link onClick={() => {publish()}} to='/manage-schema'>
+                <Link onClick={publish} to='/manage-schema'>
                     <GenericButton img='' text={t('testAndPublish.publishButton')} variant='primary'/> 
                 </Link>
             </Col>
