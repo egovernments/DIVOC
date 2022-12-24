@@ -1,5 +1,5 @@
 import {useTranslation} from "react-i18next";
-import {standardizeString} from '../../utils/keycloak';
+import {standardizeString} from '../../utils/customUtils';
 
 function Attribute(props) {
 
@@ -10,7 +10,7 @@ function Attribute(props) {
         {"label": "Date/Time", "value":"date"}
     ]
     return(
-        <tr className="border-bottom">
+        <tr className="border-bottom ">
             <td>
                 {
                     props.schemaAttribute.editMode ? 
