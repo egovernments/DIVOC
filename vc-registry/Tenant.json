@@ -115,7 +115,7 @@
       "osCreatedBy",
       "osUpdatedBy"
     ],
-    "roles": ["anonymous"],
+    "roles": [],
     "inviteRoles": ["anonymous"],
     "ownershipAttributes": [
       {

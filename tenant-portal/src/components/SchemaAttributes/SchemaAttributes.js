@@ -74,22 +74,17 @@ function SchemaAttributes({props, setschemaPreview}){
             
                 {toast}
             
+            <hr className="mt-5 mb-3"/>
                 { props.status === "DRAFT" && 
-                    <Row gutter='3' xs={1} sm={2} md={3} className="justify-content-end" >
+                    <Row gutter='3' xs={1} sm={2} md={4} className="justify-content-end" >
                     <Col onClick={()=> setschemaPreview(true)}>
                         <GenericButton img={''} text='Save as Draft' type='button' form="schema-attributes" variant='outline-primary' />
                      </Col>
                      <Col onClick={()=> setschemaPreview(true)}>
-                        <GenericButton img={''} text='Save & Next' type='button' form="schema-attributes" variant='primary' />
+                        <GenericButton img={''} text='Test & Publish' type='button' form="schema-attributes" variant='primary' />
                     </Col>
-                    </Row>
-                    
+                    </Row>  
                 }
-                {/* { props.status === "PUBLISHED" && 
-                <Link to="/manage-schema">
-                    <GenericButton img={''} text='Back to Manage Schema' type='button' variant='primary' />
-                </Link>
-                } */}
         </div>
     ); 
 }

@@ -312,7 +312,7 @@ const convertCertificateToDCCPayload = async(certificateRaw, nameDetails) => {
 }
 
 function getAlpha2CodeForCountry(addressCountry) {
-  return getAlpha2CodeFromAlpha3(addressCountry) || getAlpha2CodeFromName(addressCountry) || getAlpha2CodeIfValid(addressCountry) || 'IN';
+  return getAlpha2CodeFromAlpha3(addressCountry) || getAlpha2CodeFromName(addressCountry) || getAlpha2CodeIfValid(addressCountry) || config.FACILITY_COUNTRY_CODE;
 }
 
 function getAlpha2CodeFromAlpha3(addressCountry) {
