@@ -69,7 +69,7 @@
     },
     "createSchema": {
         "title": "Create New Schema",
-        "text": "Create new schema by selecting one of the options below",
+        "text": "Create new schema by selecting one of the options below.",
         "view": "View",
         "trainingMaterial": "Training Material",
         "or": "or",
@@ -137,5 +137,9 @@
         "errorUploadMessageTitle": "Unable to upload!",
         "errorUploadMessageBody": "The JSON file upload failed due to invalid schema",
         "goBack": "Go Back"
+    },
+    "exploreAPI": {
+        "header": "Explore APIs",
+        "body": "Click on the API URL below to test the API in swagger"
     }
 }
