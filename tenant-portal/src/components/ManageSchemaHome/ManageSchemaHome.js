@@ -85,7 +85,7 @@ const ManageSchemaHome = () => {
             </div>
             <div className='col-9 px-4'>
                 <BreadcrumbComponent showBreadCrumb={true} />
-            {!schemaClicked && <div className='p-3'>
+            {!schemaClicked && <div className='px-3'>
                 <h1 className='m-0'>{t('schemasHomePage.createNewSchemas.title')}</h1>
                 <ol className="ms-2 text lh-sm">
                     <li className="pb-2">{t('schemasHomePage.createNewSchemas.info.0')}</li>
@@ -106,14 +106,14 @@ const ManageSchemaHome = () => {
                     <li className="pb-2">{t('schemasHomePage.manageSchema.info.4')}</li>
                 </ol>
                 { !schemaClicked && <div><hr/>
-            <Row gutter='3' xs={1} sm={2} md={3} lg={4} className="justify-content-end">
+            <Row gutter='3' xs={1} sm={2} md={3} className="justify-content-end">
             <Col className="my-1 h-100">
                 <Link to={`${config.urlPath}/manage-schema/view-inbuilt-attributes`} >
                     <GenericButton img='' text={t('noSchemaPage.viewAttributesBtn')} variant='outline-primary' /> 
                 </Link>
             </Col>
             <Col className="my-1 h-100">
-                <Link to={`${config.urlPath}/manage-schema/create-schema`} >
+                <Link to={`${config.urlPath}/manage-schema/create-new-schema`} >
                     <GenericButton img='' text={t('noSchemaPage.createSchemaBtn')} variant='primary' /> 
                 </Link>
             </Col>

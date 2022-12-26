@@ -72,7 +72,7 @@ const TestAndPublish = ({schema}) => {
         if(!data["issuanceDate"] || !isoDatestringValidator.isValidISODateString(data["issuanceDate"])){errors.issuanceDate="Enter a valid Issuance Date in rfc3339 format"}
         setFormErrors(errors);
         console.log(formErrors);
-        if(Object.keys(formErrors).length === 0) {
+        if(Object.keys(errors).length === 0) {
             previewSchemaFunc();
         }
     }
@@ -123,7 +123,7 @@ const TestAndPublish = ({schema}) => {
             </div>
         </div>
         </div>
-        <div style={{ "bottom":"0", "marginBottom":"3rem", width:"100%"}} >
+        <div style={{ "bottom":"0", "marginBottom":"0.5rem", width:"100%"}} >
             <hr />
         <Row gutter='3' xs={1} sm={2} md={3} lg={5} xl={6} className="justify-content-end">
             <Col className="my-1 h-100">
