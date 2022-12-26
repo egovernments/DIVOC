@@ -17,6 +17,7 @@ import ManageSchemaHome from "./components/ManageSchemaHome/ManageSchemaHome";
 import InbuiltAttributesComponent from "./components/InbuiltAttributesComponent/InbuiltAttributesComponent";
 import TestAndPublish from "./components/TestAndPublish/TestAndPublish";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import ExploreApiComponent from "./components/ExploreApiComponent/ExploreApiComponent";
 
 function App() {
   const { initialized, keycloak } = useKeycloak();
@@ -90,6 +91,14 @@ function App() {
              element={
                         <PrivateRoute>
                           <CreateSchema />
+                        </PrivateRoute>
+                     }
+           >
+           </Route>
+           <Route path={config.urlPath + "/manage-schema/explore-api"}
+             element={
+                        <PrivateRoute>
+                          <ExploreApiComponent />
                         </PrivateRoute>
                      }
            >

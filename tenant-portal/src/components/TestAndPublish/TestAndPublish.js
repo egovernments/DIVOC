@@ -13,12 +13,13 @@ const isoDatestringValidator = require('iso-datestring-validator')
 
 const TestAndPublish = ({schema}) => {
     const { t } = useTranslation();
+    const { navigate } = useNavigate();
     const publish = async () => {
         const userToken = await getToken();
         schema.status = "PUBLISHED"
         const osid= schema.osid.slice(2);
         axios.put(`${config.schemaUrl}/${osid}`, schema, {headers:{"Authorization" :`Bearer ${userToken}`}})
-        .then((res) => {window.location.reload(true)})
+        .then((res) => {navigate(config.urlPath + '/explore-api')})
         .catch(error => {
                 console.error(error);
                 throw error;
@@ -116,7 +117,7 @@ const TestAndPublish = ({schema}) => {
         </div>
         <div className='col-6'>
             <div className='w-50 m-auto border'>
-                <iframe width="100%" height="400px"  id="ifmcontentPrint" src="" />
+                <iframe width="100%" height="350px"  id="ifmcontentPrint" src="" />
             </div>
             <div style={{margin:"auto"}} className='w-50' onClick={() =>{downloadPdf(samplefile)}}>
                 <GenericButton img={PrintIcon} text='Print' variant='outline-light' />
