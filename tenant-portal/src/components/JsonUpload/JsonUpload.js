@@ -12,6 +12,7 @@ import {Col, Container} from "react-bootstrap";
 import ActionInfoComponent from "../ActionInfoComponent/ActionInfoComponent";
 import SchemaAttributes from "../SchemaAttributes/SchemaAttributes";
 import TestAndPublish from "../TestAndPublish/TestAndPublish";
+import ToastComponent from "../ToastComponent/ToastComponent";
 function JsonUpload() {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -23,6 +24,7 @@ function JsonUpload() {
     const [schemaCreated, setSchemaCreated] = useState(false);
     const [viewSchema, setViewSchema] = useState(false);
     const [uploadedSchema, setUploadedSchema] = useState(null);
+    const [toast, setToast] = useState("");
     const handleFileUpload = (e) => {
         e.preventDefault();
         const reader = new FileReader();
@@ -39,11 +41,18 @@ function JsonUpload() {
         };
         reader.readAsText(e.target.files[0]);
     }
-    const uploadSchema = async () => {
-        if (!schema) {
+    const uploadSchema = async (saveAsDraft) => {
+        if (!schema || file.type.replace(/(.*)\//g, '') !== "json") {
+            showToastFunc("Upload a valid JSON schema file", "danger");
             return
         }
-        const schemaName = JSON.parse(schema)?.title;
+        let schemaName = "";
+        try {
+            schemaName = JSON.parse(schema)?.title;
+        } catch (err) {
+            showToastFunc("Invalid JSON uploaded for schema", "danger");
+        }
+
         const addSchemaPayload = {
             "name": schemaName,
             "schema": schema,
@@ -54,11 +63,16 @@ function JsonUpload() {
             .then((res) => {
                 setSchemaUploaded(true);
                 if (res?.data) {
-                    setSchemaCreated(true);
-                    setUploadedSchema({
-                        "osid": res.data.schemaAddResponse?.result?.Schema?.osid,
-                        ...addSchemaPayload
-                    });
+                    if (saveAsDraft) {
+                        showToastFunc("Successfully saved as draft", "success");
+                        navigate("/manage-schema");
+                    } else {
+                        setSchemaCreated(true);
+                        setUploadedSchema({
+                            "osid": res.data.schemaAddResponse?.result?.Schema?.osid,
+                            ...addSchemaPayload
+                        });
+                    }
                 }
             }).catch((error) => {
                 setSchemaUploaded(true);
@@ -70,17 +84,25 @@ function JsonUpload() {
         if (action==="view") {
             setViewSchema(true);
         } else if (action === "goBack") {
-            navigate('/manage-schema');
+            navigate(0);
         }
     }
+    const showToastFunc = (toastMessage, variant) => {
+        setToast (<ToastComponent header={toastMessage}
+                                  variant={variant} delay='2000' position="top-center" className="copy-toast" />);
+        setTimeout(() => {
+            setToast("");
+        }, 2000);
+    }
     return (
-        (!schemaUploaded && !schemaPreview &&
+        <div>
+            {(!schemaUploaded && !schemaPreview &&
             <Container className="d-flex justify-content-between align-items-center flex-column flex-md-row my-3 offset-1 offset-md-2 col-10 col-md-9">
                 <Col className={`col-12 col-md-7 me-md-3 ${styles['upload-container']}`}>
                     <p className="title">{t('jsonSchemaUpload.title')}</p>
                     <div className="border rounded-2 p-3 text-center mb-3 position-relative">
                         <div className="d-flex align-items-stretch h-100">
-                            <input type="file" className="w-100 position-absolute top-0 start-0 h-100 opacity-0" onChange={handleFileUpload}/>
+                            <input type="file" accept=".json" className="w-100 position-absolute top-0 start-0 h-100 opacity-0" onChange={handleFileUpload}/>
                         </div>
                         {
                             fileUploaded && <div className="d-flex justify-content-center align-items-center">
@@ -98,10 +120,10 @@ function JsonUpload() {
                     <div className="d-flex justify-content-between align-items-center flex-column flex-md-row">
                         <div className='container-fluid my-3 px-0'>
                             <div className='px-0 mx-0 d-flex flex-wrap'>
-                                <Link onClick={uploadSchema} to='' className='col-12 col-lg-6 my-2 pe-0 pe-lg-2'>
+                                <Link onClick={() => {uploadSchema(true)}} to='' className='col-12 col-lg-6 my-2 pe-0 pe-lg-2'>
                                     <GenericButton img='' text={t('jsonSchemaUpload.draftButtonText')} type='button' variant='outline-primary'/>
                                 </Link>
-                                <Link onClick={uploadSchema} to='' className='col-12 col-lg-6 my-2 ps-0 ps-lg-2'>
+                                <Link onClick={() => {uploadSchema(false)}} to='' className='col-12 col-lg-6 my-2 ps-0 ps-lg-2'>
                                     <GenericButton img='' text={t('jsonSchemaUpload.saveButtonText')} type='button' variant='primary'/>
                                 </Link>
                             </div>
@@ -111,8 +133,7 @@ function JsonUpload() {
                 <Col className="col-12 col-md-5 text-center">
                     <img src={uploadTheme} className="mw-100" alt="upload theme img"/>
                 </Col>
-            </Container>
-        ) || (
+            </Container>) || (
             schemaUploaded && !viewSchema && !schemaPreview &&
             <ActionInfoComponent
                 isActionSuccessful={schemaCreated}
@@ -121,16 +142,17 @@ function JsonUpload() {
                 primaryButtonText={schemaCreated ? t('jsonSchemaUpload.view') : t('jsonSchemaUpload.goBack')}
                 primaryActionKey={schemaCreated ? 'view' : 'goBack'}
                 nextActionHandler={handleNextAction}>
-            </ActionInfoComponent>
-        ) || (
+            </ActionInfoComponent>) || (
             schemaUploaded && viewSchema && !schemaPreview &&
-            <SchemaAttributes props={uploadedSchema} setschemaPreview={setschemaPreview}></SchemaAttributes>
-        ) || (
+            <SchemaAttributes props={uploadedSchema} setschemaPreview={setschemaPreview}></SchemaAttributes>) || (
             schemaPreview && 
             <div>
                 <TestAndPublish schema={uploadedSchema}/>
-            </div>
-        )
+            </div>)}
+            {
+                toast
+            }
+        </div>
     )
 }
 

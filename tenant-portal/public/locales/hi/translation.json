@@ -135,7 +135,7 @@
         "successfulUploadMessageBody": "JSON फ़ाइल सफलतापूर्वक अपलोड कर दी गई है। ",
         "view": "देखना",
         "errorUploadMessageTitle": "अपलोड करने में असमर्थ!",
-        "errorUploadMessageBody": "JSON फ़ाइल अपलोड विफल रहा",
+        "errorUploadMessageBody": "अमान्य स्कीमा के कारण JSON फ़ाइल अपलोड विफल हुआ",
         "goBack": "वापस जाओ"
     }
 }
