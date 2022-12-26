@@ -7,6 +7,7 @@ import {useTranslation} from "react-i18next";
 import {transformSchemaToAttributes} from "../../utils/schema.js"
 import Attribute  from "../Attribute/Attribute";
 import { Link } from "react-router-dom";
+import config from "../../config.json";
 function SchemaAttributes({props, setschemaPreview}){
     const { t } = useTranslation();
 
@@ -42,9 +43,9 @@ function SchemaAttributes({props, setschemaPreview}){
             <hr className="mt-5 mb-3"/>
                 { props.status === "DRAFT" && 
                     <Row gutter='3' xs={1} sm={2} md={4} className="justify-content-end" >
-                    <Col onClick={()=> setschemaPreview(true)}>
+                    <Link to={`${config.urlPath}/manage-schema`} reloadDocument={true}>
                         <GenericButton img={''} text='Save as Draft' type='button' form="schema-attributes" variant='outline-primary' />
-                     </Col>
+                     </Link>
                      <Col onClick={()=> setschemaPreview(true)}>
                         <GenericButton img={''} text='Test & Publish' type='button' form="schema-attributes" variant='primary' />
                     </Col>

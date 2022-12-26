@@ -135,7 +135,7 @@
         "successfulUploadMessageBody": "The JSON file has been uploaded successfully. ",
         "view": "View",
         "errorUploadMessageTitle": "Unable to upload!",
-        "errorUploadMessageBody": "The JSON file upload failed",
+        "errorUploadMessageBody": "The JSON file upload failed due to invalid schema",
         "goBack": "Go Back"
     }
 }
