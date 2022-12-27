@@ -140,6 +140,8 @@
     },
     "exploreAPI": {
         "header": "Explore APIs",
-        "body": "Click on the API URL below to test the API in swagger"
+        "body": "Click on the API URL below to test the API in swagger",
+        "home": "Home",
+        "testAnother": "Test Another"
     }
 }

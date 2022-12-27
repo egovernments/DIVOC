@@ -1,4 +1,4 @@
-import {Container, Form, Row} from "react-bootstrap";
+import {Container, Form, Row, Col} from "react-bootstrap";
 import {useTranslation} from "react-i18next";
 import {VC_MANAGEMENT_SWAGGER_URL} from "../../constants";
 import GenericButton from "../GenericButton/GenericButton";
@@ -9,6 +9,8 @@ import React, {useState} from "react";
 import ToastComponent from "../ToastComponent/ToastComponent";
 import axios from "axios";
 import styles from "../ExploreApiComponent/ExploreApiComponent.module.css";
+import {Link} from "react-router-dom";
+import config from "../../config.json";
 
 function ExploreApiComponent() {
 
@@ -44,9 +46,9 @@ function ExploreApiComponent() {
     }
 
     return (
-        <Container>
+        <div className="d-flex flex-column justify-content-between" style={{minHeight:"70vh"}}>
             {toast}
-            <Row className="align-items-center">
+            <Row className="align-items-center offset-1 col-10">
                 <Container className="col-lg-6">
                     <p className="title">{t('exploreAPI.header')}</p>
                     <p>{t('exploreAPI.body')}</p>
@@ -67,7 +69,24 @@ function ExploreApiComponent() {
                     <img src={ExploreAPIImage} className="mw-100" alt="explore api image"/>
                 </div>
             </Row>
-        </Container>
+            <div>
+                <hr/>
+                <div>
+                    <Row gutter='3' xs={1} sm={2} md={3} lg={4} xl={5} className="justify-content-end pe-4">
+                        <Col className="my-1 h-100">
+                            <Link to='/' reloadDocument={true} >
+                                <GenericButton img='' text={t('exploreAPI.home')} variant='outline-primary' />
+                            </Link>
+                        </Col>
+                        <Col className="my-1 h-100">
+                            <Link to={`${config.urlPath}/manage-schema`} reloadDocument={true} >
+                                <GenericButton img='' text={t('exploreAPI.testAnother')} variant='primary' />
+                            </Link>
+                        </Col>
+                    </Row>
+                </div>
+            </div>
+        </div>
     )
 
 }
