@@ -1,0 +1,6 @@
+.swagger-url {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #484646 !important;
+}

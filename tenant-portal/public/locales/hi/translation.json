@@ -138,7 +138,7 @@
         "successfulUploadMessageBody": "JSON फ़ाइल सफलतापूर्वक अपलोड कर दी गई है। ",
         "view": "देखना",
         "errorUploadMessageTitle": "अपलोड करने में असमर्थ!",
-        "errorUploadMessageBody": "JSON फ़ाइल अपलोड विफल रहा",
+        "errorUploadMessageBody": "अमान्य स्कीमा के कारण JSON फ़ाइल अपलोड विफल हुआ",
         "goBack": "वापस जाओ"
     },
     "templateUpload":{
@@ -149,5 +149,9 @@
         "placeholder": "टेम्पलेट कुंजी",
         "close": "बंद करना",
         "upload": "डालना"
+    },
+    "exploreAPI": {
+        "header": "एपीआई एक्सप्लोर करें",
+        "body": "स्वैगर में एपीआई का परीक्षण करने के लिए नीचे दिए गए एपीआई यूआरएल पर क्लिक करें"
     }
 }

@@ -138,6 +138,15 @@ async function updateTemplateUrls(req, res) {
         const createCertResp = await sunbirdRegistryService.createCertBySigner(createCertReq,token);
         console.log("Signed certificate: ",createCertResp);
         let templateSignedUrl = await minioClient.presignedGetObject(MINIO_REGISTRY_BUCKET, template, 24*60*60);
+        try {
+            await minioClient.getObject(MINIO_REGISTRY_BUCKET, template);
+        } catch (e) {
+            res.status(404).json({
+                message: e.message
+            })
+            return
+        }
+
         console.log("templateSignedUrl : ",templateSignedUrl)
         const getCertReq = {
             certificate: JSON.stringify(createCertResp),
@@ -146,7 +155,7 @@ async function updateTemplateUrls(req, res) {
         const acceptType = "application/pdf"
         const getCert = await sunbirdRegistryService.getCertByApi(getCertReq,token,acceptType);
         getCert.data.pipe(res);
-    }catch (err){
+    } catch (err){
         console.error(err);
         res.status(err?.response?.status || err?.status || 500).json({
             message: err?.response?.data || err?.message || err

@@ -2,6 +2,10 @@ const jwt = require("jsonwebtoken");
 const {ROLE_SUFFIX} = require('../configs/constants'); 
 async function addRoleIfNotPresent(req, res, next) {
     let schema = JSON.parse(req.body.schema);
+    if(!schema || !schema._osConfig) {
+        next();
+        return;
+    }
     if(schema?._osConfig?.roles === undefined || schema?._osConfig?.roles === null) {
         schema._osConfig.roles = [];
     }
