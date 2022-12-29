@@ -7,5 +7,5 @@ const templateController = require('../controllers/template.controller');
 const router = express.Router();
 
 router.post(`/:tenant`, [tokenValidationMiddleware, upload.single('files')], templateController.uploadTemplate);
-
+router.get(`/` , templateController.getTemplate);
 module.exports = router
