@@ -16,6 +16,7 @@ import ToastComponent from "../ToastComponent/ToastComponent";
 import successCheckmark from "../../assets/img/success_check_transparent.svg";
 import failedAlert from "../../assets/img/alert_check_transparent.svg";
 import config from "../../config.json";
+import ManageTempModal from "../ManageTempModal/ManageTempModal";
 import {getToken} from '../../utils/keycloak';
 import {CONTEXT_BODY, SAMPLE_TEMPLATE_WITH_QR, SCHEMA_BODY, SCHEMA_STATUS, W3C_CONTEXT} from "../../constants";
 import axios from "axios";
@@ -23,6 +24,7 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [show, setShow] = useState(false);
+    const [showModal, setShowModal] = useState(false);
     const [templateUploaded, setTemplateUploaded] = useState(false);
     const [toast,setToast] = useState("");
     const osid = props.osid;
@@ -103,19 +105,21 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
         <div>
             <Container>
                 <Stack gap={3}>
-                    <Row className="justify-content-between align-items-center">
-                        <div>
-                            <Row className="title">{props.name}</Row>
-                            <Row>{props.description}</Row>
-                        </div>
-                        <div>
-                            <Button variant="primary" onClick={() => setShow(true)} className="w-25">
-                                {t('schemaAttributesPage.uploadTemplate')}
-                            </Button>
+                    <Row className="justify-content-end" sm= {4}>
+                    <Col className={Object.keys(JSON.parse(props.schema)._osConfig?.certificateTemplates).length===0? 'd-none': '' } >
+                            <div onClick={()=>{setShowModal(true);}}>
+                            <GenericButton text={t('schemaAttributesPage.manageTemplate')} variant="outline-primary" /></div>
+                            {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={props}/>}
+                        </Col>
+                        <Col>
+                            <div onClick={() => setShow(true)}>
+                                <GenericButton text={t('schemaAttributesPage.uploadTemplate')} variant="primary"/>
+                            </div>
                             <UploadTemplate {...{show, setShow, osid, setTemplateUploaded,showToast}}/>
-                        </div>
+                        </Col>
                     </Row>
-
+                    <Row className="title">{props.name}</Row>
+                    <Row>{props.description}</Row>
                     <Row className="p-3 border overflow-auto d-xxl-inline-block">
                             <Row className="table-heading py-2">{t('schemaAttributesPage.fields')}</Row>
                             <Table className={styles["SchemaAttributesTable"]}>
@@ -138,9 +142,9 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
                     </Row>
                 </Stack>
             </Container>
-
+            
                 {toast}
-
+            
             <hr className="mt-5 mb-3"/>
                 { (props.status === SCHEMA_STATUS.DRAFT || props.status === SCHEMA_STATUS.INPROGRESS) &&
                     <Row gutter='3' xs={1} sm={2} md={4} className="justify-content-end pe-4" >

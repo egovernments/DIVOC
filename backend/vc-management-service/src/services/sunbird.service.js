@@ -129,6 +129,15 @@ const getCertByApi = async (body,token, acceptType) => {
             });
 }
 
+const getTemplate = async (templateSignedUrl) => {
+    return axios.get(templateSignedUrl)
+    .catch(error =>{
+        console.log(error);
+        throw error;
+    });
+}
+
+
 module.exports = {
     createTenant,
     createEntity,
@@ -139,5 +148,6 @@ module.exports = {
     getTransaction,
     getTenantId,
     createCertBySigner,
-    getCertByApi
+    getCertByApi,
+    getTemplate
 }

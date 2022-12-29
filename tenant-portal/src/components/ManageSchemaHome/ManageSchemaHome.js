@@ -106,7 +106,13 @@ const ManageSchemaHome = () => {
                     <li className="pb-2">{t('schemasHomePage.manageSchema.info.3')}</li>
                     <li className="pb-2">{t('schemasHomePage.manageSchema.info.4')}</li>
                 </ol>
-                { !schemaClicked && <div><hr/>
+
+            </div>}
+
+            {schemaClicked && < SchemaAttributes props={selectedSchema} setschemaPreview={setschemaPreview}  />}
+            </div>
+        </div>}
+        { !schemaClicked && <div><hr/>
             <Row gutter='3' xs={1} sm={2} md={3} className="justify-content-end">
             <Col className="my-1 h-100">
                 <Link to={`${config.urlPath}/manage-schema/view-inbuilt-attributes`} >
@@ -119,10 +125,6 @@ const ManageSchemaHome = () => {
                 </Link>
             </Col>
             </Row></div>}
-            </div>}
-            {schemaClicked && < SchemaAttributes props={selectedSchema} setschemaPreview={setschemaPreview} setUpdatedSchema={setSelectedSchema} />}
-            </div>
-        </div>}
         
         {schemaPreview && <div>
             <BreadcrumbComponent showBreadCrumb={true} />

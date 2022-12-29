@@ -62,7 +62,8 @@
         "backButton": "Back to Manage Schema",
         "uploadTemplate": "Upload Template",
         "templateUploadSuccess": "Template Uploaded Successfully!",
-        "templateUploadFailed": "Template Failed to Upload!"
+        "templateUploadFailed": "Template Failed to Upload!",
+        "manageTemplate": "Manage Uploaded Templates"
     },
     "schemaDetails": {
         "title": "Add Schema Details",
