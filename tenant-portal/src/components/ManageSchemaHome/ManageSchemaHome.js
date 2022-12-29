@@ -109,7 +109,7 @@ const ManageSchemaHome = () => {
 
             </div>}
 
-            {schemaClicked && < SchemaAttributes props={selectedSchema} setschemaPreview={setschemaPreview}  />}
+            {schemaClicked && < SchemaAttributes props={selectedSchema} setschemaPreview={setschemaPreview} setUpdatedSchema={setSelectedSchema} />}
             </div>
         </div>}
         { !schemaClicked && <div><hr/>

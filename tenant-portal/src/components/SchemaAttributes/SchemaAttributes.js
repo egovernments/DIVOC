@@ -48,7 +48,7 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
             }
         setTimeout(() => {setToast("")}, 3000);
     };
-    const upsertSchema = async () => {
+    const upsertSchema = async (saveAsDraft) => {
         const currentSchema = {
             schemaName: props.name,
             schemaDescription: props.description,
@@ -61,41 +61,57 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
             Attributes: Attributes
         }
         const currentContext = transformAttributesToContext(currentSchema, CONTEXT_BODY);
-        currentSchema["credentialTemplate"]["context"].push(currentContext);
-        const updatedSchema = transformAttributesToSchema(currentSchema, SCHEMA_BODY);
-        const draftSchemaPayload = {
-            name: props.name,
-            status: SCHEMA_STATUS.DRAFT,
-            schema: JSON.stringify(updatedSchema)
-        }
-        await (async () => {
-            const userToken = await getToken();
-            console.log(config.schemaUrl);
-            console.log(props.osid);
-            axios({
-                method: props.osid ? 'PUT' : 'POST',
-                url: `${config.schemaUrl}/${props?.osid ? props.osid?.slice(2) : ''}`,
-                data: draftSchemaPayload,
-                headers: {
-                    "Authorization": `Bearer ${userToken}`,
-                },
-            }).then((res) => {
-                console.log(res?.data);
-                setUpdatedSchema({
-                    osid: props.osid || res?.data?.schemaAddResponse?.result?.Schema?.osid,
-                    ...draftSchemaPayload
-                })
-            }).catch(error => {
-                console.error(error);
-                throw error;
-            });
-        })();
-    }
-    const testAndPublish = () => {
-        upsertSchema().then(() => {
-            setschemaPreview(true)
+
+        const json = JSON.stringify(currentContext);
+        const blob = new Blob([json], {
+            type: "application/json"
         });
+        const data = new FormData();
+        data.append("files", blob);
+        const userToken = await getToken();
+        await (async () => {
+            axios.post(`${config.contextUrl}`, data, {
+                headers: {Authorization: `Bearer ${userToken}`}
+            }).then((response) => {
+                const contextUrls = currentSchema["credentialTemplate"]["context"];
+                console.log(contextUrls);
+                currentSchema["credentialTemplate"]["context"] = [response.data.url, ...contextUrls];
+                console.log(currentSchema["credentialTemplate"]["context"]);
+              }).catch((error) => console.log(error))
+                .then(() => {
+                    const updatedSchema = transformAttributesToSchema(currentSchema, SCHEMA_BODY);
+                    const draftSchemaPayload = {
+                        name: props.name,
+                        status: SCHEMA_STATUS.DRAFT,
+                        schema: JSON.stringify(updatedSchema)
+                    }
+                    axios({
+                        method: props.osid ? 'PUT' : 'POST',
+                        url: `${config.schemaUrl}/${props?.osid ? props.osid?.slice(2) : ''}`,
+                        data: draftSchemaPayload,
+                        headers: {
+                            "Authorization": `Bearer ${userToken}`,
+                        },
+                    }).then((res) => {
+                        console.log(res?.data);
+                        setUpdatedSchema({
+                            osid: props.osid || res?.data?.schemaAddResponse?.result?.Schema?.osid,
+                            ...draftSchemaPayload
+                        })
+                        if (saveAsDraft) {
+                            navigate('/manage-schema');
+                            window.location.reload();
+                        } else {
+                            setschemaPreview(true);
+                        }
+                    }).catch(error => {
+                        console.error(error);
+                        throw error;
+                    });
+                })
+        })()
     }
+
     return (
         <div>
             <Container>
@@ -147,10 +163,10 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
             <hr className="mt-5 mb-3"/>
                 { (props.status === SCHEMA_STATUS.DRAFT || props.status === SCHEMA_STATUS.INPROGRESS) &&
                     <Row gutter='3' xs={1} sm={2} md={4} className="justify-content-end pe-4" >
-                    <Link to='/manage-schema' onClick={upsertSchema} reloadLocation={true}>
+                    <div onClick={() => {upsertSchema(true)}} >
                         <GenericButton img={''} text='Save as Draft' type='button' form="schema-attributes" variant='outline-primary' />
-                     </Link>
-                     <Col onClick={testAndPublish}>
+                     </div>
+                     <Col onClick={() => {upsertSchema(false)}}>
                         <GenericButton img={''} text='Test & Publish' type='button' form="schema-attributes" variant='primary' />
                     </Col>
                     </Row>  

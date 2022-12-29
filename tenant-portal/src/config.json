@@ -2,5 +2,6 @@
   "urlPath": "",
   "tokenEndPoint": "/vc-management/v1/tenant/generatetoken",
   "previewUrl": "/vc-management/v1/schema/preview",
-  "schemaUrl":"/vc-management/v1/schema"
+  "schemaUrl":"/vc-management/v1/schema",
+  "contextUrl": "/vc-management/v1/context"
 }
