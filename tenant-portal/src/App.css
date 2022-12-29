@@ -183,4 +183,7 @@ content: "✔";
 .toast {
     border:none;
 }
+.cursor-pointer {
+    cursor: pointer;
+}
     

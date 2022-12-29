@@ -10,6 +10,7 @@ import {getToken, getUserId} from '../../utils/keycloak';
 import SchemaAttributes from '../SchemaAttributes/SchemaAttributes';
 import BreadcrumbComponent from '../BreadcrumbComponent/BreadcrumbComponent';
 import TestAndPublish from '../TestAndPublish/TestAndPublish';
+import {SCHEMA_STATUS} from "../../constants";
 const axios = require('axios');
 
 const ManageSchemaHome = () => {
@@ -76,7 +77,7 @@ const ManageSchemaHome = () => {
                         <div key={schema.name} onClick={() =>{schemaAttViewFunc(schema);}}>
                             <div className='schema-list-items justify-content-between d-flex' >
                                 <div>{schema.name}</div>
-                             <div>{(schema.status).toLowerCase()==="published"? 
+                             <div>{(schema.status).toLowerCase()===SCHEMA_STATUS.PUBLISHED.toLowerCase()?
                             <img src={PublishedIcon}/>:<img src={DraftIcon}/>}</div>
                             </div>
                         </div>
@@ -105,9 +106,9 @@ const ManageSchemaHome = () => {
                     <li className="pb-2">{t('schemasHomePage.manageSchema.info.3')}</li>
                     <li className="pb-2">{t('schemasHomePage.manageSchema.info.4')}</li>
                 </ol>
-                
+
             </div>}
-            
+
             {schemaClicked && < SchemaAttributes props={selectedSchema} setschemaPreview={setschemaPreview}  />}
             </div>
         </div>}
