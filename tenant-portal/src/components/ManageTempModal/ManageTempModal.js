@@ -12,7 +12,7 @@ const ManageTempModal = ({schemaBody, setShowModal}) => {
     var dupSchemaBody = {...schemaBody};
     const [changeSchema, setChangeSchema] = useState(dupSchemaBody);
     var schema = JSON.parse(changeSchema.schema);
-    var templates = (schema._osConfig.certificateTemplates);
+    var templates = (schema._osConfig?.certificateTemplates);
     const [dupTemp, setDupTemp] = useState({...templates});
     const [show, setShow] = useState(true);
     const downloadHtml = async (templateUrl) => {

@@ -46,18 +46,17 @@ function SchemaAttributes({props, setschemaPreview}){
             <Container>
                 <Stack gap={3}>
                     <Row className="justify-content-end" sm= {4}>
-                        <Col>
-                            <Button variant="primary" onClick={() => setShow(true)} className="w-25">
-                                {t('schemaAttributesPage.uploadTemplate')}
-                            </Button>
-                            <UploadTemplate {...{show, setShow, osid, setTemplateUploaded,showToast}}/>
-                        </Col>
-                        <Col className={Object.keys(JSON.parse(props.schema)._osConfig.certificateTemplates).length===0? 'd-none': '' } >
+                    <Col className={Object.keys(JSON.parse(props.schema)._osConfig?.certificateTemplates).length===0? 'd-none': '' } >
                             <div onClick={()=>{setShowModal(true);}}>
                             <GenericButton text={t('schemaAttributesPage.manageTemplate')} variant="outline-primary" /></div>
                             {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={props}/>}
                         </Col>
-                        
+                        <Col>
+                            <div onClick={() => setShow(true)}>
+                                <GenericButton text={t('schemaAttributesPage.uploadTemplate')} variant="primary"/>
+                            </div>
+                            <UploadTemplate {...{show, setShow, osid, setTemplateUploaded,showToast}}/>
+                        </Col>
                     </Row>
                     <Row className="title">{props.name}</Row>
                     <Row>{props.description}</Row>
