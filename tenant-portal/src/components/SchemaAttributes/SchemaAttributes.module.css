@@ -15,6 +15,21 @@
 .SchemaAttributesTable {
     width: 1000px;
 }
+
+.templateToast{
+    margin-bottom: 2rem; 
+    position: fixed; 
+    bottom: 0;
+    border-radius: 12px 12px 0px 0px;
+}
+.toastHeaderSuccess{
+    background-color: #4EA466;
+    color: #FFFFFF;
+}
+.toastHeaderFailed{
+    background: #E84545;
+    color: #FFFFFF;
+}
 .SchemaAttributesTable tbody tr td {
     font-family: Open Sans, sans-serif;
     font-size: 14px;

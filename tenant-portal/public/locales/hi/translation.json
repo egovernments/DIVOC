@@ -59,7 +59,10 @@
         "description": "विवरण",
         "action": "गतिविधि",
         "fields": "खेत",
-        "backButton": "मैनेज स्कीमा पर वापस"
+        "backButton": "मैनेज स्कीमा पर वापस",
+        "uploadTemplate": "टेम्प्लेट अपलोड करें",
+        "templateUploadSuccess": "टेम्प्लेट सफलतापूर्वक अपलोड किया गया!",
+        "templateUploadFailed": "टेम्प्लेट अपलोड करने में विफल!"
     },
     "schemaDetails": {
         "title": "स्कीमा विवरण जोड़ें",
@@ -137,6 +140,15 @@
         "errorUploadMessageTitle": "अपलोड करने में असमर्थ!",
         "errorUploadMessageBody": "अमान्य स्कीमा के कारण JSON फ़ाइल अपलोड विफल हुआ",
         "goBack": "वापस जाओ"
+    },
+    "templateUpload":{
+        "title": "टेम्प्लेट अपलोड करें",
+        "uploadComment1": "अपलोड करने के लिए फ़ाइलें खींचें और छोड़ें",
+        "uploadComment2": "अपलोड करने के लिए फाइलों का चयन करें",
+        "or": "या",
+        "placeholder": "टेम्पलेट कुंजी",
+        "close": "बंद करना",
+        "upload": "डालना"
     },
     "exploreAPI": {
         "header": "एपीआई एक्सप्लोर करें",
