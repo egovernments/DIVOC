@@ -14,13 +14,13 @@ const isoDatestringValidator = require('iso-datestring-validator')
 
 const TestAndPublish = ({schema}) => {
     const { t } = useTranslation();
-    const { navigate } = useNavigate();
+    const navigate = useNavigate();
     const publish = async () => {
         const userToken = await getToken();
         schema.status = SCHEMA_STATUS.PUBLISHED
         const osid= schema.osid.slice(2);
         axios.put(`${config.schemaUrl}/${osid}`, schema, {headers:{"Authorization" :`Bearer ${userToken}`}})
-        .then((res) => {navigate(config.urlPath + '/explore-api')})
+        .then((res) => {navigate('/manage-schema/explore-api')})
         .catch(error => {
                 console.error(error);
                 throw error;
@@ -127,16 +127,16 @@ const TestAndPublish = ({schema}) => {
         </div>
         <div style={{ "bottom":"0", "marginBottom":"0.5rem", width:"100%"}} >
             <hr />
-        <Row gutter='3' xs={1} sm={2} md={3} lg={5} xl={6} className="justify-content-end">
+        <Row gutter='3' xs={1} sm={2} md={3} lg={4} xl={5} className="justify-content-end">
             <Col className="my-1 h-100">
                 <Link to={`${config.urlPath}/manage-schema`} reloadDocument={true} >
                     <GenericButton img='' text={t('testAndPublish.backButton')} variant='outline-primary'/> 
                 </Link>
             </Col>
             <Col className="my-1 h-100">
-                <Link onClick={publish} to='/manage-schema'>
+                <div onClick={publish}>
                     <GenericButton img='' text={t('testAndPublish.publishButton')} variant='primary'/> 
-                </Link>
+                </div>
             </Col>
         </Row>
         </div>
