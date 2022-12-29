@@ -62,7 +62,8 @@
         "backButton": "मैनेज स्कीमा पर वापस",
         "uploadTemplate": "टेम्प्लेट अपलोड करें",
         "templateUploadSuccess": "टेम्प्लेट सफलतापूर्वक अपलोड किया गया!",
-        "templateUploadFailed": "टेम्प्लेट अपलोड करने में विफल!"
+        "templateUploadFailed": "टेम्प्लेट अपलोड करने में विफल!",
+        "manageTemplate": "अपलोड किए गए टेम्प्लेट प्रबंधित करें"
     },
     "schemaDetails": {
         "title": "स्कीमा विवरण जोड़ें",

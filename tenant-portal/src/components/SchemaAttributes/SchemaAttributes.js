@@ -15,6 +15,7 @@ import config from "../../config.json";
 function SchemaAttributes({props, setschemaPreview}){
     const { t } = useTranslation();
     const [show, setShow] = useState(false);
+    const [showModal, setShowModal] = useState(false);
     const [templateUploaded, setTemplateUploaded] = useState(false);
     const [toast,setToast] = useState(""); 
     const osid = props.osid;
@@ -42,11 +43,19 @@ function SchemaAttributes({props, setschemaPreview}){
         <div>
             <Container>
                 <Stack gap={3}>
-                    <Row className="justify-content-end">
-                        <Button variant="primary" onClick={() => setShow(true)} className="w-25">
-                            {t('schemaAttributesPage.uploadTemplate')}
-                        </Button>
-                        <UploadTemplate {...{show, setShow, osid, setTemplateUploaded,showToast}}/>
+                    <Row className="justify-content-end" sm= {4}>
+                        <Col>
+                            <Button variant="primary" onClick={() => setShow(true)} className="w-25">
+                                {t('schemaAttributesPage.uploadTemplate')}
+                            </Button>
+                            <UploadTemplate {...{show, setShow, osid, setTemplateUploaded,showToast}}/>
+                        </Col>
+                        <Col>
+                            <div onClick={()=>{setShowModal(true);}}>
+                            <GenericButton text={t('schemaAttributesPage.manageTemplate')} variant="outline-primary" /></div>
+                            {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={schema}/>}
+                        </Col>
+                        
                     </Row>
                     <Row className="title">{props.name}</Row>
                     <Row>{props.description}</Row>
