@@ -50,7 +50,7 @@ function transformAttributesToSchema(schemaPayload,schemaBody){
         if(Attribute.isUniqueIndex){
             schema._osConfig.uniqueIndexFields.push(Attribute.label);   
         }
-        if(Attribute.isEvidence){
+        if(!Attribute.isIdentityInformation){
             schema._osConfig.credentialTemplate.evidence[Attribute.label] = `{{${Attribute.label}}}`
         }else{
             schema._osConfig.credentialTemplate.credentialSubject[Attribute.label] = `{{${Attribute.label}}}`
@@ -70,7 +70,7 @@ function transformAttributesToContext(schemaPayload,contextBody){
     const name = schemaPayload.schemaName;
     const Attributes = schemaPayload.Attributes;
     Attributes.map((Attribute) =>{
-        if(Attribute.isEvidence){
+        if(Attribute.isIdentityInformation){
             if(Attribute.isUniqueIndex){
                 context["@context"].Person["@context"][Attribute.label] = "schema:id"
             }else if(Attribute.label.toLowerCase().includes("date")){

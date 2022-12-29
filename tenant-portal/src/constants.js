@@ -37,7 +37,7 @@ const SCHEMA_PAYLOAD = {
             "description": "The unique Certificate ID",
             "readOnly": true,
             "editMode": false,
-            "isEvidence": true
+            "isIdentityInformation": false
         },
         {
             "label": "Valid From",

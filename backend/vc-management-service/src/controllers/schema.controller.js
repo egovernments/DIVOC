@@ -1,7 +1,9 @@
 const sunbirdRegistryService = require('../services/sunbird.service')
 const {getFormData} = require("../utils/utils");
 const {TENANT_NAME,MINIO_REGISTRY_BUCKET,IS_MINIO,MINIO_PORT,MINIO_URL,MINIO_USESSL,MINIO_ACCESSKEY,MINIO_SECRETKEY} = require("../configs/config");
-const {MINIO_URL_SCHEME, SUNBIRD_SCHEMA_ADD_URL, SUNBIRD_SCHEMA_UPDATE_URL, SUNBIRD_GET_SCHEMA_URL} = require("../configs/constants");
+const {MINIO_URL_SCHEME, SUNBIRD_SCHEMA_ADD_URL, SUNBIRD_SCHEMA_UPDATE_URL, SUNBIRD_GET_SCHEMA_URL, HTTP_URI_PREFIX,
+    HTTPS_URI_PREFIX
+} = require("../configs/constants");
 const {CustomError} = require("../models/error");
 const {addMandatoryFields, validateSchema, updateSchemaTemplateUrls} = require('../utils/schema.utils')
 const minio = require('minio');
@@ -137,17 +139,21 @@ async function updateTemplateUrls(req, res) {
         console.log("Create certificate request: ",createCertReq);
         const createCertResp = await sunbirdRegistryService.createCertBySigner(createCertReq,token);
         console.log("Signed certificate: ",createCertResp);
-        let templateSignedUrl = await minioClient.presignedGetObject(MINIO_REGISTRY_BUCKET, template, 24*60*60);
-        try {
-            await minioClient.getObject(MINIO_REGISTRY_BUCKET, template);
-        } catch (e) {
-            res.status(404).json({
-                message: e.message
-            })
-            return
+        let templateSignedUrl = "";
+        if (template.startsWith(HTTP_URI_PREFIX) || template.startsWith(HTTPS_URI_PREFIX)) {
+            templateSignedUrl = template;
+        } else {
+            try {
+                await minioClient.getObject(MINIO_REGISTRY_BUCKET, template?.split("://")[1]);
+            } catch (e) {
+                res.status(404).json({
+                    message: e.message
+                })
+                return
+            }
+            templateSignedUrl = await minioClient.presignedGetObject(MINIO_REGISTRY_BUCKET, template?.split("://")[1], 24*60*60);
+            console.log("templateSignedUrl : ",templateSignedUrl)
         }
-
-        console.log("templateSignedUrl : ",templateSignedUrl)
         const getCertReq = {
             certificate: JSON.stringify(createCertResp),
             templateUrl: templateSignedUrl

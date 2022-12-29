@@ -34,7 +34,7 @@ const TestAndPublish = ({schema}) => {
     const [formErrors, setFormErrors] = useState({});
     const previewReqBody = ({
             credentialTemplate:JSON.parse(schema.schema)?._osConfig?.credentialTemplate,
-            template: JSON.parse(schema.schema)._osConfig?.certificateTemplates?.html?.split("://")[1],
+            template: JSON.parse(schema.schema)._osConfig?.certificateTemplates?.html,
             data: data
         });
     const previewSchemaFunc = async () => {
