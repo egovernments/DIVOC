@@ -57,9 +57,9 @@ function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabe
             "isIdentityInformation": isIdentityInformation,
             "description": description,
             "readOnly": readOnly,
-            "editMode": readOnly,
+            "editMode": editMode,
             "defaultValue": defaultValue,
-            "enumValues": [...enumValues]
+            "enumFields": [...enumValues]
         })
     }
     const addEnum = () => {

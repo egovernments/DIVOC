@@ -1,4 +1,5 @@
-import {STANDARD_ATTRIBUTES} from "../constants.js"
+import {STANDARD_ATTRIBUTES,SCHEMA_BODY} from "../constants.js"
+const Mustache = require("mustache");
 
 function transformSchemaToAttributes (schema) {
     const name = schema.title;
@@ -25,4 +26,69 @@ function transformSchemaToAttributes (schema) {
     return Attributes;
 }
 
-export {transformSchemaToAttributes}
+function transformAttributesToSchema(schemaPayload,schemaBody){
+    //Validate Schema
+    const schema = JSON.parse(Mustache.render(JSON.stringify(schemaBody),schemaPayload));
+    const name = schemaPayload.schemaName;
+    const Attributes = schemaPayload.Attributes;
+    Attributes.map((Attribute) =>{
+        schema.definitions[name].properties[Attribute.label]={};
+        if(Attribute.type === "enum"){
+            schema.definitions[name].properties[Attribute.label].type = "string";
+            schema.definitions[name].properties[Attribute.label].enum = Attribute?.enumFields;
+        }else{
+            schema.definitions[name].properties[Attribute.label].type = Attribute.type;
+        }
+        
+        schema.definitions[name].properties[Attribute.label].description = Attribute?.description;
+        if (Attribute.isMandatory){
+            schema.definitions[name].required.push(Attribute.label);
+        }
+        if(Attribute.isIndexField){
+            schema._osConfig.indexFields.push(Attribute.label);
+        }
+        if(Attribute.isUniqueIndex){
+            schema._osConfig.uniqueIndexFields.push(Attribute.label);   
+        }
+        if(Attribute.isEvidence){
+            schema._osConfig.credentialTemplate.evidence[Attribute.label] = `{{${Attribute.label}}}`
+        }else{
+            schema._osConfig.credentialTemplate.credentialSubject[Attribute.label] = `{{${Attribute.label}}}`
+        }
+    });
+    schemaPayload.credentialTemplate.context.map((context)=>{
+        schema._osConfig.credentialTemplate["@context"].push(context);
+    })
+    schema._osConfig.certificateTemplates = schemaPayload.certificateTemplates;
+    schema._osConfig.credentialTemplate.issuer = "{{issuer}}";
+    schema._osConfig.credentialTemplate.issuanceDate = "{{issuanceDate}}"
+    return schema;
+}
+
+function transformAttributesToContext(schemaPayload,contextBody){
+    const context = JSON.parse(Mustache.render(JSON.stringify(contextBody),schemaPayload));
+    const name = schemaPayload.schemaName;
+    const Attributes = schemaPayload.Attributes;
+    Attributes.map((Attribute) =>{
+        if(Attribute.isEvidence){
+            if(Attribute.isUniqueIndex){
+                context["@context"].Person["@context"][Attribute.label] = "schema:id"
+            }else if(Attribute.label.toLowerCase().includes("date")){
+                context["@context"].Person["@context"][Attribute.label] = "schema:date"
+            }else{
+                context["@context"].Person["@context"][Attribute.label] = "schema:Text"
+            }
+        }else{
+            if(Attribute.isUniqueIndex){
+                context["@context"][name]["@context"][Attribute.label] = "schema:id"
+            }else if(Attribute.label.toLowerCase().includes("date")){
+                context["@context"][name]["@context"][Attribute.label] = "schema:date"
+            }else{
+                context["@context"][name]["@context"][Attribute.label] = "schema:Text"
+            }
+        }
+    });
+    return context;
+}
+
+export {transformSchemaToAttributes,transformAttributesToSchema,transformAttributesToContext}

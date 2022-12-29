@@ -26,7 +26,8 @@ function ManualSchemaCreationComponent() {
         }
         schemaDetails["properties"].push(attr);
         setSchemaDetails({...schemaDetails});
-        setViewSchemaDetails(true)
+        setViewSchemaDetails(true);
+        setCreateAttribute(false);
     }
 
     return (
