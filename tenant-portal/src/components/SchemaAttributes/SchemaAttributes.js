@@ -12,6 +12,8 @@ import ToastComponent from "../ToastComponent/ToastComponent";
 import successCheckmark from "../../assets/img/success_check_transparent.svg";
 import failedAlert from "../../assets/img/alert_check_transparent.svg";
 import config from "../../config.json";
+import ManageTempModal from "../ManageTempModal/ManageTempModal";
+
 function SchemaAttributes({props, setschemaPreview}){
     const { t } = useTranslation();
     const [show, setShow] = useState(false);
@@ -53,7 +55,7 @@ function SchemaAttributes({props, setschemaPreview}){
                         <Col>
                             <div onClick={()=>{setShowModal(true);}}>
                             <GenericButton text={t('schemaAttributesPage.manageTemplate')} variant="outline-primary" /></div>
-                            {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={schema}/>}
+                            {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={props}/>}
                         </Col>
                         
                     </Row>
