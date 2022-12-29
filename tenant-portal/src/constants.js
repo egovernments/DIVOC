@@ -27,7 +27,7 @@ const INBUILT_ATTRIBUTES =  [
         "isUniqueIndex": true,
         "description": "The unique Certificate ID",
         "readOnly": true,
-        "editMode": false
+        "editMode": false,
     },
     {
         "label": "Valid From",
@@ -60,5 +60,36 @@ const STANDARD_ATTRIBUTES = [
 ]
 
 const VC_MANAGEMENT_SWAGGER_URL = 'vc-management/api-docs';
+const DRAG_AND_DROP_TYPE = 'attributeType';
+const ATTRIBUTE_DATA_TYPES = {
+    STRING: "string",
+    INTEGER: "integer",
+    ENUM: "enum",
+    BOOLEAN: "boolean"
+}
+const SCHEMA_ATTRIBUTE_TYPES = [
+    {
+        "type": ATTRIBUTE_DATA_TYPES.STRING,
+        "label": "Text Field"
+    },
+    {
+        "type": ATTRIBUTE_DATA_TYPES.INTEGER,
+        "label": "Integer"
+    },
+    {
+        "type": ATTRIBUTE_DATA_TYPES.ENUM,
+        "label": "Select boxes"
+    },
+    {
+        "type": ATTRIBUTE_DATA_TYPES.BOOLEAN,
+        "label": "Boolean"
+    }
+];
+const SCHEMA_STATUS = {
+    "DRAFT": "DRAFT",
+    "INPROGRESS": "INPROGRESS",
+    "PUBLISHED": "PUBLISHED"
 
-export {INBUILT_ATTRIBUTES,STANDARD_ATTRIBUTES,VC_MANAGEMENT_SWAGGER_URL}
+}
+
+export {INBUILT_ATTRIBUTES,STANDARD_ATTRIBUTES,VC_MANAGEMENT_SWAGGER_URL,DRAG_AND_DROP_TYPE,SCHEMA_ATTRIBUTE_TYPES,ATTRIBUTE_DATA_TYPES,SCHEMA_STATUS}

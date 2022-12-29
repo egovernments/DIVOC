@@ -13,6 +13,7 @@ import ActionInfoComponent from "../ActionInfoComponent/ActionInfoComponent";
 import SchemaAttributes from "../SchemaAttributes/SchemaAttributes";
 import TestAndPublish from "../TestAndPublish/TestAndPublish";
 import ToastComponent from "../ToastComponent/ToastComponent";
+import {SCHEMA_STATUS} from "../../constants";
 function JsonUpload() {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -56,7 +57,7 @@ function JsonUpload() {
         const addSchemaPayload = {
             "name": schemaName,
             "schema": schema,
-            "status": "DRAFT"
+            "status": SCHEMA_STATUS.DRAFT
         }
         const userToken = await getToken();
         axios.post(`${config.schemaUrl}`, addSchemaPayload, {headers:{"Authorization" :`Bearer ${userToken}`}})
@@ -144,7 +145,11 @@ function JsonUpload() {
                 nextActionHandler={handleNextAction}>
             </ActionInfoComponent>) || (
             schemaUploaded && viewSchema && !schemaPreview &&
-            <SchemaAttributes props={uploadedSchema} setschemaPreview={setschemaPreview}></SchemaAttributes>) || (
+            <SchemaAttributes
+                props={uploadedSchema}
+                setschemaPreview={setschemaPreview}
+                setUpdatedSchema={setUploadedSchema}>
+            </SchemaAttributes>) || (
             schemaPreview && 
             <div>
                 <TestAndPublish schema={uploadedSchema}/>

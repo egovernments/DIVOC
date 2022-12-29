@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import 'react-bootstrap';
 import {  Stack, Row, Table, Container,Button, Col } from "react-bootstrap";
 import styles from "./SchemaAttributes.module.css";
@@ -8,10 +8,11 @@ import {transformSchemaToAttributes} from "../../utils/schema.js"
 import Attribute  from "../Attribute/Attribute";
 import { Link } from "react-router-dom";
 import config from "../../config.json";
-function SchemaAttributes({props, setschemaPreview}){
+import {SCHEMA_STATUS} from "../../constants";
+function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema}){
     const { t } = useTranslation();
 
-    const Attributes = transformSchemaToAttributes(JSON.parse(props.schema));
+    const Attributes = attributes ? attributes : transformSchemaToAttributes(JSON.parse(props.schema));
     return (
         <div>
             <Container>
@@ -41,12 +42,12 @@ function SchemaAttributes({props, setschemaPreview}){
                 </Stack>
             </Container>
             <hr className="mt-5 mb-3"/>
-                { props.status === "DRAFT" && 
+                { (props.status === SCHEMA_STATUS.DRAFT || props.status === SCHEMA_STATUS.INPROGRESS) &&
                     <Row gutter='3' xs={1} sm={2} md={4} className="justify-content-end" >
                     <Link to={`${config.urlPath}/manage-schema`} reloadDocument={true}>
                         <GenericButton img={''} text='Save as Draft' type='button' form="schema-attributes" variant='outline-primary' />
                      </Link>
-                     <Col onClick={()=> setschemaPreview(true)}>
+                     <Col onClick={()=> {setschemaPreview(true)}}>
                         <GenericButton img={''} text='Test & Publish' type='button' form="schema-attributes" variant='primary' />
                     </Col>
                     </Row>  

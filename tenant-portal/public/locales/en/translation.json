@@ -141,5 +141,25 @@
     "exploreAPI": {
         "header": "Explore APIs",
         "body": "Click on the API URL below to test the API in swagger"
+    },
+    "manualSchema": {
+        "searchPlaceHolder": "Search",
+        "createAttribute": "Drag and drop a field type here to create a schema attribute",
+        "attributeSpecs": "Attribute Specs",
+        "values": "Values",
+        "value": "Value",
+        "label": "Label",
+        "labelPlaceHolder": "Enter the attribute name",
+        "placeholder": "Placeholder",
+        "defaultValuePlaceHolder": "Enter default value for the attribute",
+        "description": "Description",
+        "descriptionPlaceHolder": "Enter the description of attribute",
+        "mandatory": "Mandatory",
+        "indexed": "Indexed",
+        "unique": "Unique",
+        "identityInformation": "Identity Information",
+        "addAnother": "Add Another",
+        "remove": "Remove",
+        "save": "Save"
     }
 }

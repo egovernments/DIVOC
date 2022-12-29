@@ -1,13 +1,13 @@
 import React,{useState}  from "react";
 import styles from "./CreateSchema.module.css";
 import {useTranslation} from "react-i18next";
-import SchemaDetails from "../SchemaDetails/SchemaDetails"
 import upload_image from "../../assets/img/upload_image.png";
 import addVector from "../../assets/img/add-vector.svg";
 import uploadVector from "../../assets/img/upload-vector.svg";
 import {  Card, Col, Container , Image, Row, Stack } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import JsonUpload from "../JsonUpload/JsonUpload";
+import ManualSchemaCreationComponent from "../ManualSchemaCreationComponent/ManualSchemaCreationComponent";
 
 function CreateSchema(){
     const { t } = useTranslation();
@@ -69,7 +69,7 @@ return (
             </Row>               
         </Container>
     </div>}
-    {createSchemaInitialized && manuallyCreateSchema && <div><SchemaDetails/></div>}
+    {createSchemaInitialized && manuallyCreateSchema && <div><ManualSchemaCreationComponent/></div>}
     {createSchemaInitialized && jsonUploadSchema && <div><JsonUpload/></div>}
     
 </div>

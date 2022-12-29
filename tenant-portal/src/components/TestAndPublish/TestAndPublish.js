@@ -8,6 +8,7 @@ import PrintIcon from '../../assets/img/print.svg';
 import {getToken, getUserId} from '../../utils/keycloak';
 import { standardizeString, downloadPdf} from '../../utils/customUtils';
 import ToastComponent from "../ToastComponent/ToastComponent";
+import {SCHEMA_STATUS} from "../../constants";
 const axios = require('axios');
 const isoDatestringValidator = require('iso-datestring-validator')
 
@@ -16,7 +17,7 @@ const TestAndPublish = ({schema}) => {
     const { navigate } = useNavigate();
     const publish = async () => {
         const userToken = await getToken();
-        schema.status = "PUBLISHED"
+        schema.status = SCHEMA_STATUS.PUBLISHED
         const osid= schema.osid.slice(2);
         axios.put(`${config.schemaUrl}/${osid}`, schema, {headers:{"Authorization" :`Bearer ${userToken}`}})
         .then((res) => {navigate(config.urlPath + '/explore-api')})

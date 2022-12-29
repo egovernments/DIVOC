@@ -18,6 +18,7 @@ import InbuiltAttributesComponent from "./components/InbuiltAttributesComponent/
 import TestAndPublish from "./components/TestAndPublish/TestAndPublish";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ExploreApiComponent from "./components/ExploreApiComponent/ExploreApiComponent";
+import AddSchemaFieldComponent from "./components/AddSchemaFieldComponent/AddSchemaFieldComponent";
 
 function App() {
   const { initialized, keycloak } = useKeycloak();
