@@ -77,7 +77,7 @@ function SchemaAttributes({props, setschemaPreview}){
             
             <hr className="mt-5 mb-3"/>
                 { props.status === "DRAFT" && 
-                    <Row gutter='3' xs={1} sm={2} md={4} className="justify-content-end" >
+                    <Row gutter='3' xs={1} sm={2} md={4} className="justify-content-end pe-4" >
                     <Link to={`${config.urlPath}/manage-schema`} reloadDocument={true}>
                         <GenericButton img={''} text='Save as Draft' type='button' form="schema-attributes" variant='outline-primary' />
                      </Link>
