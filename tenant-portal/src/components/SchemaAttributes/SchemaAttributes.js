@@ -52,7 +52,7 @@ function SchemaAttributes({props, setschemaPreview}){
                             </Button>
                             <UploadTemplate {...{show, setShow, osid, setTemplateUploaded,showToast}}/>
                         </Col>
-                        <Col>
+                        <Col className={Object.keys(JSON.parse(props.schema)._osConfig.certificateTemplates).length===0? 'd-none': '' } >
                             <div onClick={()=>{setShowModal(true);}}>
                             <GenericButton text={t('schemaAttributesPage.manageTemplate')} variant="outline-primary" /></div>
                             {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={props}/>}
