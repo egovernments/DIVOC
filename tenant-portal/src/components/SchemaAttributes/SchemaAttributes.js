@@ -100,21 +100,25 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
         <div>
             <Container>
                 <Stack gap={3}>
-                    <Row className="justify-content-end" sm= {4}>
-                    <Col className={Object.keys(JSON.parse(props.schema)._osConfig?.certificateTemplates).length===0? 'd-none': '' } >
-                            <div onClick={()=>{setShowModal(true);}}>
-                            <GenericButton text={t('schemaAttributesPage.manageTemplate')} variant="outline-primary" /></div>
-                            {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={props}/>}
-                        </Col>
-                        <Col>
-                            <div onClick={() => setShow(true)}>
-                                <GenericButton text={t('schemaAttributesPage.uploadTemplate')} variant="primary"/>
-                            </div>
-                            <UploadTemplate {...{show, setShow, osid, setTemplateUploaded,showToast}}/>
-                        </Col>
+                    <Row className="justify-content-between align-items-center">
+                        <Container className="col-6">
+                            <Row className="title">{props.name}</Row>
+                            <Row>{props.description}</Row>
+                        </Container>
+                        <Row className="justify-content-end col-6">
+                            <Col className={props.schema && (props.status === SCHEMA_STATUS.DRAFT) && Object.keys(JSON.parse(props.schema)._osConfig?.certificateTemplates).length===0? 'd-none': '' } >
+                                <div onClick={()=>{setShowModal(true);}}>
+                                    <GenericButton text={t('schemaAttributesPage.manageTemplate')} variant="outline-primary" /></div>
+                                {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={props}/>}
+                            </Col>
+                            <Col>
+                                <div onClick={() => setShow(true)}>
+                                    <GenericButton text={t('schemaAttributesPage.uploadTemplate')} variant="primary"/>
+                                </div>
+                                <UploadTemplate {...{show, setShow, osid, setTemplateUploaded,showToast}}/>
+                            </Col>
+                        </Row>
                     </Row>
-                    <Row className="title">{props.name}</Row>
-                    <Row>{props.description}</Row>
                     <Row className="p-3 border overflow-auto d-xxl-inline-block">
                             <Row className="table-heading py-2">{t('schemaAttributesPage.fields')}</Row>
                             <Table className={styles["SchemaAttributesTable"]}>
