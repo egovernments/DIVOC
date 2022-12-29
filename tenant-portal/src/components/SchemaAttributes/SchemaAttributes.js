@@ -91,11 +91,6 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
             });
         })();
     }
-    const saveSchemaAsDraft = () => {
-        upsertSchema().then(() => {
-            navigate(`${config.urlPath}/manage-schema`);
-        })
-    }
     const testAndPublish = () => {
         upsertSchema().then(() => {
             setschemaPreview(true)
@@ -148,7 +143,7 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
             <hr className="mt-5 mb-3"/>
                 { (props.status === SCHEMA_STATUS.DRAFT || props.status === SCHEMA_STATUS.INPROGRESS) &&
                     <Row gutter='3' xs={1} sm={2} md={4} className="justify-content-end pe-4" >
-                    <Link to='/manage-schema' onClick={saveSchemaAsDraft} reloadLocation={true}>
+                    <Link to='/manage-schema' onClick={upsertSchema} reloadLocation={true}>
                         <GenericButton img={''} text='Save as Draft' type='button' form="schema-attributes" variant='outline-primary' />
                      </Link>
                      <Col onClick={testAndPublish}>
