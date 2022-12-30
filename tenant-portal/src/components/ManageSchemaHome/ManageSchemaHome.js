@@ -46,7 +46,7 @@ const ManageSchemaHome = () => {
     const modifyAttribute = (index, action, newDetails) => {
         switch (action) {
             case ATTRIBUTE_MODIFY_ACTIONS.DELETE:
-                attributes.slice(index, 1);
+                attributes.splice(index, 1);
                 setAttributes([...attributes]);
                 break;
             case ATTRIBUTE_MODIFY_ACTIONS.EDIT:

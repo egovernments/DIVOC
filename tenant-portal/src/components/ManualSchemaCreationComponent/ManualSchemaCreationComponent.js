@@ -39,7 +39,7 @@ function ManualSchemaCreationComponent() {
     const modifyAttribute = (index, action, newDetails) => {
         switch (action) {
             case ATTRIBUTE_MODIFY_ACTIONS.DELETE:
-                schemaDetails["properties"].slice(index, 1);
+                schemaDetails["properties"].splice(index, 1);
                 setSchemaDetails({...schemaDetails});
                 break;
             case ATTRIBUTE_MODIFY_ACTIONS.EDIT:
