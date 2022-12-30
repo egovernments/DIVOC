@@ -31,6 +31,7 @@ function ManualSchemaCreationComponent() {
         setCreateAttribute(false);
     }
 
+
     const createNewFieldInSchema = () => {
         setViewSchemaDetails(false);
         setCreateAttribute(true);
@@ -65,15 +66,15 @@ function ManualSchemaCreationComponent() {
         <div>
             {!createAttribute && <BreadcrumbComponent showBreadCrumb={true} />}
             {
-                !initialDetailsCreated &&
+                !initialDetailsCreated && !schemaPreview &&
                 <SchemaDetails addInitialSchemaDetails={updateInitialSchemaDetails}></SchemaDetails>
             }
             {
-                initialDetailsCreated && createAttribute &&
+                initialDetailsCreated && createAttribute && !schemaPreview &&
                 <AddSchemaFieldComponent addNewAttributeToSchema={addNewAttributeToSchema}></AddSchemaFieldComponent>
             }
             {
-                !createAttribute && viewSchemaDetails &&
+                !createAttribute && viewSchemaDetails && !schemaPreview &&
                 <SchemaAttributes
                     schemaDetails={schemaDetails}
                     attributes={schemaDetails["properties"]}
