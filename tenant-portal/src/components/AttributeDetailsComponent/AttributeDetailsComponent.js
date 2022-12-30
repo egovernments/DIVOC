@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState,useEffect} from "react";
 import {useTranslation} from "react-i18next";
 import styles from "./AttributeDetailsComponent.module.css"
 import {useDrop} from "react-dnd";
@@ -6,6 +6,7 @@ import {ATTRIBUTE_DATA_TYPES, DRAG_AND_DROP_TYPE} from "../../constants";
 import {Form, FormControl} from "react-bootstrap";
 import addIcon from "../../assets/img/add-icon.svg";
 import GenericButton from "../GenericButton/GenericButton";
+import {camelCase} from "../../utils/customUtils";
 
 function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabel, removeSelectedType, addNewAttributeToSchema}) {
     const {t} = useTranslation();
@@ -17,10 +18,11 @@ function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabe
     const [isUniqueIndex, setIsUniqueIndex] = useState(false);
     const [isIdentityInformation, setIsIdentityInformation] = useState(false);
     const [description, setDescription] = useState("");
-    const [readOnly, setReadOnly] = useState(true);
+    const [readOnly, setReadOnly] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [defaultValue, setDefaultValue] = useState("");
     const [enumValues, setEnumValues] = useState([""]);
+    const [error, setError] = useState("");
     const [{ canDrop, isOver }, drop] = useDrop(() => ({
         accept: DRAG_AND_DROP_TYPE,
         drop: () => ({ }),
@@ -42,14 +44,19 @@ function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabe
         setIsIndexField(false);
         setIsIdentityInformation(false);
         setDescription("");
-        setReadOnly(true);
+        setReadOnly(false);
         setEditMode(false);
         setDefaultValue("");
         setEnumValues([""]);
     }
     const saveAttributeDetails = () => {
+        if (!attributeLabel) {
+            setError("This is a required field");
+            setTimeout(() => {setError("")}, 3000)
+            return
+        }
         addNewAttributeToSchema({
-            "label": attributeLabel,
+            "label": camelCase(attributeLabel),
             "type": selectedAttributeType,
             "isMandatory": isMandatory,
             "isIndexField": isIndexField,
@@ -66,8 +73,11 @@ function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabe
         enumValues.push("");
         setEnumValues([...enumValues]);
     }
+    useEffect(() => {
+        setShowAttributeSpecs(true);
+    }, [selectedAttributeType]);
     return (
-        <div ref={drop} className="text-center h-100">
+        <div ref={drop} className="text-center">
             {!selectedAttributeType && <div style={{marginTop: "10rem"}} className={`d-flex flex-column justify-content-center ${styles['info-text']}`}>{t('manualSchema.createAttribute')}</div>}
             {selectedAttributeType &&
                 <div className="d-flex flex-column justify-content-center">
@@ -75,26 +85,28 @@ function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabe
                     <p className="title text-start">{selectedAttributeLabel}</p>
                     <div className="shadow-sm px-4 py-3 col-10 col-xl-9">
                         <div className="d-flex align-items-center justify-content-start">
-                            <p onClick={() => setShowAttributeSpecs(true)} className={`${styles['info-text']} me-5 cursor-pointer text-black`}>{t('manualSchema.attributeSpecs')}</p>
+                            <p onClick={() => setShowAttributeSpecs(true)} className={`${styles['section-header']} ${(showAttributeSpecs && (selectedAttributeType === ATTRIBUTE_DATA_TYPES.ENUM)) ? styles['active-heading'] : ''} me-5 cursor-pointer`}>{t('manualSchema.attributeSpecs')}</p>
                             {
                                 (selectedAttributeType === ATTRIBUTE_DATA_TYPES.ENUM) &&
-                                <p onClick={() => setShowAttributeSpecs(false)} className={`${styles['info-text']} cursor-pointer text-black`}>{t('manualSchema.value')}</p>
+                                <p onClick={() => setShowAttributeSpecs(false)} className={`${styles['section-header']} ${!showAttributeSpecs ? styles['active-heading'] : ''} cursor-pointer`}>{t('manualSchema.value')}</p>
                             }
                         </div>
                         {
                             showAttributeSpecs &&
                             <div className="d-flex align-items-start">
                                 <Form className="col-6 border-end pe-5 text-start">
-                                    <Form.Group className="mb-3" controlId="attributeSpecs.label">
+                                    <Form.Group controlId="attributeSpecs.label">
                                         <Form.Label className={styles['input-labels']}>{t('manualSchema.label')}</Form.Label>
                                         <Form.Control
                                             type="text"
                                             id="attributeName"
                                             placeholder={t('manualSchema.labelPlaceHolder')}
                                             value={attributeLabel}
+                                            required
                                             onChange={(e) => {setAttributeLabel(e.target.value)}} />
                                     </Form.Group>
-                                    <Form.Group className="mb-3" controlId="attributeSpecs.placeholder">
+                                    {error && <span className="text-danger">{error}</span>}
+                                    <Form.Group className="mt-3" controlId="attributeSpecs.placeholder">
                                         <Form.Label className={styles['input-labels']}>{t('manualSchema.placeholder')}</Form.Label>
                                         <Form.Control
                                             type="text"
@@ -103,7 +115,7 @@ function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabe
                                             value={defaultValue}
                                             onChange={(e) => {setDefaultValue(e.target.value)}}  />
                                     </Form.Group>
-                                    <Form.Group className="mb-3" controlId="attributeSpecs.description">
+                                    <Form.Group className="mt-3" controlId="attributeSpecs.description">
                                         <Form.Label className={styles['input-labels']}>{t('manualSchema.description')}</Form.Label>
                                         <Form.Control
                                             type="text"

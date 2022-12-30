@@ -8,6 +8,7 @@ function transformSchemaToAttributes (schema) {
     const requiredFields = schema?.definitions[name]?.required || [];
     const indexFields = schema?._osConfig?.indexFields || [];
     const uniqueIndex = schema?._osConfig?.uniqueIndexFields || [];
+    const credentialSubject = schema?._osConfig?.credentialTemplate?.credentialSubject
 
     var Attributes = [];
     labels.map((label) => {
@@ -18,8 +19,9 @@ function transformSchemaToAttributes (schema) {
             "isIndexField": indexFields.includes(label),
             "isUniqueIndex": uniqueIndex.includes(label),
             "description" : properties[label]?.description || "NA",
-            "readOnly": STANDARD_ATTRIBUTES.includes(label),
-            "editMode": false
+            "readOnly": STANDARD_ATTRIBUTES.findIndex(attr => (attr.toLowerCase() === label.toLowerCase())) !== -1,
+            "editMode": false,
+            "isIdentityInformation": credentialSubject?.hasOwnProperty(label)
         }
         Attributes.push(attribute)
     })

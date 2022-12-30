@@ -3,7 +3,15 @@
     font-weight: 700;
     font-size: 20px;
 }
+.section-header {
+     font-weight: 700;
+     font-size: 20px;
+ }
 .input-labels {
     font-size: 16px;
     font-weight: 500;
+}
+.active-heading {
+    color: #6493E0 !important;
+    border-bottom: 3px solid #6493E0;
 }
