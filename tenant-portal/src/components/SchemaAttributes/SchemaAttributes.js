@@ -26,6 +26,7 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
     const [show, setShow] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [templateUploaded, setTemplateUploaded] = useState(false);
+    const [showDeletToast, setshowDeleteToast] = useState("");
     const [toast,setToast] = useState("");
     const osid = props.osid;
     const Attributes = attributes ? attributes : transformSchemaToAttributes(JSON.parse(props.schema));
@@ -41,6 +42,18 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
                 case "FAILED":
                     setToast(<div className="d-flex justify-content-center">
                         <ToastComponent header={<div className="d-flex gap-3"><img src={failedAlert}/><div>{t('schemaAttributesPage.templateUploadFailed')}</div></div>}
+                            headerClassName={`${styles['toastHeaderFailed']}  `} toastClass="w-100" toastContainerClass={`${styles['templateToast']} w-50`} />
+                    </div>)
+                    break;
+                case "DELETE_SUCCESS":
+                    setToast(<div className="d-flex justify-content-center">
+                        <ToastComponent header={<div className="d-flex gap-3"><img src={successCheckmark}/><div>{t('schemaAttributesPage.deleteTemplateSuccess')}</div></div>}
+                            headerClassName={`${styles['toastHeaderSuccess']}  `} toastClass="w-100" toastContainerClass={`${styles['templateToast']} w-50`} />
+                    </div>)
+                    break;
+                case "DELETE_FAILED":
+                    setToast(<div className="d-flex justify-content-center">
+                        <ToastComponent header={<div className="d-flex gap-3"><img src={failedAlert}/><div>{t('schemaAttributesPage.deleteTemplateFailed')}</div></div>}
                             headerClassName={`${styles['toastHeaderFailed']}  `} toastClass="w-100" toastContainerClass={`${styles['templateToast']} w-50`} />
                     </div>)
                     break;
@@ -117,23 +130,27 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
             <Container>
                 <Stack gap={3}>
                     <Row className="justify-content-between align-items-center">
-                        <Container className="col-6">
+                        <Container className="col-4">
                             <Row className="title">{props.name}</Row>
                             <Row>{props.description}</Row>
                         </Container>
-                        <Row className="justify-content-end col-6">
-                            <Col className={props.schema && (props.status === SCHEMA_STATUS.DRAFT) && Object.keys(JSON.parse(props.schema)._osConfig?.certificateTemplates).length===0? 'd-none': '' } >
-                                <div onClick={()=>{setShowModal(true);}}>
-                                    <GenericButton text={t('schemaAttributesPage.manageTemplate')} variant="outline-primary" /></div>
-                                {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={props}/>}
+                        {props.status==="DRAFT" &&
+                          <Row className="justify-content-end col-8" xs={2}>
+                            <Col className={props.schema && (props.status === SCHEMA_STATUS.DRAFT) && 
+                                JSON.parse(props.schema)?._osConfig && JSON.parse(props.schema)._osConfig?.certificateTemplates && 
+                                Object.keys(JSON.parse(props.schema)._osConfig?.certificateTemplates).length===0? 'd-none': '' } >
+                            <div onClick={()=>{setShowModal(true);}}>
+                                    <GenericButton text={t('schemaAttributesPage.manageTemplate')} variant="outline-primary border-0" /></div>
+                                {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={props} showToast={showToast} />}
+                                                        
                             </Col>
                             <Col>
                                 <div onClick={() => setShow(true)}>
-                                    <GenericButton text={t('schemaAttributesPage.uploadTemplate')} variant="primary"/>
+                                    <GenericButton text={t('schemaAttributesPage.uploadTemplate')} variant="outline-primary"/>
                                 </div>
                                 <UploadTemplate {...{show, setShow, osid, setTemplateUploaded,showToast}}/>
                             </Col>
-                        </Row>
+                        </Row> }
                     </Row>
                     <Row className="p-3 border overflow-auto d-xxl-inline-block">
                             <Row className="table-heading py-2">{t('schemaAttributesPage.fields')}</Row>
@@ -159,6 +176,7 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
             </Container>
             
                 {toast}
+                {showDeletToast}
             
             <hr className="mt-5 mb-3"/>
                 { (props.status === SCHEMA_STATUS.DRAFT || props.status === SCHEMA_STATUS.INPROGRESS) &&

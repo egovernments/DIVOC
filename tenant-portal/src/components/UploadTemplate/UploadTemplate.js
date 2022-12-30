@@ -57,6 +57,9 @@ function UploadTemplate(props){
         });
         
         props.setShow(false);
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
     }
     return (
         <>
@@ -86,7 +89,7 @@ function UploadTemplate(props){
                 </Modal.Body>
                 <Modal.Footer className="justify-content-center">
                 <Row className="w-100">
-                    <Col><Button variant="outline-primary" onClick={() => {props.setShow(false)}}>
+                    <Col><Button variant="outline-primary" onClick={() => {props.setShow(false);}}>
                             {t('templateUpload.close')}
                         </Button></Col>
                     <Col><Button variant="primary" onClick={saveTemplate}>
