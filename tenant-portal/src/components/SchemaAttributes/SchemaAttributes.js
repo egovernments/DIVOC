@@ -132,17 +132,17 @@ function SchemaAttributes({schemaDetails, setschemaPreview, attributes, setUpdat
                 <Stack gap={3}>
                     <Row className="justify-content-between align-items-center">
                         <Container className="col-4">
-                            <Row className="title">{props.name}</Row>
-                            <Row>{props.description}</Row>
+                            <Row className="title">{schemaDetails.name}</Row>
+                            <Row>{schemaDetails.description}</Row>
                         </Container>
-                        {props.status==="DRAFT" &&
+                        {schemaDetails.status===SCHEMA_STATUS.DRAFT &&
                           <Row className="justify-content-end col-8" xs={2}>
-                            <Col className={props.schema && (props.status === SCHEMA_STATUS.DRAFT) &&
-                                JSON.parse(props.schema)?._osConfig && JSON.parse(props.schema)._osConfig?.certificateTemplates &&
-                                Object.keys(JSON.parse(props.schema)._osConfig?.certificateTemplates).length===0? 'd-none': '' } >
+                            <Col className={schemaDetails.schema && (schemaDetails.status === SCHEMA_STATUS.DRAFT) &&
+                                JSON.parse(schemaDetails.schema)?._osConfig && JSON.parse(schemaDetails.schema)._osConfig?.certificateTemplates &&
+                                Object.keys(JSON.parse(schemaDetails.schema)._osConfig?.certificateTemplates).length===0? 'd-none': '' } >
                             <div onClick={()=>{setShowModal(true);}}>
                                     <GenericButton text={t('schemaAttributesPage.manageTemplate')} variant="outline-primary border-0" /></div>
-                                {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={props} showToast={showToast} />}
+                                {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={schemaDetails} showToast={showToast} />}
 
                             </Col>
                             <Col>
