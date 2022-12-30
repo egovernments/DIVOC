@@ -1,5 +1,3 @@
-import {useTranslation} from "react-i18next";
-import {standardizeString} from '../../utils/customUtils';
 import deleteIcon from '../../assets/img/Delete.svg';
 import editIcon from '../../assets/img/Edit.svg';
 import doneIcon from '../../assets/img/done.svg';
@@ -33,7 +31,7 @@ function Attribute(props) {
             <td className="table-text-col">
                 {
                     props.schemaAttribute.editMode ? 
-                        <input className="py-1 px-2 border rounded-1" type="text" value={label} onChange={(e) => setLabel(e.target.value)} /> : standardizeString(label)
+                        <input className="py-1 px-2 border rounded-1" type="text" value={label} onChange={(e) => setLabel(e.target.value)} /> : label
                 }
             </td>
             <td className="text-center table-text-col">

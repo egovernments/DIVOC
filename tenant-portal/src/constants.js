@@ -20,7 +20,7 @@ const SCHEMA_PAYLOAD = {
             "isIdentityInformation": false
         },
         {
-            "label": "Issuer",
+            "label": "issuer",
             "type": "string",
             "isMandatory": true,
             "isIndexField": false,
@@ -31,7 +31,7 @@ const SCHEMA_PAYLOAD = {
             "isIdentityInformation": false
         },
         {
-            "label": "Certificate ID",
+            "label": "certificateId",
             "type": "string",
             "isMandatory": true,
             "isIndexField": true,
@@ -42,7 +42,7 @@ const SCHEMA_PAYLOAD = {
             "isIdentityInformation": false
         },
         {
-            "label": "Valid From",
+            "label": "validTill",
             "type": "string",
             "isMandatory": false,
             "isIndexField": false,
@@ -53,7 +53,7 @@ const SCHEMA_PAYLOAD = {
             "isIdentityInformation": false
         },
         {
-            "label": "Valid To",
+            "label": "validTill",
             "type": "string",
             "isMandatory": false,
             "isIndexField": false,
@@ -79,7 +79,7 @@ const INBUILT_ATTRIBUTES =  [
         "isIdentityInformation": false
     },
     {
-        "label": "Issuer",
+        "label": "issuer",
         "type": "string",
         "isMandatory": true,
         "isIndexField": false,
@@ -90,7 +90,7 @@ const INBUILT_ATTRIBUTES =  [
         "isIdentityInformation": false
     },
     {
-        "label": "Certificate ID",
+        "label": "certificateId",
         "type": "string",
         "isMandatory": true,
         "isIndexField": true,
@@ -101,7 +101,7 @@ const INBUILT_ATTRIBUTES =  [
         "isIdentityInformation": false
     },
     {
-        "label": "Valid From",
+        "label": "validFrom",
         "type": "string",
         "isMandatory": false,
         "isIndexField": false,
@@ -112,7 +112,7 @@ const INBUILT_ATTRIBUTES =  [
         "isIdentityInformation": false
     },
     {
-        "label": "Valid To",
+        "label": "validTill",
         "type": "string",
         "isMandatory": false,
         "isIndexField": false,

@@ -6,6 +6,7 @@ import {ATTRIBUTE_DATA_TYPES, DRAG_AND_DROP_TYPE} from "../../constants";
 import {Form, FormControl} from "react-bootstrap";
 import addIcon from "../../assets/img/add-icon.svg";
 import GenericButton from "../GenericButton/GenericButton";
+import {camelCase} from "../../utils/customUtils";
 
 function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabel, removeSelectedType, addNewAttributeToSchema}) {
     const {t} = useTranslation();
@@ -21,6 +22,7 @@ function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabe
     const [editMode, setEditMode] = useState(false);
     const [defaultValue, setDefaultValue] = useState("");
     const [enumValues, setEnumValues] = useState([""]);
+    const [error, setError] = useState("");
     const [{ canDrop, isOver }, drop] = useDrop(() => ({
         accept: DRAG_AND_DROP_TYPE,
         drop: () => ({ }),
@@ -48,8 +50,13 @@ function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabe
         setEnumValues([""]);
     }
     const saveAttributeDetails = () => {
+        if (!attributeLabel) {
+            setError("This is a required field");
+            setTimeout(() => {setError("")}, 3000)
+            return
+        }
         addNewAttributeToSchema({
-            "label": attributeLabel,
+            "label": camelCase(attributeLabel),
             "type": selectedAttributeType,
             "isMandatory": isMandatory,
             "isIndexField": isIndexField,
@@ -88,16 +95,18 @@ function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabe
                             showAttributeSpecs &&
                             <div className="d-flex align-items-start">
                                 <Form className="col-6 border-end pe-5 text-start">
-                                    <Form.Group className="mb-3" controlId="attributeSpecs.label">
+                                    <Form.Group controlId="attributeSpecs.label">
                                         <Form.Label className={styles['input-labels']}>{t('manualSchema.label')}</Form.Label>
                                         <Form.Control
                                             type="text"
                                             id="attributeName"
                                             placeholder={t('manualSchema.labelPlaceHolder')}
                                             value={attributeLabel}
+                                            required
                                             onChange={(e) => {setAttributeLabel(e.target.value)}} />
                                     </Form.Group>
-                                    <Form.Group className="mb-3" controlId="attributeSpecs.placeholder">
+                                    {error && <span className="text-danger">{error}</span>}
+                                    <Form.Group className="mt-3" controlId="attributeSpecs.placeholder">
                                         <Form.Label className={styles['input-labels']}>{t('manualSchema.placeholder')}</Form.Label>
                                         <Form.Control
                                             type="text"
@@ -106,7 +115,7 @@ function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabe
                                             value={defaultValue}
                                             onChange={(e) => {setDefaultValue(e.target.value)}}  />
                                     </Form.Group>
-                                    <Form.Group className="mb-3" controlId="attributeSpecs.description">
+                                    <Form.Group className="mt-3" controlId="attributeSpecs.description">
                                         <Form.Label className={styles['input-labels']}>{t('manualSchema.description')}</Form.Label>
                                         <Form.Control
                                             type="text"

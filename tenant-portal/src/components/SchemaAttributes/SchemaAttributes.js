@@ -36,25 +36,25 @@ function SchemaAttributes({schemaDetails, setschemaPreview, attributes, setUpdat
                 case "SUCCESS":
                     setToast(<div className="d-flex justify-content-center">
                         <ToastComponent header={<div className="d-flex gap-3"><img src={successCheckmark}/><div>{t('schemaAttributesPage.templateUploadSuccess')}</div></div>}
-                            headerClassName={`${styles['toastHeaderSuccess']}  `} toastClass="w-100" toastContainerClass={`${styles['templateToast']} w-50`} />
+                            headerClassName={`${styles['toastHeaderSuccess']}  `} toastClass="w-100" className={`${styles['templateToast']} w-50`} />
                         </div>)
                     break;
                 case "FAILED":
                     setToast(<div className="d-flex justify-content-center">
                         <ToastComponent header={<div className="d-flex gap-3"><img src={failedAlert}/><div>{t('schemaAttributesPage.templateUploadFailed')}</div></div>}
-                            headerClassName={`${styles['toastHeaderFailed']}  `} toastClass="w-100" toastContainerClass={`${styles['templateToast']} w-50`} />
+                            headerClassName={`${styles['toastHeaderFailed']}  `} toastClass="w-100" className={`${styles['templateToast']} w-50`} />
                     </div>)
                     break;
                 case "DELETE_SUCCESS":
                     setToast(<div className="d-flex justify-content-center">
                         <ToastComponent header={<div className="d-flex gap-3"><img src={successCheckmark}/><div>{t('schemaAttributesPage.deleteTemplateSuccess')}</div></div>}
-                            headerClassName={`${styles['toastHeaderSuccess']}  `} toastClass="w-100" toastContainerClass={`${styles['templateToast']} w-50`} />
+                            headerClassName={`${styles['toastHeaderSuccess']}  `} toastClass="w-100" className={`${styles['templateToast']} w-50`} />
                     </div>)
                     break;
                 case "DELETE_FAILED":
                     setToast(<div className="d-flex justify-content-center">
                         <ToastComponent header={<div className="d-flex gap-3"><img src={failedAlert}/><div>{t('schemaAttributesPage.deleteTemplateFailed')}</div></div>}
-                            headerClassName={`${styles['toastHeaderFailed']}  `} toastClass="w-100" toastContainerClass={`${styles['templateToast']} w-50`} />
+                            headerClassName={`${styles['toastHeaderFailed']}  `} toastClass="w-100" className={`${styles['templateToast']} w-50`} />
                     </div>)
                     break;
                 default: setToast("")

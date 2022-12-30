@@ -19,6 +19,15 @@ function SchemaDetails({addInitialSchemaDetails}) {
     const {t} = useTranslation()
     const [schemaName, setSchemaName] = useState("");
     const [schemaDescription, setSchemaDescription] = useState("");
+    const [error, setError] = useState("");
+    const saveDetails = () => {
+        if (!schemaName) {
+            setError("This is a required field");
+            setTimeout(() => {setError("")}, 3000)
+            return
+        }
+        addInitialSchemaDetails(schemaName, schemaDescription)
+    }
 
     return(
         <div>
@@ -27,7 +36,7 @@ function SchemaDetails({addInitialSchemaDetails}) {
                     <Col md={6}>
                         <Row className="title gx-0">{t('createSchema.title')}</Row>
                         <Form id="schema-details"   >
-                            <FormGroup className="py-3">
+                            <FormGroup>
                                 <Form.Label className="input-label">{t('schemaDetails.label1')}</Form.Label>
                                 <FormControl
                                     id="name"
@@ -36,6 +45,7 @@ function SchemaDetails({addInitialSchemaDetails}) {
                                     onChange={(e) => setSchemaName(e.target.value)}
                                     value={schemaName}/>
                             </FormGroup>
+                            {error && <p className="text-danger">{error}</p>}
                             <FormGroup className="py-3">
                                 <Form.Label className="input-label">{t('schemaDetails.label2')}<span className="secondary-label">{t('schemaDetails.labelOptional')}</span></Form.Label>
                                 <FormControl
@@ -54,7 +64,7 @@ function SchemaDetails({addInitialSchemaDetails}) {
                 
             </Container>
             <Row className="custom-footer justify-content-end w-100 gx-0 p-4" >
-                <div onClick={() => {addInitialSchemaDetails(schemaName, schemaDescription)}} className="text-end">
+                <div onClick={saveDetails} className="text-end">
                     <GenericButton img={''} text='Save' type='button' form="schema-details" variant='primary' styles={{width:"15%"}}/>
                 </div>
             </Row>

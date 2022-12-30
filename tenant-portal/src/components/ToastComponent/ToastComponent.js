@@ -8,7 +8,7 @@ const ToastComponent = (props) => {
     const toggleShow = () => setShowToast(!showToast);
   return (
     <>
-    <ToastContainer position={props.position} className={props.toastContainerClass}>
+    <ToastContainer position={props.position} className={props.className}>
         <Toast onClose={toggleShow} bg={props.variant} show={showToast}
             delay = {props.delay? props.delay: 3000} className={props.toastClass}>
              <Toast.Header className={props.headerClassName}>

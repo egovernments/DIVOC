@@ -1,8 +1,9 @@
 const sunbirdRegistryService = require('../services/sunbird.service');
 const {getFormData, isValidTenantName} = require('../utils/utils');
 const {TENANT_NAME,MINIO_REGISTRY_BUCKET,IS_MINIO,MINIO_PORT,MINIO_URL,MINIO_USESSL,MINIO_ACCESSKEY,MINIO_SECRETKEY} = require("../configs/config");
-const {MINIO_URL_SCHEME, SUNBIRD_SCHEMA_ADD_URL, SUNBIRD_SCHEMA_UPDATE_URL, SUNBIRD_GET_SCHEMA_URL} = require("../configs/constants");
+const { HTTP_URI_PREFIX, HTTPS_URI_PREFIX} = require("../configs/constants");
 const minio = require('minio');
+const axios = require('axios');
 
 let minioClient;
 (async function() {
@@ -56,11 +57,23 @@ async function uploadTemplate(req, res) {
 
 async function getTemplate(req, res) {
     const {template} = req.query;
-    let templateSignedUrl = await minioClient.presignedGetObject(MINIO_REGISTRY_BUCKET, template, 24*60*60);
-    const data = await sunbirdRegistryService.getTemplate(templateSignedUrl);
-    res.status(200).json({
-        htmlData: data.data
-    });
+    let templateSignedUrl = "";
+    if (template.startsWith(HTTP_URI_PREFIX) || template.startsWith(HTTPS_URI_PREFIX)) {
+        templateSignedUrl = template;
+        const data = await axios.get(templateSignedUrl);
+        res.status(200).json({
+            htmlData: data.data
+        });
+        console.log("templateSignedUrl : ",templateSignedUrl)
+
+    } else {
+        templateSignedUrl = await minioClient.presignedGetObject(MINIO_REGISTRY_BUCKET, template?.split("://")[1], 24*60*60);
+        console.log("templateSignedUrl : ",templateSignedUrl)
+        const data = await sunbirdRegistryService.getTemplate(templateSignedUrl);
+        res.status(200).json({
+            htmlData: data.data
+        });
+    }
     return;
 }
 module.exports = {
