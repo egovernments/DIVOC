@@ -171,7 +171,7 @@
         "label": "Label",
         "labelPlaceHolder": "Enter the attribute name",
         "placeholder": "Placeholder",
-        "defaultValuePlaceHolder": "Enter default value for the attribute",
+        "defaultValuePlaceHolder": "Enter default value for attribute",
         "description": "Description",
         "descriptionPlaceHolder": "Enter the description of attribute",
         "mandatory": "Mandatory",

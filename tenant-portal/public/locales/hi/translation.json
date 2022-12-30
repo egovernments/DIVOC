@@ -160,5 +160,25 @@
         "body": "स्वैगर में एपीआई का परीक्षण करने के लिए नीचे दिए गए एपीआई यूआरएल पर क्लिक करें",
         "home": "घर",
         "testAnother": "एक और परीक्षण करें"
+    },
+    "manualSchema": {
+        "searchPlaceHolder": "खोज",
+        "createAttribute": "स्कीमा विशेषता बनाने के लिए फ़ील्ड प्रकार को यहाँ खींचें और छोड़ें",
+        "attributeSpecs": "विशेषता चश्मा",
+        "values": "मूल्यों",
+        "value": "कीमत",
+        "label": "लेबल",
+        "labelPlaceHolder": "विशेषता नाम दर्ज करें",
+        "placeholder": "प्लेसहोल्डर",
+        "defaultValuePlaceHolder": "विशेषता के लिए डिफ़ॉल्ट मान दर्ज करें",
+        "description": "विवरण",
+        "descriptionPlaceHolder": "विशेषता का विवरण दर्ज करें",
+        "mandatory": "अनिवार्य",
+        "indexed": "इंडेक्स किए गए",
+        "unique": "अद्वितीय",
+        "identityInformation": "पहचान की जानकारी",
+        "addAnother": "एक और जोड़ें",
+        "remove": "हटाना",
+        "save": "सहेजें"
     }
 }

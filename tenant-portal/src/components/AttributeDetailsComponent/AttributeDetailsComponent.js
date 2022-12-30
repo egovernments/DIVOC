@@ -70,7 +70,7 @@ function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabe
         setShowAttributeSpecs(true);
     }, [selectedAttributeType]);
     return (
-        <div ref={drop} className="text-center h-100">
+        <div ref={drop} className="text-center">
             {!selectedAttributeType && <div style={{marginTop: "10rem"}} className={`d-flex flex-column justify-content-center ${styles['info-text']}`}>{t('manualSchema.createAttribute')}</div>}
             {selectedAttributeType &&
                 <div className="d-flex flex-column justify-content-center">

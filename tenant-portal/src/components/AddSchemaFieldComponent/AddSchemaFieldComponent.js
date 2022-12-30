@@ -17,7 +17,7 @@ function AddSchemaFieldComponent({addNewAttributeToSchema}) {
     }
 
     return (
-        <div className="d-flex position-absolute h-75 w-100 border-top">
+        <div className="d-flex position-absolute h-100 w-100">
             <DndProvider backend={HTML5Backend}>
                 <Col className="col-3 pt-3 border-end">
                     <SchemaAttributeTypesComponent selectAttributeType={selectAttributeType}></SchemaAttributeTypesComponent>
