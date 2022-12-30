@@ -15,12 +15,13 @@ import UploadTemplate from "../UploadTemplate/UploadTemplate";
 import ToastComponent from "../ToastComponent/ToastComponent";
 import successCheckmark from "../../assets/img/success_check_transparent.svg";
 import failedAlert from "../../assets/img/alert_check_transparent.svg";
+import addIcon from "../../assets/img/add-icon.svg";
 import config from "../../config.json";
 import ManageTempModal from "../ManageTempModal/ManageTempModal";
 import {getToken} from '../../utils/keycloak';
 import {CONTEXT_BODY, SAMPLE_TEMPLATE_WITH_QR, SCHEMA_BODY, SCHEMA_STATUS, W3C_CONTEXT} from "../../constants";
 import axios from "axios";
-function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema}){
+function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema, createNewFieldInSchema}){
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [show, setShow] = useState(false);
@@ -28,7 +29,6 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
     const [templateUploaded, setTemplateUploaded] = useState(false);
     const [toast,setToast] = useState("");
     const osid = props.osid;
-    const Attributes = attributes ? attributes : transformSchemaToAttributes(JSON.parse(props.schema));
 
     const showToast = (status) => {
             switch (status) {
@@ -58,7 +58,7 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
             certificateTemplates: {
                 html : SAMPLE_TEMPLATE_WITH_QR
             },
-            Attributes: Attributes
+            Attributes: attributes
         }
         const currentContext = transformAttributesToContext(currentSchema, CONTEXT_BODY);
 
@@ -122,7 +122,7 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
                             <Row>{props.description}</Row>
                         </Container>
                         <Row className="justify-content-end col-6">
-                            <Col className={props.schema && (props.status === SCHEMA_STATUS.DRAFT) && Object.keys(JSON.parse(props.schema)._osConfig?.certificateTemplates).length===0? 'd-none': '' } >
+                            <Col className={props.schema && (props.status === SCHEMA_STATUS.DRAFT) && JSON.parse(props.schema)._osConfig?.certificateTemplates && Object.keys(JSON.parse(props.schema)._osConfig?.certificateTemplates).length===0? 'd-none': '' } >
                                 <div onClick={()=>{setShowModal(true);}}>
                                     <GenericButton text={t('schemaAttributesPage.manageTemplate')} variant="outline-primary" /></div>
                                 {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={props}/>}
@@ -136,24 +136,29 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
                         </Row>
                     </Row>
                     <Row className="p-3 border overflow-auto d-xxl-inline-block">
-                            <Row className="table-heading py-2">{t('schemaAttributesPage.fields')}</Row>
-                            <Table className={styles["SchemaAttributesTable"]}>
-                                <thead className="table-col-header">
-                                    <th>{t('schemaAttributesPage.label')}</th>
-                                    <th>{t('schemaAttributesPage.fieldType')}</th>
-                                    <th className="text-center">{t('schemaAttributesPage.mandatory')}</th>
-                                    <th className="text-center">{t('schemaAttributesPage.indexed')}</th>
-                                    <th className="text-center">{t('schemaAttributesPage.unique')}</th>
-                                    <th>{t('schemaAttributesPage.description')}</th>
-                                </thead>
-                                <tbody>
+                        <Row className="table-heading py-2">{t('schemaAttributesPage.fields')}</Row>
+                        <Table className={styles["SchemaAttributesTable"]}>
+                            <thead className="table-col-header">
+                                <th>{t('schemaAttributesPage.label')}</th>
+                                <th>{t('schemaAttributesPage.fieldType')}</th>
+                                <th className="text-center">{t('schemaAttributesPage.mandatory')}</th>
+                                <th className="text-center">{t('schemaAttributesPage.indexed')}</th>
+                                <th className="text-center">{t('schemaAttributesPage.unique')}</th>
+                                <th className="text-center">{t('schemaAttributesPage.identityInformation')}</th>
+                                <th>{t('schemaAttributesPage.description')}</th>
+                            </thead>
+                            <tbody>
                                 {
-                                    Attributes.map((attribute) => {
+                                    attributes?.map((attribute) => {
                                         return <Attribute schemaAttribute={attribute}></Attribute>
                                     })
                                 }
-                                </tbody>
-                            </Table>
+                            </tbody>
+                        </Table>
+                        <div className="d-flex justify-content-center align-items-center my-3" onClick={createNewFieldInSchema}>
+                            <img src={addIcon} alt="add icon" className="me-1"/>
+                            <span className={styles['action-text']}>{t('schemaAttributesPage.addField')}</span>
+                        </div>
                     </Row>
                 </Stack>
             </Container>

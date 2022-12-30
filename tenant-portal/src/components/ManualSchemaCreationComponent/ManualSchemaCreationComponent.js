@@ -30,6 +30,11 @@ function ManualSchemaCreationComponent() {
         setCreateAttribute(false);
     }
 
+    const createNewFieldInSchema = () => {
+        setViewSchemaDetails(false);
+        setCreateAttribute(true);
+    }
+
     return (
         <div>
             {
@@ -46,7 +51,8 @@ function ManualSchemaCreationComponent() {
                     props={schemaDetails}
                     attributes={schemaDetails["properties"]}
                     setschemaPreview={setSchemaPreview}
-                    setUpdatedSchema={setUploadedSchema}></SchemaAttributes>
+                    setUpdatedSchema={setUploadedSchema}
+                    createNewFieldInSchema={createNewFieldInSchema}></SchemaAttributes>
             }
             {
                 schemaPreview &&

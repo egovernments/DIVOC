@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState,useEffect} from "react";
 import {useTranslation} from "react-i18next";
 import styles from "./AttributeDetailsComponent.module.css"
 import {useDrop} from "react-dnd";
@@ -66,6 +66,9 @@ function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabe
         enumValues.push("");
         setEnumValues([...enumValues]);
     }
+    useEffect(() => {
+        setShowAttributeSpecs(true);
+    }, [selectedAttributeType]);
     return (
         <div ref={drop} className="text-center h-100">
             {!selectedAttributeType && <div style={{marginTop: "10rem"}} className={`d-flex flex-column justify-content-center ${styles['info-text']}`}>{t('manualSchema.createAttribute')}</div>}
@@ -75,10 +78,10 @@ function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabe
                     <p className="title text-start">{selectedAttributeLabel}</p>
                     <div className="shadow-sm px-4 py-3 col-10 col-xl-9">
                         <div className="d-flex align-items-center justify-content-start">
-                            <p onClick={() => setShowAttributeSpecs(true)} className={`${styles['info-text']} me-5 cursor-pointer text-black`}>{t('manualSchema.attributeSpecs')}</p>
+                            <p onClick={() => setShowAttributeSpecs(true)} className={`${styles['section-header']} ${(showAttributeSpecs && (selectedAttributeType === ATTRIBUTE_DATA_TYPES.ENUM)) ? styles['active-heading'] : ''} me-5 cursor-pointer`}>{t('manualSchema.attributeSpecs')}</p>
                             {
                                 (selectedAttributeType === ATTRIBUTE_DATA_TYPES.ENUM) &&
-                                <p onClick={() => setShowAttributeSpecs(false)} className={`${styles['info-text']} cursor-pointer text-black`}>{t('manualSchema.value')}</p>
+                                <p onClick={() => setShowAttributeSpecs(false)} className={`${styles['section-header']} ${!showAttributeSpecs ? styles['active-heading'] : ''} cursor-pointer`}>{t('manualSchema.value')}</p>
                             }
                         </div>
                         {

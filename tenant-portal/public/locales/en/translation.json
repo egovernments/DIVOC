@@ -56,6 +56,8 @@
         "mandatory": "Mandatory",
         "indexed": "Indexed",
         "unique": "Unique",
+        "identityInformation": "Person Information",
+        "addField": "Add Field",
         "description": "Description",
         "action": "Action",
         "fields": "Fields",

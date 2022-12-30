@@ -38,6 +38,9 @@ function Attribute(props) {
             <td className="text-center">
                 <input className="custom-cb" type="checkbox" id="uniqueAttribute" name="uniqueAttribute" checked={props.schemaAttribute.isUniqueIndex}/>
             </td>
+            <td className="text-center">
+                <input className="custom-cb" type="checkbox" id="identityInformation" name="identityInformation" checked={props.schemaAttribute.isIdentityInformation}/>
+            </td>
             <td>
                 {
                     props.schemaAttribute.editMode ? 

@@ -16,7 +16,8 @@ const SCHEMA_PAYLOAD = {
             "isUniqueIndex": false,
             "description": "Date certificate issued on",
             "readOnly": true,
-            "editMode": false
+            "editMode": false,
+            "isIdentityInformation": false
         },
         {
             "label": "Issuer",
@@ -26,7 +27,8 @@ const SCHEMA_PAYLOAD = {
             "isUniqueIndex": false,
             "description": "Name of the issuing authority",
             "readOnly": true,
-            "editMode": false
+            "editMode": false,
+            "isIdentityInformation": false
         },
         {
             "label": "Certificate ID",
@@ -47,7 +49,8 @@ const SCHEMA_PAYLOAD = {
             "isUniqueIndex": false,
             "description": "The date from which the credential is valid from",
             "readOnly": true,
-            "editMode": false
+            "editMode": false,
+            "isIdentityInformation": false
         },
         {
             "label": "Valid To",
@@ -57,7 +60,8 @@ const SCHEMA_PAYLOAD = {
             "isUniqueIndex": false,
             "description": "The date until which the credential is valid to",
             "readOnly": true,
-            "editMode": false
+            "editMode": false,
+            "isIdentityInformation": false
         }
     ]
 }
@@ -71,7 +75,8 @@ const INBUILT_ATTRIBUTES =  [
         "isUniqueIndex": false,
         "description": "Date certificate issued on",
         "readOnly": true,
-        "editMode": false
+        "editMode": false,
+        "isIdentityInformation": false
     },
     {
         "label": "Issuer",
@@ -81,7 +86,8 @@ const INBUILT_ATTRIBUTES =  [
         "isUniqueIndex": false,
         "description": "Name of the issuing authority",
         "readOnly": true,
-        "editMode": false
+        "editMode": false,
+        "isIdentityInformation": false
     },
     {
         "label": "Certificate ID",
@@ -92,6 +98,7 @@ const INBUILT_ATTRIBUTES =  [
         "description": "The unique Certificate ID",
         "readOnly": true,
         "editMode": false,
+        "isIdentityInformation": false
     },
     {
         "label": "Valid From",
@@ -101,7 +108,8 @@ const INBUILT_ATTRIBUTES =  [
         "isUniqueIndex": false,
         "description": "The date from which the credential is valid from",
         "readOnly": true,
-        "editMode": false
+        "editMode": false,
+        "isIdentityInformation": false
     },
     {
         "label": "Valid To",
@@ -111,7 +119,8 @@ const INBUILT_ATTRIBUTES =  [
         "isUniqueIndex": false,
         "description": "The date until which the credential is valid to",
         "readOnly": true,
-        "editMode": false
+        "editMode": false,
+        "isIdentityInformation": false
     }
 ]
 const SAMPLE_TEMPLATE_WITH_QR = 'https://gist.githubusercontent.com/saiprakash-v/c5aa3d97de95806669b4ea26ec54bd55/raw/9f38b9c6d3e458e7facb658dbb3cb661af9664fb/templateWithOnlyQR.html'

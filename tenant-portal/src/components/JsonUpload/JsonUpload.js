@@ -14,6 +14,8 @@ import SchemaAttributes from "../SchemaAttributes/SchemaAttributes";
 import TestAndPublish from "../TestAndPublish/TestAndPublish";
 import ToastComponent from "../ToastComponent/ToastComponent";
 import {SCHEMA_STATUS} from "../../constants";
+import AddSchemaFieldComponent from "../AddSchemaFieldComponent/AddSchemaFieldComponent";
+import {transformSchemaToAttributes} from "../../utils/schema";
 function JsonUpload() {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -26,6 +28,8 @@ function JsonUpload() {
     const [viewSchema, setViewSchema] = useState(false);
     const [uploadedSchema, setUploadedSchema] = useState(null);
     const [toast, setToast] = useState("");
+    const [createAttribute, setCreateAttribute] = useState(false);
+    const [attributes, setAttributes] = useState([]);
     const handleFileUpload = (e) => {
         e.preventDefault();
         const reader = new FileReader();
@@ -69,6 +73,8 @@ function JsonUpload() {
                         navigate("/manage-schema");
                     } else {
                         setSchemaCreated(true);
+                        const schemaAttributes = transformSchemaToAttributes(JSON.parse(addSchemaPayload["schema"]));
+                        setAttributes([...schemaAttributes]);
                         setUploadedSchema({
                             "osid": res.data.schemaAddResponse?.result?.Schema?.osid,
                             ...addSchemaPayload
@@ -95,9 +101,22 @@ function JsonUpload() {
             setToast("");
         }, 2000);
     }
+    const addNewAttributeToSchema = (attr) => {
+        console.log(attr);
+        setAttributes([attr, ...attributes]);
+        setCreateAttribute(false);
+    }
+    const createNewFieldInSchema = () => {
+        setCreateAttribute(true);
+    }
+    const updateSchema = (schema) => {
+        setUploadedSchema(schema);
+        const updatedAttributes = transformSchemaToAttributes(JSON.parse(schema?.schema));
+        setAttributes([...updatedAttributes]);
+    }
     return (
         <div>
-            {(!schemaUploaded && !schemaPreview &&
+            {(!schemaUploaded && !schemaPreview && !createAttribute &&
             <Container className="d-flex justify-content-between align-items-center flex-column flex-md-row my-3 offset-1 offset-md-2 col-10 col-md-9">
                 <Col className={`col-12 col-md-7 me-md-3 ${styles['upload-container']}`}>
                     <p className="title">{t('jsonSchemaUpload.title')}</p>
@@ -135,7 +154,7 @@ function JsonUpload() {
                     <img src={uploadTheme} className="mw-100" alt="upload theme img"/>
                 </Col>
             </Container>) || (
-            schemaUploaded && !viewSchema && !schemaPreview &&
+            schemaUploaded && !viewSchema && !schemaPreview && !createAttribute &&
             <ActionInfoComponent
                 isActionSuccessful={schemaCreated}
                 actionHeaderMessage={schemaCreated ? t('jsonSchemaUpload.successfulUploadMessageTitle') : t('jsonSchemaUpload.errorUploadMessageTitle')}
@@ -144,16 +163,21 @@ function JsonUpload() {
                 primaryActionKey={schemaCreated ? 'view' : 'goBack'}
                 nextActionHandler={handleNextAction}>
             </ActionInfoComponent>) || (
-            schemaUploaded && viewSchema && !schemaPreview &&
+            schemaUploaded && viewSchema && !schemaPreview && !createAttribute &&
             <SchemaAttributes
                 props={uploadedSchema}
                 setschemaPreview={setschemaPreview}
-                setUpdatedSchema={setUploadedSchema}>
+                setUpdatedSchema={updateSchema} attributes={attributes} createNewFieldInSchema={createNewFieldInSchema}>
             </SchemaAttributes>) || (
-            schemaPreview && 
+            schemaPreview &&  !createAttribute &&
             <div>
                 <TestAndPublish schema={uploadedSchema}/>
-            </div>)}
+            </div>) || (
+                createAttribute &&
+                <div>
+                    <AddSchemaFieldComponent addNewAttributeToSchema={addNewAttributeToSchema}></AddSchemaFieldComponent>
+                </div>
+            )}
             {
                 toast
             }

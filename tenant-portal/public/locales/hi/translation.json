@@ -56,6 +56,8 @@
         "mandatory": "अनिवार्य",
         "indexed": "इंडेक्स किए गए",
         "unique": "अद्वितीय",
+        "identityInformation": "व्यक्ति की जानकारी",
+        "addField": "क्षेत्र जोड़ें",
         "description": "विवरण",
         "action": "गतिविधि",
         "fields": "खेत",
