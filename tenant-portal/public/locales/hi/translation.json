@@ -65,6 +65,8 @@
         "uploadTemplate": "टेम्प्लेट अपलोड करें",
         "templateUploadSuccess": "टेम्प्लेट सफलतापूर्वक अपलोड किया गया!",
         "templateUploadFailed": "टेम्प्लेट अपलोड करने में विफल!",
+        "deleteTemplateSuccess": "टेम्प्लेट सफलतापूर्वक हटा दिया गया था!",
+        "deleteTemplateFailed": "टेम्प्लेट हटाने में विफल",
         "manageTemplate": "अपलोड किए गए टेम्प्लेट प्रबंधित करें"
     },
     "schemaDetails": {

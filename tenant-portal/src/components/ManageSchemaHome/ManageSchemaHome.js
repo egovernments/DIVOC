@@ -163,7 +163,7 @@ const ManageSchemaHome = () => {
                         </div>
                     </div>}
                     { !schemaClicked && <div><hr/>
-                    <Row gutter='3' xs={1} sm={2} md={3} className="justify-content-end">
+                    <Row gutter='3' xs={1} sm={2} md={5} className="justify-content-end">
                     <Col className="my-1 h-100">
                         <Link to={`${config.urlPath}/manage-schema/view-inbuilt-attributes`} >
                             <GenericButton img='' text={t('noSchemaPage.viewAttributesBtn')} variant='outline-primary' />

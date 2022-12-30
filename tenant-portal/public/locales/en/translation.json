@@ -65,6 +65,8 @@
         "uploadTemplate": "Upload Template",
         "templateUploadSuccess": "Template Uploaded Successfully!",
         "templateUploadFailed": "Template Failed to Upload!",
+        "deleteTemplateSuccess": "Template Deleted Successfully!",
+        "deleteTemplateFailed": "Failed to Delete Template",
         "manageTemplate": "Manage Uploaded Templates"
     },
     "schemaDetails": {
