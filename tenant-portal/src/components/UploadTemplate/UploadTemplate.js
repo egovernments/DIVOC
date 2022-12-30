@@ -71,7 +71,7 @@ function UploadTemplate(props){
                     <div className="border rounded-2 p-3 text-center mb-3 position-relative">
                         <FormControl type="text" id="key" className={`${styles['input-box']}  w-100`} placeholder={t('templateUpload.placeholder')} />
                         <div className="p-2">
-                            <FormControl type="file" className="form-control h-75 opacity-0 position-absolute pt-0 start-0 w-100"  id="file" onChange={handleFileUpload}/>
+                            <input type="file" accept=".svg,.html" className="form-control h-75 opacity-0 position-absolute pt-0 start-0 w-100"  id="file" onChange={handleFileUpload}/>
                             {
                             fileUploaded && <div className="d-flex justify-content-center align-items-center">
                                     <img src={uploadIcon} alt="upload icon" className="me-3"/>

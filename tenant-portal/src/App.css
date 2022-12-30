@@ -186,4 +186,13 @@ content: "✔";
 .cursor-pointer {
     cursor: pointer;
 }
-    
+.action-icon {
+    width: 15px;
+    height: 15px;
+}
+.table-check-boxes {
+    min-width: 90px;
+}
+.table-text-col {
+    max-width: 250px;
+}

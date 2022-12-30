@@ -3,7 +3,7 @@ import {useTranslation} from "react-i18next";
 import GenericButton from '../GenericButton/GenericButton';
 import { Link, useNavigate } from 'react-router-dom';
 import config from '../../config.json'
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row, FormControl } from 'react-bootstrap';
 import DraftIcon from '../../assets/img/Loaders.svg';
 import PublishedIcon from '../../assets/img/done_all.svg';
 import {getToken, getUserId} from '../../utils/keycloak';
@@ -105,7 +105,7 @@ const ManageSchemaHome = () => {
                     <div className='d-flex flex-wrap'>
                         <div className={`col-3 px-4 border-end`}>
                             <h3>Schemas Created</h3>
-                            <input
+                            <FormControl
                             className='search-icon w-100 border border-1'
                             style={{borderRadius:'4px', borderColor:'#C4C4C4'}}
                             type='text'

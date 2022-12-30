@@ -14,7 +14,7 @@ function SchemaAttributeTypesComponent({selectAttributeType}) {
     });
     return (
         <Container>
-            <input
+            <FormControl
                 className='search-icon w-100 border border-1 rounded'
                 type='text'  id="schemaFieldSearch"
                 value={searchAttributeTypeInput}

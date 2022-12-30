@@ -7,7 +7,6 @@ import {useTranslation} from "react-i18next";
 import {
     transformAttributesToContext,
     transformAttributesToSchema,
-    transformSchemaToAttributes
 } from "../../utils/schema.js"
 import Attribute  from "../Attribute/Attribute";
 import {Link, useNavigate} from "react-router-dom";
@@ -21,7 +20,7 @@ import ManageTempModal from "../ManageTempModal/ManageTempModal";
 import {getToken} from '../../utils/keycloak';
 import {CONTEXT_BODY, SAMPLE_TEMPLATE_WITH_QR, SCHEMA_BODY, SCHEMA_STATUS, W3C_CONTEXT} from "../../constants";
 import axios from "axios";
-import attribute from "../Attribute/Attribute";
+import uploadIcon from '../../assets/img/Upload.svg';
 function SchemaAttributes({schemaDetails, setschemaPreview, attributes, setUpdatedSchema, createNewFieldInSchema, modifyAttribute}){
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -131,7 +130,7 @@ function SchemaAttributes({schemaDetails, setschemaPreview, attributes, setUpdat
             <Container>
                 <Stack gap={3}>
                     <Row className="justify-content-between align-items-center">
-                        <Container className="col-4">
+                        <Container className={`${schemaDetails.status===SCHEMA_STATUS.DRAFT ? 'col-4' : 'col-12'}`}>
                             <Row className="title">{schemaDetails.name}</Row>
                             <Row>{schemaDetails.description}</Row>
                         </Container>
@@ -147,7 +146,7 @@ function SchemaAttributes({schemaDetails, setschemaPreview, attributes, setUpdat
                             </Col>
                             <Col>
                                 <div onClick={() => setShow(true)}>
-                                    <GenericButton text={t('schemaAttributesPage.uploadTemplate')} variant="outline-primary"/>
+                                    <GenericButton img={uploadIcon} text={t('schemaAttributesPage.uploadTemplate')} variant="outline-primary"/>
                                 </div>
                                 <UploadTemplate {...{show, setShow, osid, setTemplateUploaded,showToast}}/>
                             </Col>
@@ -156,30 +155,31 @@ function SchemaAttributes({schemaDetails, setschemaPreview, attributes, setUpdat
                     <Row className="p-3 border overflow-auto d-xxl-inline-block">
                         <Row className="table-heading py-2">{t('schemaAttributesPage.fields')}</Row>
                         <Table className={styles["SchemaAttributesTable"]}>
-                            <thead className="table-col-header">
+                            <thead className="table-col-header align-middle">
                                 <th>{t('schemaAttributesPage.label')}</th>
-                                <th>{t('schemaAttributesPage.fieldType')}</th>
+                                <th className="text-center">{t('schemaAttributesPage.fieldType')}</th>
                                 <th className="text-center">{t('schemaAttributesPage.mandatory')}</th>
                                 <th className="text-center">{t('schemaAttributesPage.indexed')}</th>
                                 <th className="text-center">{t('schemaAttributesPage.unique')}</th>
                                 <th className="text-center">{t('schemaAttributesPage.identityInformation')}</th>
-                                <th>{t('schemaAttributesPage.description')}</th>
-                                <th className="text-center">{t('schemaAttributesPage.action')}</th>
+                                <th className="text-center">{t('schemaAttributesPage.description')}</th>
+                                { schemaDetails.status !== SCHEMA_STATUS.PUBLISHED && <th className="text-center">{t('schemaAttributesPage.action')}</th>}
                             </thead>
                             <tbody>
                                 {
                                     attributes?.map((attribute, index) => {
                                         return <Attribute
-                                            schemaAttribute={attribute}
+                                            schemaAttribute={attribute} published = {schemaDetails.status}
                                             modifyAttribute={(action, newDetails) => modifyAttribute(index, action, newDetails)}></Attribute>
                                     })
                                 }
                             </tbody>
                         </Table>
-                        <div className="d-flex justify-content-center align-items-center my-3 cursor-pointer" onClick={createNewFieldInSchema}>
+                        {(schemaDetails.status !== SCHEMA_STATUS.PUBLISHED) &&
+                            <div className="d-flex justify-content-center align-items-center my-3 cursor-pointer" onClick={createNewFieldInSchema}>
                             <img src={addIcon} alt="add icon" className="me-1"/>
                             <span className={styles['action-text']}>{t('schemaAttributesPage.addField')}</span>
-                        </div>
+                        </div>}
                     </Row>
                 </Stack>
             </Container>
