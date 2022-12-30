@@ -8,6 +8,7 @@ import {  Card, Col, Container , Image, Row, Stack } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import JsonUpload from "../JsonUpload/JsonUpload";
 import ManualSchemaCreationComponent from "../ManualSchemaCreationComponent/ManualSchemaCreationComponent";
+import BreadcrumbComponent from "../BreadcrumbComponent/BreadcrumbComponent";
 
 function CreateSchema(){
     const { t } = useTranslation();
@@ -30,6 +31,7 @@ function CreateSchema(){
 
 return (
 <div>
+    {!manuallyCreateSchema && <BreadcrumbComponent showBreadCrumb={true} />}
     { !createSchemaInitialized && <div>
         <Container fluid="md" className="py-4">
             <Row className="justify-content-between px-5" >

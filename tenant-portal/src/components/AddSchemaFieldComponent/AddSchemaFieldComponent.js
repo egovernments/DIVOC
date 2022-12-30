@@ -4,6 +4,7 @@ import AttributeDetailsComponent from "../AttributeDetailsComponent/AttributeDet
 import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
 import {useState} from "react";
+import BreadcrumbComponent from "../BreadcrumbComponent/BreadcrumbComponent";
 
 function AddSchemaFieldComponent({addNewAttributeToSchema}) {
     const [selectedType, setSelectedType] = useState("");
@@ -23,6 +24,7 @@ function AddSchemaFieldComponent({addNewAttributeToSchema}) {
                     <SchemaAttributeTypesComponent selectAttributeType={selectAttributeType}></SchemaAttributeTypesComponent>
                 </Col>
                 <Col className="col-9 pt-3">
+                    <BreadcrumbComponent showBreadCrumb={true} />
                     <AttributeDetailsComponent
                         selectedAttributeType={selectedType}
                         selectedAttributeLabel={selectedLabel}

@@ -4,6 +4,7 @@ import AddSchemaFieldComponent from "../AddSchemaFieldComponent/AddSchemaFieldCo
 import SchemaAttributes from "../SchemaAttributes/SchemaAttributes";
 import {ATTRIBUTE_MODIFY_ACTIONS, INBUILT_ATTRIBUTES, SCHEMA_STATUS} from "../../constants";
 import TestAndPublish from "../TestAndPublish/TestAndPublish";
+import BreadcrumbComponent from "../BreadcrumbComponent/BreadcrumbComponent";
 
 function ManualSchemaCreationComponent() {
     const [initialDetailsCreated, setInitialDetailsCreated] = useState(false);
@@ -62,6 +63,7 @@ function ManualSchemaCreationComponent() {
 
     return (
         <div>
+            {!createAttribute && <BreadcrumbComponent showBreadCrumb={true} />}
             {
                 !initialDetailsCreated &&
                 <SchemaDetails addInitialSchemaDetails={updateInitialSchemaDetails}></SchemaDetails>
