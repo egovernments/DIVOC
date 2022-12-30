@@ -13,7 +13,7 @@ import ActionInfoComponent from "../ActionInfoComponent/ActionInfoComponent";
 import SchemaAttributes from "../SchemaAttributes/SchemaAttributes";
 import TestAndPublish from "../TestAndPublish/TestAndPublish";
 import ToastComponent from "../ToastComponent/ToastComponent";
-import {SCHEMA_STATUS} from "../../constants";
+import {ATTRIBUTE_MODIFY_ACTIONS, SCHEMA_STATUS} from "../../constants";
 import AddSchemaFieldComponent from "../AddSchemaFieldComponent/AddSchemaFieldComponent";
 import {transformSchemaToAttributes} from "../../utils/schema";
 function JsonUpload() {
@@ -114,6 +114,30 @@ function JsonUpload() {
         const updatedAttributes = transformSchemaToAttributes(JSON.parse(schema?.schema));
         setAttributes([...updatedAttributes]);
     }
+    const modifyAttribute = (index, action, newDetails) => {
+        switch (action) {
+            case ATTRIBUTE_MODIFY_ACTIONS.DELETE:
+                setAttributes([...attributes.slice(index, 1)]);
+                break;
+            case ATTRIBUTE_MODIFY_ACTIONS.EDIT:
+                attributes[index].editMode = true;
+                setAttributes([...attributes]);
+                break;
+            case ATTRIBUTE_MODIFY_ACTIONS.UPDATE:
+                for (const [key, value] of Object.entries(newDetails)) {
+                    attributes[index][key]=value;
+                }
+                attributes[index].editMode = false;
+                setAttributes([...attributes]);
+                break;
+            case ATTRIBUTE_MODIFY_ACTIONS.CANCEL:
+                attributes[index].editMode = false;
+                setAttributes([...attributes]);
+                break;
+            default:
+                console.log("Invalid action");
+        }
+    }
     return (
         <div>
             {(!schemaUploaded && !schemaPreview && !createAttribute &&
@@ -165,9 +189,12 @@ function JsonUpload() {
             </ActionInfoComponent>) || (
             schemaUploaded && viewSchema && !schemaPreview && !createAttribute &&
             <SchemaAttributes
-                props={uploadedSchema}
+                schemaDetails={uploadedSchema}
                 setschemaPreview={setschemaPreview}
-                setUpdatedSchema={updateSchema} attributes={attributes} createNewFieldInSchema={createNewFieldInSchema}>
+                setUpdatedSchema={updateSchema}
+                attributes={attributes}
+                modifyAttribute={modifyAttribute}
+                createNewFieldInSchema={createNewFieldInSchema}>
             </SchemaAttributes>) || (
             schemaPreview &&  !createAttribute &&
             <div>

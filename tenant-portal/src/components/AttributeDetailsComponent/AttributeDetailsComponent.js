@@ -17,7 +17,7 @@ function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabe
     const [isUniqueIndex, setIsUniqueIndex] = useState(false);
     const [isIdentityInformation, setIsIdentityInformation] = useState(false);
     const [description, setDescription] = useState("");
-    const [readOnly, setReadOnly] = useState(true);
+    const [readOnly, setReadOnly] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [defaultValue, setDefaultValue] = useState("");
     const [enumValues, setEnumValues] = useState([""]);
@@ -42,7 +42,7 @@ function AttributeDetailsComponent({selectedAttributeType, selectedAttributeLabe
         setIsIndexField(false);
         setIsIdentityInformation(false);
         setDescription("");
-        setReadOnly(true);
+        setReadOnly(false);
         setEditMode(false);
         setDefaultValue("");
         setEnumValues([""]);

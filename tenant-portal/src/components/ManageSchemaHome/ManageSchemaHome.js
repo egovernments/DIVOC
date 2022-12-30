@@ -10,7 +10,7 @@ import {getToken, getUserId} from '../../utils/keycloak';
 import SchemaAttributes from '../SchemaAttributes/SchemaAttributes';
 import BreadcrumbComponent from '../BreadcrumbComponent/BreadcrumbComponent';
 import TestAndPublish from '../TestAndPublish/TestAndPublish';
-import {SCHEMA_STATUS} from "../../constants";
+import {ATTRIBUTE_MODIFY_ACTIONS, SCHEMA_STATUS} from "../../constants";
 import AddSchemaFieldComponent from "../AddSchemaFieldComponent/AddSchemaFieldComponent";
 import {transformSchemaToAttributes} from "../../utils/schema";
 const axios = require('axios');
@@ -43,7 +43,31 @@ const ManageSchemaHome = () => {
           (schemas?.name)?.toLowerCase().includes(searchSchemaInput?.toLowerCase())
         );
       });
-      useEffect(() => {
+    const modifyAttribute = (index, action, newDetails) => {
+        switch (action) {
+            case ATTRIBUTE_MODIFY_ACTIONS.DELETE:
+                setAttributes([...attributes.slice(index, 1)]);
+                break;
+            case ATTRIBUTE_MODIFY_ACTIONS.EDIT:
+                attributes[index].editMode = true;
+                setAttributes([...attributes]);
+                break;
+            case ATTRIBUTE_MODIFY_ACTIONS.UPDATE:
+                for (const [key, value] of Object.entries(newDetails)) {
+                    attributes[index][key]=value;
+                }
+                attributes[index].editMode = false;
+                setAttributes([...attributes]);
+                break;
+            case ATTRIBUTE_MODIFY_ACTIONS.CANCEL:
+                attributes[index].editMode = false;
+                setAttributes([...attributes]);
+                break;
+            default:
+                console.log("Invalid action");
+        }
+    }
+    useEffect(() => {
         (async () =>{
             const userToken = await getToken();
             return axios.get(`/vc-management/v1/schema`, {headers:{"Authorization" :`Bearer ${userToken}`}}).then(res =>
@@ -129,10 +153,11 @@ const ManageSchemaHome = () => {
                         {
                             schemaClicked &&
                             <SchemaAttributes
-                                props={selectedSchema}
+                                schemaDetails={selectedSchema}
                                 setschemaPreview={setschemaPreview}
                                 setUpdatedSchema={schemaAttViewFunc}
                                 attributes={attributes}
+                                modifyAttribute={modifyAttribute}
                                 createNewFieldInSchema={createNewFieldInSchema} />
                         }
                         </div>

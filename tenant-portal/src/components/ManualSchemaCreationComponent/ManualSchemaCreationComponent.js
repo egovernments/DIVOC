@@ -2,7 +2,7 @@ import SchemaDetails from "../SchemaDetails/SchemaDetails";
 import React, {useState} from "react";
 import AddSchemaFieldComponent from "../AddSchemaFieldComponent/AddSchemaFieldComponent";
 import SchemaAttributes from "../SchemaAttributes/SchemaAttributes";
-import {SCHEMA_STATUS} from "../../constants";
+import {ATTRIBUTE_MODIFY_ACTIONS, INBUILT_ATTRIBUTES, SCHEMA_STATUS} from "../../constants";
 import TestAndPublish from "../TestAndPublish/TestAndPublish";
 
 function ManualSchemaCreationComponent() {
@@ -22,7 +22,7 @@ function ManualSchemaCreationComponent() {
 
     const addNewAttributeToSchema = (attr) => {
         if(!schemaDetails["properties"] || !schemaDetails["properties"].length) {
-            schemaDetails["properties"] = [];
+            schemaDetails["properties"] = INBUILT_ATTRIBUTES;
         }
         schemaDetails["properties"].push(attr);
         setSchemaDetails({...schemaDetails});
@@ -33,6 +33,31 @@ function ManualSchemaCreationComponent() {
     const createNewFieldInSchema = () => {
         setViewSchemaDetails(false);
         setCreateAttribute(true);
+    }
+    const modifyAttribute = (index, action, newDetails) => {
+        switch (action) {
+            case ATTRIBUTE_MODIFY_ACTIONS.DELETE:
+                schemaDetails["properties"].slice(index, 1);
+                setSchemaDetails({...schemaDetails});
+                break;
+            case ATTRIBUTE_MODIFY_ACTIONS.EDIT:
+                schemaDetails["properties"][index].editMode = true;
+                setSchemaDetails({...schemaDetails});
+                break;
+            case ATTRIBUTE_MODIFY_ACTIONS.UPDATE:
+                for (const [key, value] of Object.entries(newDetails)) {
+                    schemaDetails["properties"][index][key]=value;
+                }
+                schemaDetails["properties"][index].editMode = false;
+                setSchemaDetails({...schemaDetails});
+                break;
+            case ATTRIBUTE_MODIFY_ACTIONS.CANCEL:
+                schemaDetails["properties"][index].editMode = false;
+                setSchemaDetails({...schemaDetails});
+                break;
+            default:
+                console.log("Invalid action");
+        }
     }
 
     return (
@@ -48,10 +73,11 @@ function ManualSchemaCreationComponent() {
             {
                 !createAttribute && viewSchemaDetails &&
                 <SchemaAttributes
-                    props={schemaDetails}
+                    schemaDetails={schemaDetails}
                     attributes={schemaDetails["properties"]}
                     setschemaPreview={setSchemaPreview}
                     setUpdatedSchema={setUploadedSchema}
+                    modifyAttribute={modifyAttribute}
                     createNewFieldInSchema={createNewFieldInSchema}></SchemaAttributes>
             }
             {

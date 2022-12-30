@@ -19,7 +19,7 @@ function transformSchemaToAttributes (schema) {
             "isIndexField": indexFields.includes(label),
             "isUniqueIndex": uniqueIndex.includes(label),
             "description" : properties[label]?.description || "NA",
-            "readOnly": STANDARD_ATTRIBUTES.includes(label),
+            "readOnly": STANDARD_ATTRIBUTES.findIndex(attr => (attr.toLowerCase() === label.toLowerCase())) !== -1,
             "editMode": false,
             "isIdentityInformation": credentialSubject?.hasOwnProperty(label)
         }

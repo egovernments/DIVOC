@@ -21,14 +21,15 @@ import ManageTempModal from "../ManageTempModal/ManageTempModal";
 import {getToken} from '../../utils/keycloak';
 import {CONTEXT_BODY, SAMPLE_TEMPLATE_WITH_QR, SCHEMA_BODY, SCHEMA_STATUS, W3C_CONTEXT} from "../../constants";
 import axios from "axios";
-function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema, createNewFieldInSchema}){
+import attribute from "../Attribute/Attribute";
+function SchemaAttributes({schemaDetails, setschemaPreview, attributes, setUpdatedSchema, createNewFieldInSchema, modifyAttribute}){
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [show, setShow] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [templateUploaded, setTemplateUploaded] = useState(false);
     const [toast,setToast] = useState("");
-    const osid = props.osid;
+    const osid = schemaDetails.osid;
 
     const showToast = (status) => {
             switch (status) {
@@ -50,8 +51,8 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
     };
     const upsertSchema = async (saveAsDraft) => {
         const currentSchema = {
-            schemaName: props.name,
-            schemaDescription: props.description,
+            schemaName: schemaDetails.name,
+            schemaDescription: schemaDetails.description,
             credentialTemplate: {
                 context:[W3C_CONTEXT]
             },
@@ -81,13 +82,13 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
                 .then(() => {
                     const updatedSchema = transformAttributesToSchema(currentSchema, SCHEMA_BODY);
                     const draftSchemaPayload = {
-                        name: props.name,
+                        name: schemaDetails.name,
                         status: SCHEMA_STATUS.DRAFT,
                         schema: JSON.stringify(updatedSchema)
                     }
                     axios({
-                        method: props.osid ? 'PUT' : 'POST',
-                        url: `${config.schemaUrl}/${props?.osid ? props.osid?.slice(2) : ''}`,
+                        method: schemaDetails.osid ? 'PUT' : 'POST',
+                        url: `${config.schemaUrl}/${schemaDetails?.osid ? schemaDetails.osid?.slice(2) : ''}`,
                         data: draftSchemaPayload,
                         headers: {
                             "Authorization": `Bearer ${userToken}`,
@@ -95,7 +96,7 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
                     }).then((res) => {
                         console.log(res?.data);
                         setUpdatedSchema({
-                            osid: props.osid || res?.data?.schemaAddResponse?.result?.Schema?.osid,
+                            osid: schemaDetails.osid || res?.data?.schemaAddResponse?.result?.Schema?.osid,
                             ...draftSchemaPayload
                         })
                         if (saveAsDraft) {
@@ -118,14 +119,14 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
                 <Stack gap={3}>
                     <Row className="justify-content-between align-items-center">
                         <Container className="col-6">
-                            <Row className="title">{props.name}</Row>
-                            <Row>{props.description}</Row>
+                            <Row className="title">{schemaDetails.name}</Row>
+                            <Row>{schemaDetails.description}</Row>
                         </Container>
                         <Row className="justify-content-end col-6">
-                            <Col className={props.schema && (props.status === SCHEMA_STATUS.DRAFT) && JSON.parse(props.schema)._osConfig?.certificateTemplates && Object.keys(JSON.parse(props.schema)._osConfig?.certificateTemplates).length===0? 'd-none': '' } >
+                            <Col className={schemaDetails.schema && (schemaDetails.status === SCHEMA_STATUS.DRAFT) && JSON.parse(schemaDetails.schema)._osConfig?.certificateTemplates && Object.keys(JSON.parse(schemaDetails.schema)._osConfig?.certificateTemplates).length===0? 'd-none': '' } >
                                 <div onClick={()=>{setShowModal(true);}}>
                                     <GenericButton text={t('schemaAttributesPage.manageTemplate')} variant="outline-primary" /></div>
-                                {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={props}/>}
+                                {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={schemaDetails}/>}
                             </Col>
                             <Col>
                                 <div onClick={() => setShow(true)}>
@@ -146,16 +147,19 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
                                 <th className="text-center">{t('schemaAttributesPage.unique')}</th>
                                 <th className="text-center">{t('schemaAttributesPage.identityInformation')}</th>
                                 <th>{t('schemaAttributesPage.description')}</th>
+                                <th className="text-center">{t('schemaAttributesPage.action')}</th>
                             </thead>
                             <tbody>
                                 {
-                                    attributes?.map((attribute) => {
-                                        return <Attribute schemaAttribute={attribute}></Attribute>
+                                    attributes?.map((attribute, index) => {
+                                        return <Attribute
+                                            schemaAttribute={attribute}
+                                            modifyAttribute={(action, newDetails) => modifyAttribute(index, action, newDetails)}></Attribute>
                                     })
                                 }
                             </tbody>
                         </Table>
-                        <div className="d-flex justify-content-center align-items-center my-3" onClick={createNewFieldInSchema}>
+                        <div className="d-flex justify-content-center align-items-center my-3 cursor-pointer" onClick={createNewFieldInSchema}>
                             <img src={addIcon} alt="add icon" className="me-1"/>
                             <span className={styles['action-text']}>{t('schemaAttributesPage.addField')}</span>
                         </div>
@@ -166,7 +170,7 @@ function SchemaAttributes({props, setschemaPreview, attributes, setUpdatedSchema
                 {toast}
             
             <hr className="mt-5 mb-3"/>
-                { (props.status === SCHEMA_STATUS.DRAFT || props.status === SCHEMA_STATUS.INPROGRESS) &&
+                { (schemaDetails.status === SCHEMA_STATUS.DRAFT || schemaDetails.status === SCHEMA_STATUS.INPROGRESS) &&
                     <Row gutter='3' xs={1} sm={2} md={4} className="justify-content-end pe-4" >
                     <div onClick={() => {upsertSchema(true)}} >
                         <GenericButton img={''} text='Save as Draft' type='button' form="schema-attributes" variant='outline-primary' />

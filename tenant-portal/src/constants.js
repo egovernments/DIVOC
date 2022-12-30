@@ -132,14 +132,19 @@ const STANDARD_ATTRIBUTES = [
     "issuer",
     "issuanceDate"
 ]
-
+const ATTRIBUTE_MODIFY_ACTIONS = {
+    "DELETE": "delete",
+    "EDIT": "edit",
+    "UPDATE": "update",
+    "CANCEL": "cancel"
+}
 const VC_MANAGEMENT_SWAGGER_URL = 'vc-management/api-docs';
 const DRAG_AND_DROP_TYPE = 'attributeType';
 const ATTRIBUTE_DATA_TYPES = {
-    STRING: "string",
-    INTEGER: "integer",
-    ENUM: "enum",
-    BOOLEAN: "boolean"
+    "STRING": "string",
+    "INTEGER": "integer",
+    "ENUM": "enum",
+    "BOOLEAN": "boolean"
 }
 const SCHEMA_ATTRIBUTE_TYPES = [
     {
@@ -255,5 +260,6 @@ export {
     SCHEMA_BODY,
     CONTEXT_BODY,
     SAMPLE_TEMPLATE_WITH_QR,
-    W3C_CONTEXT
+    W3C_CONTEXT,
+    ATTRIBUTE_MODIFY_ACTIONS
 }
