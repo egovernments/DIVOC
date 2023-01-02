@@ -1,5 +1,5 @@
 import {React, useEffect, useState} from 'react'
-import { Col, Form, FormControl, FormGroup, FormLabel, FormSelect, Row } from 'react-bootstrap';
+import { Col, Form, FormControl, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import {useTranslation} from "react-i18next";
 import config from '../../config.json';
 import GenericButton from '../GenericButton/GenericButton';
@@ -8,18 +8,19 @@ import PrintIcon from '../../assets/img/print.svg';
 import {getToken, getUserId} from '../../utils/keycloak';
 import { standardizeString, downloadPdf} from '../../utils/customUtils';
 import ToastComponent from "../ToastComponent/ToastComponent";
+import {SCHEMA_STATUS} from "../../constants";
 const axios = require('axios');
 const isoDatestringValidator = require('iso-datestring-validator')
 
 const TestAndPublish = ({schema}) => {
     const { t } = useTranslation();
-    const { navigate } = useNavigate();
+    const navigate = useNavigate();
     const publish = async () => {
         const userToken = await getToken();
-        schema.status = "PUBLISHED"
+        schema.status = SCHEMA_STATUS.PUBLISHED
         const osid= schema.osid.slice(2);
         axios.put(`${config.schemaUrl}/${osid}`, schema, {headers:{"Authorization" :`Bearer ${userToken}`}})
-        .then((res) => {navigate(config.urlPath + '/explore-api')})
+        .then((res) => {navigate('/manage-schema/explore-api')})
         .catch(error => {
                 console.error(error);
                 throw error;
@@ -145,9 +146,9 @@ const TestAndPublish = ({schema}) => {
                 </Link>
             </Col>
             <Col className="my-1 h-100">
-                <Link onClick={publish} to='/manage-schema'>
+                <div onClick={publish}>
                     <GenericButton img='' text={t('testAndPublish.publishButton')} variant='primary'/> 
-                </Link>
+                </div>
             </Col>
         </Row>
         </div>
