@@ -1,16 +1,14 @@
-const monthNames = [
-    "Jan", "Feb", "Mar", "Apr",
-    "May", "Jun", "Jul", "Aug",
-    "Sep", "Oct", "Nov", "Dec"
-];
+import config from "./config";
 
 export function formatDate(givenDate) {
-    const dob = new Date(givenDate);
-    let day = (dob.getDate()).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
-    let monthName = monthNames[dob.getMonth()];
-    let year = dob.getFullYear();
-
-    return `${day}-${monthName}-${year}`;
+    const options = {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        timeZone: config.TIMEZONE
+    };
+    const date = new Date(givenDate).toLocaleDateString('en-GB',options);
+    return date.replace(/ /gi,"-");
 }
 
 export const CertificateDetailsPaths = {
