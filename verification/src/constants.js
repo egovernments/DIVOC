@@ -1,11 +1,9 @@
-import config from "./config";
-
 export function formatDate(givenDate) {
     const options = {
         year: "numeric",
         month: "short",
         day: "numeric",
-        timeZone: config.TIMEZONE
+        timeZone: "GMT"
     };
     const date = new Date(givenDate).toLocaleDateString('en-GB',options);
     return date.replace(/ /gi,"-");

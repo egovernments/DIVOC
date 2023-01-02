@@ -1,8 +1,6 @@
 FROM node:13.12.0-alpine as build
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
-ARG TIMEZONE
-ENV REACT_APP_TIMEZONE $TIMEZONE
 COPY package.json ./
 COPY package-lock.json ./
 RUN npm ci --silent
