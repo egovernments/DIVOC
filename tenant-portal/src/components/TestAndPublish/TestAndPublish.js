@@ -8,7 +8,7 @@ import PrintIcon from '../../assets/img/print.svg';
 import {getToken, getUserId} from '../../utils/keycloak';
 import { standardizeString, downloadPdf} from '../../utils/customUtils';
 import ToastComponent from "../ToastComponent/ToastComponent";
-import {SCHEMA_STATUS} from "../../constants";
+import {SAMPLE_TEMPLATE_WITH_QR, SCHEMA_STATUS} from "../../constants";
 const axios = require('axios');
 const isoDatestringValidator = require('iso-datestring-validator')
 
@@ -27,7 +27,7 @@ const TestAndPublish = ({schema}) => {
             });
     };
     const certificateTemplates = JSON.parse(schema.schema)?._osConfig?.certificateTemplates;
-    const [template,setTemplate] = useState("");
+    const [template,setTemplate] = useState(SAMPLE_TEMPLATE_WITH_QR);
     const [samplefile, setSamplefile] = useState(null);
     const [toast, setToast] = useState("");
     const requiredFeilds = (JSON.parse(schema.schema).definitions[schema.name].required).toString().split(",");
