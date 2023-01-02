@@ -62,15 +62,17 @@ function SchemaAttributes({schemaDetails, setschemaPreview, attributes, setUpdat
         setTimeout(() => {setToast("")}, 3000);
     };
     const upsertSchema = async (saveAsDraft) => {
+        let certificateTemplates = {
+            default: SAMPLE_TEMPLATE_WITH_QR
+        }
+        if (schemaDetails.schema) {
+            certificateTemplates = {...JSON.parse(schemaDetails.schema)?._osConfig?.certificateTemplates, default: SAMPLE_TEMPLATE_WITH_QR}
+        }
         const currentSchema = {
             schemaName: schemaDetails.name,
             schemaDescription: schemaDetails.description,
-            credentialTemplate: {
-                context:[W3C_CONTEXT]
-            },
-            certificateTemplates: {
-                html : SAMPLE_TEMPLATE_WITH_QR
-            },
+            credentialTemplate: {context : [W3C_CONTEXT]},
+            certificateTemplates: certificateTemplates,
             Attributes: attributes
         }
         const currentContext = transformAttributesToContext(currentSchema, CONTEXT_BODY);

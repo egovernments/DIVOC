@@ -58,8 +58,8 @@ function transformAttributesToSchema(schemaPayload,schemaBody){
             schema._osConfig.credentialTemplate.credentialSubject[Attribute.label] = `{{${Attribute.label}}}`
         }
     });
-    schemaPayload.credentialTemplate.context.map((context)=>{
-        schema._osConfig.credentialTemplate["@context"].push(context);
+    schemaPayload.credentialTemplate?.context.map((context)=>{
+        schema._osConfig?.credentialTemplate["@context"].push(context);
     })
     schema._osConfig.certificateTemplates = schemaPayload.certificateTemplates;
     schema._osConfig.credentialTemplate.issuer = "{{issuer}}";

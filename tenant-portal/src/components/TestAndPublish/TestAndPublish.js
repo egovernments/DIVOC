@@ -1,5 +1,5 @@
 import {React, useEffect, useState} from 'react'
-import { Col, Form, FormControl, FormGroup, FormLabel, Row } from 'react-bootstrap';
+import { Col, Form, FormControl, FormGroup, FormLabel, FormSelect, Row } from 'react-bootstrap';
 import {useTranslation} from "react-i18next";
 import config from '../../config.json';
 import GenericButton from '../GenericButton/GenericButton';
@@ -8,24 +8,25 @@ import PrintIcon from '../../assets/img/print.svg';
 import {getToken, getUserId} from '../../utils/keycloak';
 import { standardizeString, downloadPdf} from '../../utils/customUtils';
 import ToastComponent from "../ToastComponent/ToastComponent";
-import {SCHEMA_STATUS} from "../../constants";
 const axios = require('axios');
 const isoDatestringValidator = require('iso-datestring-validator')
 
 const TestAndPublish = ({schema}) => {
     const { t } = useTranslation();
-    const navigate = useNavigate();
+    const { navigate } = useNavigate();
     const publish = async () => {
         const userToken = await getToken();
-        schema.status = SCHEMA_STATUS.PUBLISHED
+        schema.status = "PUBLISHED"
         const osid= schema.osid.slice(2);
         axios.put(`${config.schemaUrl}/${osid}`, schema, {headers:{"Authorization" :`Bearer ${userToken}`}})
-        .then((res) => {navigate('/manage-schema/explore-api')})
+        .then((res) => {navigate(config.urlPath + '/explore-api')})
         .catch(error => {
                 console.error(error);
                 throw error;
             });
     };
+    const certificateTemplates = JSON.parse(schema.schema)?._osConfig?.certificateTemplates;
+    const [template,setTemplate] = useState("");
     const [samplefile, setSamplefile] = useState(null);
     const [toast, setToast] = useState("");
     const requiredFeilds = (JSON.parse(schema.schema).definitions[schema.name].required).toString().split(",");
@@ -34,7 +35,7 @@ const TestAndPublish = ({schema}) => {
     const [formErrors, setFormErrors] = useState({});
     const previewReqBody = ({
             credentialTemplate:JSON.parse(schema.schema)?._osConfig?.credentialTemplate,
-            template: JSON.parse(schema.schema)._osConfig?.certificateTemplates?.html,
+            template: template,
             data: data
         });
     const previewSchemaFunc = async () => {
@@ -102,6 +103,16 @@ const TestAndPublish = ({schema}) => {
         <div className='col-6'>
             <h1>{t('testAndPublish.title')}</h1>
             <small>{t('testAndPublish.text')}</small>
+            <div className='ms-1 px-2 my-2'>
+            <label>Select Template</label>
+            <select className='bg-white border-1 d-block p-2 rounded-1 w-100'
+            onChange={(e) => {setTemplate(certificateTemplates[e.target.value])}}>
+                {Object.keys(certificateTemplates).map((objKey) => 
+                <option value={objKey}>
+                    {objKey}
+                </option>)}
+            </select>
+            </div>
             <Form className='tp-form'>
                 {data && Object.keys(data).map((index) => 
                 <div className='m-3'>
@@ -127,16 +138,16 @@ const TestAndPublish = ({schema}) => {
         </div>
         <div style={{ "bottom":"0", "marginBottom":"0.5rem", width:"100%"}} >
             <hr />
-        <Row gutter='3' xs={1} sm={2} md={3} lg={4} xl={5} className="justify-content-end">
+        <Row gutter='3' xs={1} sm={2} md={3} lg={5} xl={6} className="justify-content-end">
             <Col className="my-1 h-100">
                 <Link to={`${config.urlPath}/manage-schema`} reloadDocument={true} >
                     <GenericButton img='' text={t('testAndPublish.backButton')} variant='outline-primary'/> 
                 </Link>
             </Col>
             <Col className="my-1 h-100">
-                <div onClick={publish}>
+                <Link onClick={publish} to='/manage-schema'>
                     <GenericButton img='' text={t('testAndPublish.publishButton')} variant='primary'/> 
-                </div>
+                </Link>
             </Col>
         </Row>
         </div>
