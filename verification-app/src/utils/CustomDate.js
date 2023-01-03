@@ -21,7 +21,7 @@ export function formatDateLong(givenDate) {
         month: "short",
         day: "numeric",
         timeZone: config.TIMEZONE,
-  		weekday: "long"
+        weekday: "long"
     };
     const date = new Date(givenDate).toLocaleDateString('en-GB',options);
     return date.split(/ (.*)/s)[0] + " " + date.split(/ (.*)/s)[1].replace(/ /g,"-");
@@ -33,7 +33,7 @@ export function formatDateForSlot(givenDate) {
         month: "short",
         day: "numeric",
         timeZone: config.TIMEZONE,
-  		weekday: "short"
+        weekday: "short"
     };
     const date = new Date(givenDate).toLocaleDateString('en-GB',options);
     return date.split(" ")[0] + " " + date.split(" ")[2] + " " + date.split(" ")[1];
