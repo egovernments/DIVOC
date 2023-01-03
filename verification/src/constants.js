@@ -3,7 +3,7 @@ export function formatDate(givenDate) {
         year: "numeric",
         month: "short",
         day: "numeric",
-        timeZone: "GMT"
+        timeZone: "IST"
     };
     const date = new Date(givenDate).toLocaleDateString('en-GB',options);
     return date.replace(/ /gi,"-");
