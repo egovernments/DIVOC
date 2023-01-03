@@ -1,16 +1,14 @@
-const monthNames = [
-    "Jan", "Feb", "Mar", "Apr",
-    "May", "Jun", "Jul", "Aug",
-    "Sep", "Oct", "Nov", "Dec"
-];
+import config from "../config"
 
 export function formatDate(givenDate) {
-    const dob = new Date(givenDate);
-    let day = dob.getDate();
-    let monthName = monthNames[dob.getMonth()];
-    let year = dob.getFullYear();
-
-    return `${padDigit(day)}-${monthName}-${year}`;
+    const options = {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        timeZone: config.TIMEZONE
+    };
+    const date = new Date(givenDate).toLocaleDateString('en-GB',options);
+    return date.replace(/ /gi,"-");
 }
 
 export function padDigit(digit, totalDigits = 2) {
@@ -18,20 +16,27 @@ export function padDigit(digit, totalDigits = 2) {
 }
 
 export function formatDateLong(givenDate) {
-    const d = new Date(givenDate);
-    const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][d.getDay()]
-    const day = d.getDate()
-    const monthName = monthNames[d.getMonth()];
-    const year = d.getFullYear();
-    return `${weekday}, ${day}-${monthName}-${year}`
+    const options = {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        timeZone: config.TIMEZONE,
+  		weekday: "long"
+    };
+    const date = new Date(givenDate).toLocaleDateString('en-GB',options);
+    return date.split(/ (.*)/s)[0] + " " + date.split(/ (.*)/s)[1].replace(/ /g,"-");
 }
 
 export function formatDateForSlot(givenDate) {
-    const d = new Date(givenDate);
-    const weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()]
-    const day = d.getDate()
-    const monthName = monthNames[d.getMonth()];
-    return `${weekday}, ${monthName} ${day}`
+    const options = {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        timeZone: config.TIMEZONE,
+  		weekday: "short"
+    };
+    const date = new Date(givenDate).toLocaleDateString('en-GB',options);
+    return date.split(" ")[0] + " " + date.split(" ")[2] + " " + date.split(" ")[1];
 }
 
 export function formatTimeInterval12hr(t) {
