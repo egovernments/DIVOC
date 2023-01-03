@@ -1,7 +1,7 @@
 const urlPath = "/certificate";
 const registerMemberLimit = 4;
 const certificatePublicKey = process.env.REACT_APP_CERTIFICATE_PUBLIC_KEY || "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnXQalrgztecTpc+INjRQ8s73FSE1kU5QSlwBdICCVJBUKiuQUt7s+Z5epgCvLVAOCbP1mm5lV7bfgV/iYWDio7lzX4MlJwDedWLiufr3Ajq+79CQiqPaIbZTo0i13zijKtX7wgxQ78wT/HkJRLkFpmGeK3za21tEfttytkhmJYlwaDTEc+Kx3RJqVhVh/dfwJGeuV4Xc/e2NH++ht0ENGuTk44KpQ+pwQVqtW7lmbDZQJoOJ7HYmmoKGJ0qt2hrj15uwcD1WEYfY5N7N0ArTzPgctExtZFDmituLGzuAZfv2AZZ9/7Y+igshzfB0reIFdUKw3cdVTzfv5FNrIqN5pwIDAQAB\n-----END PUBLIC KEY-----\n"
-
+const TIMEZONE = process.env.REACT_APP_TIMEZONE || "GMT";
 const CERTIFICATE_CONTROLLER_ID = process.env.REACT_APP_CERTIFICATE_CONTROLLER_ID || 'https://cowin.gov.in/';
 const CERTIFICATE_NAMESPACE = process.env.REACT_APP_CERTIFICATE_NAMESPACE || "https://cowin.gov.in/credentials/vaccination/v1";
 const CERTIFICATE_NAMESPACE_V2 = process.env.REACT_APP_CERTIFICATE_NAMESPACE_V2 || "https://cowin.gov.in/credentials/vaccination/v2";
@@ -24,5 +24,6 @@ module.exports = {
     CERTIFICATE_SCAN_TIMEOUT,
     CERTIFICATE_SIGNED_KEY_TYPE,
     certificatePublicKeyBase58,
-    CERTIFICATE_STATUS_VC
+    CERTIFICATE_STATUS_VC,
+    TIMEZONE
 };

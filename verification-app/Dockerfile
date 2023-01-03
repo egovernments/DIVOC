@@ -2,6 +2,8 @@ FROM node:lts-alpine3.13 as verification_app_build
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 ENV REACT_APP_CERTIFICATE_STATUS_VC 'true'
+ARG REACT_APP_TIMEZONE
+ENV REACT_APP_TIMEZONE $REACT_APP_TIMEZONE
 COPY package.json ./
 COPY package-lock.json ./
 RUN npm install --silent
