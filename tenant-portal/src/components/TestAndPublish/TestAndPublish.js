@@ -28,18 +28,19 @@ const TestAndPublish = ({schema}) => {
     };
     const certificateTemplates = JSON.parse(schema.schema)?._osConfig?.certificateTemplates;
     const [template,setTemplate] = useState(SAMPLE_TEMPLATE_WITH_QR);
+    const [templateKey,setTemplateKey] = useState("default");
     const [samplefile, setSamplefile] = useState(null);
     const [toast, setToast] = useState("");
     const requiredFeilds = (JSON.parse(schema.schema).definitions[schema.name].required).toString().split(",");
     var formObj = {}; requiredFeilds.forEach(key => formObj[key] = "");
     const [data, setData] = useState(formObj);
     const [formErrors, setFormErrors] = useState({});
-    const previewReqBody = ({
+    const previewSchemaFunc = async () => {
+        const previewReqBody = {
             credentialTemplate:JSON.parse(schema.schema)?._osConfig?.credentialTemplate,
             template: template,
             data: data
-        });
-    const previewSchemaFunc = async () => {
+        };
         if(!previewReqBody?.template) {
             showToastFunc("Template is not available to test & preview", "danger");
             return
@@ -106,9 +107,9 @@ const TestAndPublish = ({schema}) => {
             <small>{t('testAndPublish.text')}</small>
             <div className='ms-1 px-2 my-2'>
             <label>Select Template</label>
-            <select className='bg-white border-1 d-block p-2 rounded-1 w-100'
-            onChange={(e) => {setTemplate(certificateTemplates[e.target.value])}}>
-                {Object.keys(certificateTemplates).map((objKey) => 
+            <select className='bg-white border-1 d-block p-2 rounded-1 w-100' value={templateKey}
+            onChange={(e) => {setTemplateKey(e.target.value);setTemplate(certificateTemplates[e.target.value])}}>
+                {Object.keys(certificateTemplates).map((objKey) =>
                 <option value={objKey}>
                     {objKey}
                 </option>)}
