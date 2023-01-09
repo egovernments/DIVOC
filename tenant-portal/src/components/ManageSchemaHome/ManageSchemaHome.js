@@ -86,6 +86,7 @@ const ManageSchemaHome = () => {
             }
             ).catch(error => {
                 console.error(error);
+                setGetSchemaList(true)
                 throw error;
             });
         }) ();
