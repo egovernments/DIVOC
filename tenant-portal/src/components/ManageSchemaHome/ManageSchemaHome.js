@@ -181,7 +181,7 @@ const ManageSchemaHome = () => {
                         schemaPreview &&
                         <div>
                             <BreadcrumbComponent showBreadCrumb={true} />
-                            <TestAndPublish schema={selectedSchema}/>
+                            <TestAndPublish schema={selectedSchema} setSchemaPreview={setschemaPreview}/>
                         </div>
                     }
                 </div>

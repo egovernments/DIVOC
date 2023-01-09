@@ -86,7 +86,7 @@ function ManualSchemaCreationComponent() {
             {
                 schemaPreview &&
                 <div>
-                    <TestAndPublish schema={uploadedSchema}/>
+                    <TestAndPublish schema={uploadedSchema} setSchemaPreview={setSchemaPreview}/>
                 </div>
             }
         </div>

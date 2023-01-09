@@ -12,7 +12,7 @@ import {SAMPLE_TEMPLATE_WITH_QR, SCHEMA_STATUS} from "../../constants";
 const axios = require('axios');
 const isoDatestringValidator = require('iso-datestring-validator')
 
-const TestAndPublish = ({schema}) => {
+const TestAndPublish = ({schema, setSchemaPreview}) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const publish = async () => {
@@ -141,9 +141,9 @@ const TestAndPublish = ({schema}) => {
             <hr />
         <Row gutter='3' xs={1} sm={2} md={3} lg={5} xl={6} className="justify-content-end">
             <Col className="my-1 h-100">
-                <Link to={`${config.urlPath}/manage-schema`} reloadDocument={true} >
+                <div onClick={() => setSchemaPreview(false)} >
                     <GenericButton img='' text={t('testAndPublish.backButton')} variant='outline-primary'/> 
-                </Link>
+                </div>
             </Col>
             <Col className="my-1 h-100">
                 <div onClick={publish}>
