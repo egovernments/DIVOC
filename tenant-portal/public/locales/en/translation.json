@@ -109,7 +109,7 @@
                 "Enter ‘Name of the Schema’ (Eg. Modern medicine permanent registration) and ‘Description’. Then click ‘Save’",
                 "The form builder will open with which you can drag and drop different types of fields to create custom attributes. For eg: If you wish to add an attribute of type ‘number’, drag the card ‘Number’ from the left panel to the blank space on the right side.  You can also add the attributes as a JSON file by clicking on the ‘Upload JSON’ card",
                 "Enter the ‘Label Name, Placeholder, Description, Data, Validation wherever applicable and click Save",
-                "The attribute that you created is populated in the table. If you wish to add acother field, click ‘Add field’. Once all the attributes are added, you can choose to upload the template for the certificate.",
+                "The attribute that you created is populated in the table. If you wish to add another field, click ‘Add field’. Once all the attributes are added, you can choose to upload the template for the certificate.",
                 "Click on ‘Save & Next’  which will take you to the ‘Test & Publish’ screen.",
                 "Next, you can add sample data for the attributes that you created and check the QR code sizing and configuration. Click on ‘Publish’ to create the schema. Once you publish the schema, it cannot be edited"
             ]
@@ -122,7 +122,8 @@
                 "To search for any particular schema, enter the schema name in the search bar",
                 "Clicking on the schema name will open the attributes created for that schema",
                 "You can differentiate between ‘Published Schemas’ and ‘Saved as Draft Schemas’ by the icons next to them.",
-                "‘Published Schemas’ are indicated by —- and ‘Saved as Draft Schemas’ are indicated by — "
+                "‘Published Schemas’ are indicated by ", 
+                " and ‘Saved as Draft Schemas’ are indicated by ", ""
             ]
         }
     },

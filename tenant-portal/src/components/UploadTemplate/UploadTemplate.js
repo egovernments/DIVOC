@@ -29,8 +29,16 @@ function UploadTemplate(props){
         };
         reader.readAsArrayBuffer(e.target.files[0]);
     }
-    
-
+    const getUpdatedSchema = async (osid) => {
+        const userToken = await getToken();
+            return axios.get(`/vc-management/v1/schema/${osid}`, {headers:{"Authorization" :`Bearer ${userToken}`}}).then(res => {
+                props.updateSchema(res?.data?.schemas[0]);
+            }
+            ).catch(error => {
+                console.error(error);
+                throw error;
+            });
+    }
     const saveTemplate = async () => {
         if(!template){
             props.showToast("FAILED");
@@ -48,7 +56,7 @@ function UploadTemplate(props){
                     props.setTemplateUploaded(true);
                     props.showToast("SUCCESS");
                     console.log("Upload template response: ", res.data.templateUpdateResponse);
-                    
+                    getUpdatedSchema(schemaId);
                 }
             }).catch((error) => {
                 props.setTemplateUploaded(false);
@@ -57,9 +65,6 @@ function UploadTemplate(props){
         });
         
         props.setShow(false);
-        setTimeout(() => {
-            window.location.reload();
-        }, 1500);
     }
     return (
         <>

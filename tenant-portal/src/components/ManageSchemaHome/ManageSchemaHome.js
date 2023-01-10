@@ -160,7 +160,7 @@ const ManageSchemaHome = () => {
                                 <li className="pb-2">{t('schemasHomePage.manageSchema.info.1')}</li>
                                 <li className="pb-2">{t('schemasHomePage.manageSchema.info.2')}</li>
                                 <li className="pb-2">{t('schemasHomePage.manageSchema.info.3')}</li>
-                                <li className="pb-2">{t('schemasHomePage.manageSchema.info.4')}</li>
+                                <li className="pb-2">{t('schemasHomePage.manageSchema.info.4')}<img src={PublishedIcon}/> {t('schemasHomePage.manageSchema.info.5')}<img src={DraftIcon}/> {t('schemasHomePage.manageSchema.info.6')}</li>
                             </ol>
 
                         </div>}
