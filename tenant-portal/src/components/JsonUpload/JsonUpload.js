@@ -199,7 +199,7 @@ function JsonUpload() {
             </SchemaAttributes>) || (
             schemaPreview &&  !createAttribute &&
             <div>
-                <TestAndPublish schema={uploadedSchema}/>
+                <TestAndPublish schema={uploadedSchema} setSchemaPreview={setschemaPreview}/>
             </div>) || (
                 createAttribute &&
                 <div>
