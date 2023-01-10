@@ -8,7 +8,7 @@ import config from '../../config.json';
 import { getToken } from '../../utils/keycloak';
 const axios = require('axios');
 
-const ManageTempModal = ({schemaBody, setShowModal, showToast}) => {
+const ManageTempModal = ({schemaBody, setShowModal, showToast,updateSchema}) => {
     var dupSchemaBody = {...schemaBody};
     const [changeSchema, setChangeSchema] = useState(dupSchemaBody);
     var schema = JSON.parse(changeSchema.schema);
@@ -46,6 +46,7 @@ const ManageTempModal = ({schemaBody, setShowModal, showToast}) => {
         .then((res) => {
             if(res?.data) {
                 showToast("DELETE_SUCCESS");
+                updateSchema(requestBody);
             }
         })
         .catch(error => {
@@ -59,10 +60,6 @@ const ManageTempModal = ({schemaBody, setShowModal, showToast}) => {
     const handleClose = () => {
         setShow(false);
         setShowModal(false); 
-        setTimeout(() => {
-            window.location.reload()
-        }, 1500);
-        
     }
     useEffect(() => {
         setDupTemp(JSON.parse(changeSchema.schema)._osConfig?.certificateTemplates)

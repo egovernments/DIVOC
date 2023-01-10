@@ -21,7 +21,7 @@ import {getToken} from '../../utils/keycloak';
 import {CONTEXT_BODY, SAMPLE_TEMPLATE_WITH_QR, SCHEMA_BODY, SCHEMA_STATUS, W3C_CONTEXT} from "../../constants";
 import axios from "axios";
 import uploadIcon from '../../assets/img/Upload.svg';
-function SchemaAttributes({schemaDetails, setschemaPreview, attributes, setUpdatedSchema, createNewFieldInSchema, modifyAttribute}){
+function SchemaAttributes({schemaDetails, setschemaPreview, attributes, setUpdatedSchema, createNewFieldInSchema, modifyAttribute,updateSchema}){
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [show, setShow] = useState(false);
@@ -143,7 +143,7 @@ function SchemaAttributes({schemaDetails, setschemaPreview, attributes, setUpdat
                                 Object.keys(JSON.parse(schemaDetails.schema)._osConfig?.certificateTemplates).length===0? 'd-none': '' } >
                             <div onClick={()=>{setShowModal(true);}}>
                                     <GenericButton text={t('schemaAttributesPage.manageTemplate')} variant="outline-primary border-0" /></div>
-                                {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={schemaDetails} showToast={showToast} />}
+                                {showModal && <ManageTempModal setShowModal={setShowModal} schemaBody={schemaDetails} showToast={showToast} updateSchema={updateSchema} />}
 
                             </Col>
                             <Col>

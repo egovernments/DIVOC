@@ -18,6 +18,7 @@ const axios = require('axios');
 const ManageSchemaHome = () => {
     const { t } = useTranslation();
     const[schemasList, setSchemasList] = useState([]);
+    const [getSchemaList, setGetSchemaList] = useState(false);
     const [schemaPreview, setschemaPreview] = useState(false);
     const [searchSchemaInput, setSearchSchemaInput] = useState('');
     const [schemaClicked, setSchemaClicked] = useState(false);
@@ -68,18 +69,31 @@ const ManageSchemaHome = () => {
                 console.log("Invalid action");
         }
     }
+    const updateSchema = (updatedSchema) => {
+        schemasList.map(schema => {
+            if(schema.name === updatedSchema.name){
+                schema.schema = updatedSchema.schema;
+            }
+        });
+        setSchemasList(schemasList);
+    }
     useEffect(() => {
         (async () =>{
             const userToken = await getToken();
-            return axios.get(`/vc-management/v1/schema`, {headers:{"Authorization" :`Bearer ${userToken}`}}).then(res =>
+            return axios.get(`/vc-management/v1/schema`, {headers:{"Authorization" :`Bearer ${userToken}`}}).then(res => {
                 setSchemasList([...res.data?.schemas])
+                setGetSchemaList(true)
+            }
             ).catch(error => {
                 console.error(error);
+                setGetSchemaList(true)
                 throw error;
             });
         }) ();
     }, [])
-    
+    if (!getSchemaList){
+        return <div>Loading...</div>
+    }
   return (
     <div>
         {
@@ -159,7 +173,8 @@ const ManageSchemaHome = () => {
                                 setUpdatedSchema={schemaAttViewFunc}
                                 attributes={attributes}
                                 modifyAttribute={modifyAttribute}
-                                createNewFieldInSchema={createNewFieldInSchema} />
+                                createNewFieldInSchema={createNewFieldInSchema}
+                                updateSchema = {updateSchema} />
                         }
                         </div>
                     </div>}
