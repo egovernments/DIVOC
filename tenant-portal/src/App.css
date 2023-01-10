@@ -177,6 +177,12 @@ text-align: center;
 color: rgba(137, 131, 131, 1);
 content: "✔";
 }
+.editable-cb[type="checkbox"]:after {
+    border-color: #6493E0 !important;
+}
+.editable-cb[type="checkbox"]:checked:after {
+    color: #6493E0 !important;
+}
 .toast-header {
     border-bottom:none;
 }

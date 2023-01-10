@@ -150,7 +150,7 @@ function SchemaAttributes({schemaDetails, setschemaPreview, attributes, setUpdat
                                 <div onClick={() => setShow(true)}>
                                     <GenericButton img={uploadIcon} text={t('schemaAttributesPage.uploadTemplate')} variant="outline-primary"/>
                                 </div>
-                                <UploadTemplate {...{show, setShow, osid, setTemplateUploaded,showToast}}/>
+                                <UploadTemplate {...{show, setShow, osid, setTemplateUploaded,showToast, updateSchema}}/>
                             </Col>
                         </Row> }
                     </Row>

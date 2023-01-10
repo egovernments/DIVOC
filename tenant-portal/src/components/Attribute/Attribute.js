@@ -47,19 +47,19 @@ function Attribute(props) {
                 }
             </td>
             <td className="text-center table-check-boxes">
-                <input className="custom-cb" type="checkbox" id="mandatoryAttribute" name="mandatoryAttribute"
+                <input className={props.schemaAttribute.editMode ? "custom-cb editable-cb": "custom-cb"} type="checkbox" id="mandatoryAttribute" name="mandatoryAttribute"
                        checked={isMandatory} onChange={(e) => {props.schemaAttribute.editMode ? setIsMandatory(!isMandatory) : e.preventDefault()}}/>
             </td>
             <td className="text-center table-check-boxes">
-                <input className="custom-cb" type="checkbox" id="indexedAttribute" name="indexedAttribute"
+                <input className={props.schemaAttribute.editMode ? "custom-cb editable-cb": "custom-cb"} type="checkbox" id="indexedAttribute" name="indexedAttribute"
                        checked={isIndexField} onChange={(e) => {props.schemaAttribute.editMode ? setIsIndexField(!isIndexField) : e.preventDefault()}}/>
             </td>
             <td className="text-center table-check-boxes">
-                <input className="custom-cb" type="checkbox" id="uniqueAttribute" name="uniqueAttribute"
+                <input className={props.schemaAttribute.editMode ? "custom-cb editable-cb": "custom-cb"} type="checkbox" id="uniqueAttribute" name="uniqueAttribute"
                        checked={isUniqueIndex} onChange={(e) => {props.schemaAttribute.editMode ? setIsUniqueIndex(!isUniqueIndex) : e.preventDefault()}}/>
             </td>
             <td className="text-center table-check-boxes">
-                <input className="custom-cb" type="checkbox" id="identityInformation" name="identityInformation"
+                <input className={props.schemaAttribute.editMode ? "custom-cb editable-cb": "custom-cb"} type="checkbox" id="identityInformation" name="identityInformation"
                        checked={isIdentityInformation}
                        onChange={(e) => {props.schemaAttribute.editMode ? setIsIdentityInformation(!isIdentityInformation) : e.preventDefault()}}/>
             </td>

@@ -13,6 +13,8 @@ const axios = require('axios');
 const isoDatestringValidator = require('iso-datestring-validator')
 
 const TestAndPublish = ({schema, setSchemaPreview}) => {
+    const date =  new Date();
+    const rfcFormat = date.toISOString();
     const { t } = useTranslation();
     const navigate = useNavigate();
     const publish = async () => {
@@ -120,7 +122,7 @@ const TestAndPublish = ({schema, setSchemaPreview}) => {
                 <div className='m-3'>
                     <FormGroup>
                         <FormLabel>{standardizeString(index)}</FormLabel>
-                        <FormControl type='text' name={index} onChange={formInputHandler}/>
+                        <FormControl type='text' name={index} onChange={formInputHandler} placeholder={index==="issuanceDate" ? rfcFormat: ""} />
                         {formErrors[index] && (
                         <p className="text-danger">{formErrors[index]}</p>
                         )}
