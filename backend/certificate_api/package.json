@@ -18,7 +18,7 @@
     "jsonwebtoken": "^8.5.1",
     "jszip": "^3.6.0",
     "kafkajs": "^1.15.0",
-    "node-jose": "^2.0.0",
+    "node-jose": "^2.2.0",
     "puppeteer": "^8.0.0",
     "qrcode": "^1.4.4",
     "redis": "^3.0.2",
