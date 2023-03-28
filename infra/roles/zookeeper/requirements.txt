@@ -3,3 +3,4 @@ docker-py==1.10.6
 flake8==3.5.0
 molecule==2.19.0
 yamllint==1.11.1
+cryptography>=39.0.1 # not directly required, pinned by Snyk to avoid a vulnerability
