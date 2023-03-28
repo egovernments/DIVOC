@@ -230,7 +230,7 @@ services:
         condition: service_started
 
   tenant-portal:
-    image: divoc/tenant-portal:3.5.0-generic
+    image: divoc/vc-tenant-portal:3.5.0-generic
   
   verification-app:
     image: divoc/vc-verification-webapp:3.5.0-generic
