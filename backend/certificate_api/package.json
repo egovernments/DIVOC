@@ -16,7 +16,7 @@
     "handlebars": "^4.7.7",
     "i18n-iso-countries": "6.8.0",
     "jsonwebtoken": "^8.5.1",
-    "jszip": "^3.6.0",
+    "jszip": "^3.8.0",
     "kafkajs": "^1.15.0",
     "node-jose": "^2.0.0",
     "puppeteer": "^8.0.0",
