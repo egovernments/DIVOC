@@ -1,3 +1,4 @@
 docker==3.5.1
 molecule==2.19.0
 pytest==3.9.3
+setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
