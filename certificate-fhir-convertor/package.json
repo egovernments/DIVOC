@@ -22,7 +22,7 @@
     "jszip": "^3.7.1",
     "mustache": "^4.2.0",
     "qrcode": "^1.4.4",
-    "ramda": "^0.27.1",
+    "ramda": "^0.27.2",
     "uuid": "^8.3.2"
   },
   "author": "divoc",
