@@ -1,4 +1,4 @@
 requests
 pytest
 etcd3
-protobuf==3.20.1
+protobuf==3.20.2
