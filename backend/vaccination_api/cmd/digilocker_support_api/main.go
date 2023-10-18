@@ -86,6 +86,7 @@ var vaccineProphylaxis = map[string]string{
 	"sinovac":     "COVID-19 vaccine, inactivated virus",
 	"gemcovac":    "COVID-19 vaccine, mRNA based",
 	"incovacc":    "Covid 19 vaccine, non-replicating viral vector",
+	"gemcovac®-om": "COVID-19 vaccine, mRNA based",
 }
 
 type DoseWiseData struct {

@@ -38,6 +38,9 @@ var vaccineEffectiveDaysInfo = map[string]map[string]int{
     "incovacc": {
         "dueDays": 28,
     },
+    "gemcovac®-om": {
+        "dueDays": 28,
+    },
 }
 
 type Certificate struct {
