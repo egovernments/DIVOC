@@ -14,7 +14,7 @@
   "author": "divoc",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "axios": "^0.27.2",
+    "axios": "^0.28.0",
     "kafkajs": "^2.2.0",
     "ramda": "^0.27.1",
     "redis": "^3.0.2",
