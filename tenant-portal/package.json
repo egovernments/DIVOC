@@ -8,7 +8,7 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "axios": "^0.27.2",
+    "axios": "^0.28.0",
     "bootstrap": "^5.2.1",
     "i18next": "^20.3.5",
     "i18next-browser-languagedetector": "^6.1.2",
