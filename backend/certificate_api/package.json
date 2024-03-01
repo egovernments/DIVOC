@@ -22,7 +22,7 @@
     "puppeteer": "^8.0.0",
     "qrcode": "^1.4.4",
     "redis": "^3.0.2",
-    "sanitize-html": "^2.6.1",
+    "sanitize-html": "^2.12.1",
     "util": "^0.12.4"
   },
   "devDependencies": {
