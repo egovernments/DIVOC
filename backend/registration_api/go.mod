@@ -19,10 +19,10 @@ require (
 	github.com/imroc/req v0.3.0
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jinzhu/configor v1.2.1
-	github.com/lestrrat-go/jwx v1.2.24
+	github.com/lestrrat-go/jwx v1.2.29
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.7.0
-	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2
+	golang.org/x/net v0.21.0
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.5.2
 )
 
